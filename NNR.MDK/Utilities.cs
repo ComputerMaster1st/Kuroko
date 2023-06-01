@@ -1,13 +1,13 @@
 ﻿using Discord;
 using Microsoft.Extensions.DependencyInjection;
-using NewNewRailgun.Core.Attributes;
+using NNR.MDK.Attributes;
 using System.Collections;
 
-namespace NewNewRailgun
+namespace NNR.MDK
 {
     public class Utilities
     {
-        private static readonly string LOG_DIRECTORY = $"{VirtualVolume.VIRT_DATA_DIRECTORY}/logs";
+        private static readonly string LOG_DIRECTORY = "logs";
         private static readonly SemaphoreSlim _logLock = new(1);
 
         public const string SeparatorCharacter = "⬤";

@@ -1,4 +1,4 @@
-﻿namespace NewNewRailgun
+﻿namespace NNR.MDK
 {
     public abstract class LogHeader
     {
