@@ -7,7 +7,6 @@ namespace NNR.MDK
 {
     public class Utilities
     {
-        private static readonly string LOG_DIRECTORY = "logs";
         private static readonly SemaphoreSlim _logLock = new(1);
 
         public const string SeparatorCharacter = "⬤";
@@ -16,13 +15,13 @@ namespace NNR.MDK
         {
             await _logLock.WaitAsync();
 
-            if (!Directory.Exists(LOG_DIRECTORY))
-                Directory.CreateDirectory(LOG_DIRECTORY);
+            if (!Directory.Exists(DataDirectories.LOG))
+                Directory.CreateDirectory(DataDirectories.LOG);
 
             try
             {
                 await File.AppendAllTextAsync(string.Format("{0}/{1}.log",
-                    LOG_DIRECTORY,
+                    DataDirectories.LOG,
                     DateTime.Today.ToString("yyyy_MM_dd")),
                     message + Environment.NewLine);
             }
