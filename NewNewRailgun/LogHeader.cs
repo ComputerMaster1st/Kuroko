@@ -1,6 +1,6 @@
 ﻿namespace NewNewRailgun
 {
-    public static class LogHeader
+    public abstract class LogHeader
     {
         public const string SYSTEM = "SYSTEM";
     }
