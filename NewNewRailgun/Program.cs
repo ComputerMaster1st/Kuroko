@@ -1,2 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using Discord;
+using NewNewRailgun;
+
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, "SYSTEM", "Now Starting New New Railgun. Please wait a few minutes to boot the operating system..."));
