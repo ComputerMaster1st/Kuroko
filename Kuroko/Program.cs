@@ -7,6 +7,7 @@ using Kuroko.Core.Configuration;
 using Kuroko.MDK;
 using Kuroko.MDK.Attributes;
 using Microsoft.Extensions.DependencyInjection;
+using System.Text;
 
 internal class Program
 {
@@ -91,10 +92,71 @@ internal class Program
 
     private static async Task StartAndWaitConsoleAsync()
     {
-        while (true)
-        {
+        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "For console commands, type \"help\" or press \"return\" key!"));
 
+        string output;
+        bool shutdownNow = false;
+        while (!shutdownNow)
+        {
+            var input = Console.ReadLine();
+            switch (input ?? string.Empty)
+            {
+                case "discordStats":
+                    output = new StringBuilder()
+                        .AppendFormat("Shard Count  : {0}", _discordClient.Shards.Count).AppendLine()
+                        .AppendFormat("Guild Count  : {0}", _discordClient.Guilds.Count).AppendLine()
+                        .AppendFormat("Latency (ms) : {0}", _discordClient.Latency).AppendLine()
+                        .ToString();
+                    break;
+                case "reloadModules":
+                    output = new StringBuilder()
+                        .AppendLine("Not Yet Implemented!")
+                        .ToString();
+                    break;
+                case "addModule":
+                    output = new StringBuilder()
+                        .AppendLine("Not Yet Implemented!")
+                        .ToString();
+                    break;
+                case "removeModule":
+                    output = new StringBuilder()
+                        .AppendLine("Not Yet Implemented!")
+                        .ToString();
+                    break;
+                case "shutdown":
+                    output = new StringBuilder()
+                        .AppendLine("Shutting down now... Goodbye!")
+                        .ToString();
+                    shutdownNow = true;
+                    break;
+                case "":
+                case "help":
+                    output = new StringBuilder()
+                        .AppendLine("help          - Show all available commands")
+                        .AppendLine("discordStats  - Show discord shard, guild & latency")
+                        .AppendLine("reloadModules - Reload all modules")
+                        .AppendLine("addModule     - Install a module")
+                        .AppendLine("removeModule  - Remove a module")
+                        .AppendLine("shutdown      - Stop & shutdown")
+                        .ToString();
+                    break;
+                default:
+                    output = "Unknown console command!";
+                    break;
+            };
+            Console.WriteLine(output);
         }
+
+        //await _discordClient.SetStatusAsync(UserStatus.DoNotDisturb);
+        //await _discordClient.SetGameAsync("Shutting down...");
+        //await _discordClient.StopAsync();
+        //await _discordClient.LogoutAsync();
+
+        _moduleLoader.UnloadAllModules(_serviceCollection, _serviceProvider, _interactionService);
+        _interactionService.Dispose();
+        _discordClient.Dispose();
+
+        Environment.Exit(0);
     }
 
     private static async Task Main()
