@@ -6,7 +6,7 @@ using NNR.MDK.Attributes;
 namespace NNR.CoreModule.Events
 {
     [PreInitialize]
-    public class DiscordLogEvent
+    public class DiscordLogEvent : NnrEvent
     {
         private readonly DiscordShardedClient _client;
 
@@ -16,10 +16,8 @@ namespace NNR.CoreModule.Events
             _client.Log += LogEvent;
         }
 
-        public void Unload()
-        {
-            _client.Log -= LogEvent;
-        }
+        public override void Unload()
+            => _client.Log -= LogEvent;
 
         private Task LogEvent(LogMessage logMessage)
             => Utilities.WriteLogAsync(logMessage);
