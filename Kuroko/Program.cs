@@ -1,12 +1,12 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Kuroko;
+using Kuroko.Core;
+using Kuroko.Core.Configuration;
 using Kuroko.MDK;
 using Kuroko.MDK.Attributes;
 using Microsoft.Extensions.DependencyInjection;
-using NewNewRailgun;
-using NewNewRailgun.Core;
-using NewNewRailgun.Core.Configuration;
 
 #region Load Configurations
 
