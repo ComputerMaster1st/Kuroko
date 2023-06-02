@@ -25,7 +25,7 @@ namespace Kuroko
 
                 if (moduleSetupType is null)
                 {
-                    await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"Failed to load: {moduleAssembly.FullName}! Missing \"INnrModule\". Contact Module Developer!"));
+                    await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"Failed to load: {moduleAssembly.FullName}! Missing \"KurokoModule\". Contact Module Developer!"));
 
                     moduleAssemblyContext.Unload();
                     continue;
@@ -62,6 +62,12 @@ namespace Kuroko
                 count += module.EventCount;
 
             return count;
+        }
+
+        public void UnloadAllModules(IServiceCollection serviceCollection, IServiceProvider serviceProvider, InteractionService interactionService)
+        {
+            foreach (var module in _modules)
+                module.UnloadModule(serviceCollection, serviceProvider, interactionService);
         }
     }
 }
