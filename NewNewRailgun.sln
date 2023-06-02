@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewNewRailgun", "NewNewRail
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NNR.MDK", "NNR.MDK\NNR.MDK.csproj", "{FF131B7C-A92C-4756-872D-15D7DC82DBC0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NNR.CoreModule", "NNR.CoreModule\NNR.CoreModule.csproj", "{713F6CF4-52A6-40F4-9E4D-C7C985996FD3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{FF131B7C-A92C-4756-872D-15D7DC82DBC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF131B7C-A92C-4756-872D-15D7DC82DBC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF131B7C-A92C-4756-872D-15D7DC82DBC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{713F6CF4-52A6-40F4-9E4D-C7C985996FD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{713F6CF4-52A6-40F4-9E4D-C7C985996FD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{713F6CF4-52A6-40F4-9E4D-C7C985996FD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{713F6CF4-52A6-40F4-9E4D-C7C985996FD3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
