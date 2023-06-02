@@ -4,5 +4,6 @@
     {
         public const string LOG = "logs";
         public const string CONFIG = "config";
+        public const string MODULES = "modules";
     }
 }
