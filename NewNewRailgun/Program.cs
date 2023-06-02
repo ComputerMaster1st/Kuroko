@@ -74,15 +74,17 @@ Utilities.PreloadServices(serviceCollection, serviceProvider);
 
 #endregion
 
-#region Start "New New Railgun"
+Console.ReadLine();
 
-await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "Setup Completed! Beginning connection to Discord..."));
+//#region Start "New New Railgun"
 
-await discordClient.LoginAsync(TokenType.Bot, discordConfig.Token);
-await discordClient.StartAsync();
-await discordClient.SetStatusAsync(UserStatus.DoNotDisturb);
-await discordClient.SetGameAsync("Booting...");
+//await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "Setup Completed! Beginning connection to Discord..."));
 
-await Task.Delay(Timeout.Infinite);
+//await discordClient.LoginAsync(TokenType.Bot, discordConfig.Token);
+//await discordClient.StartAsync();
+//await discordClient.SetStatusAsync(UserStatus.DoNotDisturb);
+//await discordClient.SetGameAsync("Booting...");
 
-#endregion
+//await Task.Delay(Timeout.Infinite);
+
+//#endregion
