@@ -2,9 +2,9 @@
 
 namespace NNR.MDK.Configuration
 {
-    public abstract class BaseConfig<TConfig> where TConfig : class, IConfig
+    public abstract class BaseConfig
     {
-        protected async Task<TConfig> LoadAsync(string filePath)
+        protected static async Task<IConfig> BaseLoadAsync<TConfig>(string filePath) where TConfig : class, IConfig
         {
             if (File.Exists(filePath))
                 return JsonConvert.DeserializeObject<TConfig>(
@@ -16,7 +16,7 @@ namespace NNR.MDK.Configuration
             return null;
         }
 
-        protected Task SaveAsync(string filePath)
-            => File.WriteAllTextAsync(filePath, JsonConvert.SerializeObject(this, Formatting.Indented));
+        protected static Task BaseSaveAsync<TConfig>(string filePath, TConfig config) where TConfig : class, IConfig
+            => File.WriteAllTextAsync(filePath, JsonConvert.SerializeObject(config, Formatting.Indented));
     }
 }

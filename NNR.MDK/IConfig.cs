@@ -2,8 +2,6 @@
 {
     public interface IConfig
     {
-        Task LoadAsync();
-
         Task SaveAsync();
     }
 }

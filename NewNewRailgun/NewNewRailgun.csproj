@@ -16,8 +16,4 @@
     <ProjectReference Include="..\NNR.MDK\NNR.MDK.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Core\Configuration\" />
-  </ItemGroup>
-
 </Project>
