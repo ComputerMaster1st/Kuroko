@@ -41,7 +41,7 @@ InteractionService interactionService = new(discordClient, new()
     UseCompiledLambda = true
 });
 
-ServiceCollection serviceCollection = new();
+IServiceCollection serviceCollection = new ServiceCollection();
 
 serviceCollection.AddSingleton(discordConfig)
 .AddSingleton(discordClient)
@@ -55,14 +55,21 @@ await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MOD
 
 ModuleLoader moduleLoader = new();
 int moduleCount = await moduleLoader.ScanForModulesAsync();
-
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"{moduleCount} modules found!"));
+
+moduleLoader.RegisterModuleDependencies(ref serviceCollection);
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, "Loaded module dependencies!"));
 
 #endregion
 
 #region Finalize Loading
 
 IServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
+
+moduleLoader.RegisterModuleCommands(interactionService, serviceProvider);
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, "Loaded module commands!"));
+
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "Initializing services..."));
 Utilities.PreloadServices(serviceCollection, serviceProvider);
 
 #endregion
