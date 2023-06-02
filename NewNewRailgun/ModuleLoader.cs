@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.Interactions;
 using Microsoft.Extensions.DependencyInjection;
 using NewNewRailgun.Core;
 using NNR.MDK;
@@ -52,6 +53,12 @@ namespace NewNewRailgun
                     Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"{module.ModuleName} <> No dependencies to inject.")).GetAwaiter();
                 }
             }
+        }
+
+        public void RegisterModuleCommands(InteractionService interactionService, IServiceProvider serviceProvider)
+        {
+            foreach (var module in _moduleAssemblies)
+                interactionService.AddModulesAsync(module, serviceProvider);
         }
     }
 }
