@@ -10,7 +10,7 @@ namespace NNR.CoreModule
         public string ModuleCodeName => "NNR_CORE";
         public string ModuleDescription => "Contains primary events and basic commands.";
 
-        public void RegisterToDependencyInjection(ref IServiceCollection serviceCollection)
+        public void RegisterToDependencyInjection(IServiceCollection serviceCollection)
         {
             serviceCollection.AddSingleton<DiscordLogEvent>();
         }
