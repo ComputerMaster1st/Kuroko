@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Microsoft.Extensions.DependencyInjection;
 using NewNewRailgun.Core;
 using NNR.MDK;
 using System.Reflection;
@@ -36,6 +37,21 @@ namespace NewNewRailgun
             }
 
             return _moduleAssemblies.Count;
+        }
+
+        public void RegisterModuleDependencies(ref IServiceCollection serviceCollection)
+        {
+            foreach (var module in _modules)
+            {
+                try
+                {
+                    module.RegisterToDependencyInjection(ref serviceCollection);
+                }
+                catch (NotImplementedException)
+                {
+                    Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"{module.ModuleName} <> No dependencies to inject.")).GetAwaiter();
+                }
+            }
         }
     }
 }
