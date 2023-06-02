@@ -7,6 +7,7 @@ using NewNewRailgun.Core;
 using NewNewRailgun.Core.Configuration;
 using NNR.MDK;
 using NNR.MDK.Attributes;
+using System.Text;
 
 #region Load Configurations
 
@@ -59,7 +60,7 @@ int moduleCount = await moduleLoader.ScanForModulesAsync();
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"{moduleCount} modules found!"));
 
 moduleLoader.RegisterModuleDependencies(serviceCollection);
-await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, "Loaded module dependencies!"));
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"Loaded {serviceCollection.Count - 3} dependencies from modules!"));
 
 #endregion
 
@@ -68,7 +69,14 @@ await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MOD
 IServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
 
 moduleLoader.RegisterModuleCommands(interactionService, serviceProvider);
-await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, "Loaded module commands!"));
+
+var output = new StringBuilder()
+    .AppendFormat("SLASH COMMANDS     : {0}/100", interactionService.SlashCommands.Count).AppendLine()
+    .AppendFormat("MODAL COMMANDS     : {0}", interactionService.ModalCommands.Count).AppendLine()
+    .AppendFormat("COMPONENT COMMANDS : {0}", interactionService.ComponentCommands.Count).AppendLine()
+    .AppendFormat("TEXT COMMANDS      : {0}", interactionService.ContextCommands.Count).AppendLine();
+
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, output.ToString()));
 
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "Initializing services..."));
 
