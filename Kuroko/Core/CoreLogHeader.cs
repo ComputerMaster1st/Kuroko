@@ -1,6 +1,6 @@
-﻿using NNR.MDK;
+﻿using Kuroko.MDK;
 
-namespace NewNewRailgun.Core
+namespace Kuroko.Core
 {
     internal class CoreLogHeader : LogHeader
     {

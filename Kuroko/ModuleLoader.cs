@@ -1,12 +1,11 @@
 ﻿using Discord;
 using Discord.Interactions;
+using Kuroko.Core;
+using Kuroko.MDK;
 using Microsoft.Extensions.DependencyInjection;
-using NewNewRailgun.Core;
-using NNR.MDK;
-using System.Reflection;
 using System.Runtime.Loader;
 
-namespace NewNewRailgun
+namespace Kuroko
 {
     internal class ModuleLoader
     {
@@ -21,7 +20,7 @@ namespace NewNewRailgun
 
                 var moduleAssembly = moduleAssemblyContext.Assemblies.First();
                 var moduleSetupType = moduleAssembly.GetTypes()
-                    .Where(typeof(NnrModule).IsAssignableFrom)
+                    .Where(typeof(KurokoModule).IsAssignableFrom)
                     .FirstOrDefault();
 
                 if (moduleSetupType is null)
@@ -32,7 +31,7 @@ namespace NewNewRailgun
                     continue;
                 }
 
-                var module = Activator.CreateInstance(moduleSetupType) as NnrModule;
+                var module = Activator.CreateInstance(moduleSetupType) as KurokoModule;
                 var moduleContext = new ModuleContext(moduleAssemblyContext, module);
 
                 _modules.Add(moduleContext);

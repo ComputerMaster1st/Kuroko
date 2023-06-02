@@ -1,6 +1,6 @@
 ﻿using Discord;
 
-namespace NNR.MDK
+namespace Kuroko.MDK
 {
     public class Utilities
     {

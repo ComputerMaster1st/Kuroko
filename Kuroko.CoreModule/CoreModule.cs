@@ -1,13 +1,13 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using NNR.CoreModule.Events;
-using NNR.MDK;
+﻿using Kuroko.CoreModule.Events;
+using Kuroko.MDK;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace NNR.CoreModule
+namespace Kuroko.CoreModule
 {
-    public class CoreModule : NnrModule
+    public class CoreModule : KurokoModule
     {
-        public override string ModuleName => "New New Railgun: Core Module";
-        public override string ModuleCodeName => "NNR_CORE";
+        public override string ModuleName => "Kuroko: Core Module";
+        public override string ModuleCodeName => "KUROKO_CORE";
         public override string ModuleDescription => "Contains primary events and basic commands.";
 
         public override void RegisterToDependencyInjection(IServiceCollection serviceCollection)

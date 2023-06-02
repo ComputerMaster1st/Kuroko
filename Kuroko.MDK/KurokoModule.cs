@@ -1,9 +1,9 @@
 ﻿using Discord.Interactions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace NNR.MDK
+namespace Kuroko.MDK
 {
-    public abstract class NnrModule
+    public abstract class KurokoModule
     {
         public abstract string ModuleName { get; }
         public abstract string ModuleCodeName { get; }

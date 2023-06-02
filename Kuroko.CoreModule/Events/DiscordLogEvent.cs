@@ -1,12 +1,12 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using NNR.MDK;
-using NNR.MDK.Attributes;
+using Kuroko.MDK;
+using Kuroko.MDK.Attributes;
 
-namespace NNR.CoreModule.Events
+namespace Kuroko.CoreModule.Events
 {
-    [NnrEvent]
-    public class DiscordLogEvent : NnrEvent
+    [KurokoEvent]
+    public class DiscordLogEvent : KurokoEvent
     {
         private readonly DiscordShardedClient _client;
 
@@ -19,7 +19,7 @@ namespace NNR.CoreModule.Events
         public override void Unload()
             => _client.Log -= LogEvent;
 
-        [NnrEvent]
+        [KurokoEvent]
         public static Task LogEvent(LogMessage logMessage)
             => Utilities.WriteLogAsync(logMessage);
     }

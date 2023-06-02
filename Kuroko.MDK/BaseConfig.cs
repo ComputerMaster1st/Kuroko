@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace NNR.MDK.Configuration
+namespace Kuroko.MDK.Configuration
 {
     public abstract class BaseConfig
     {

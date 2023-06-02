@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
-using NNR.MDK;
-using NNR.MDK.Configuration;
+﻿using Kuroko.MDK;
+using Kuroko.MDK.Configuration;
+using Newtonsoft.Json;
 
-namespace NewNewRailgun.Core.Configuration
+namespace Kuroko.Core.Configuration
 {
     internal class NnrDiscordConfig : BaseConfig, IConfig
     {

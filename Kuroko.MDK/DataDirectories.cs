@@ -1,4 +1,4 @@
-﻿namespace NNR.MDK
+﻿namespace Kuroko.MDK
 {
     public static class DataDirectories
     {

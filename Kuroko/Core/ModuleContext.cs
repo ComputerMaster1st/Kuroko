@@ -1,11 +1,11 @@
 ﻿using Discord.Interactions;
+using Kuroko.MDK;
+using Kuroko.MDK.Attributes;
 using Microsoft.Extensions.DependencyInjection;
-using NNR.MDK;
-using NNR.MDK.Attributes;
 using System.Reflection;
 using System.Runtime.Loader;
 
-namespace NewNewRailgun.Core
+namespace Kuroko.Core
 {
     internal class ModuleContext
     {
@@ -13,7 +13,7 @@ namespace NewNewRailgun.Core
 
         public string CodeName { get; }
 
-        public NnrModule Module { get; }
+        public KurokoModule Module { get; }
 
         public Assembly Assembly
         {
@@ -29,12 +29,12 @@ namespace NewNewRailgun.Core
             {
                 return Assembly.GetTypes()
                     .SelectMany(x => x.GetMethods())
-                    .Where(y => y.GetCustomAttributes(typeof(NnrEventAttribute), false).Length > 0)
+                    .Where(y => y.GetCustomAttributes(typeof(KurokoEventAttribute), false).Length > 0)
                     .Count();
             }
         }
 
-        public ModuleContext(AssemblyLoadContext assemblyContext, NnrModule module)
+        public ModuleContext(AssemblyLoadContext assemblyContext, KurokoModule module)
         {
             _assemblyContext = assemblyContext;
 

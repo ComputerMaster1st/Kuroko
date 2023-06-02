@@ -1,4 +1,4 @@
-﻿namespace NNR.MDK.Configuration
+﻿namespace Kuroko.MDK.Configuration
 {
     public interface IConfig
     {
