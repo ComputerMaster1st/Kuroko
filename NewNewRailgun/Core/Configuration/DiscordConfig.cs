@@ -4,7 +4,7 @@ using NNR.MDK.Configuration;
 
 namespace NewNewRailgun.Core.Configuration
 {
-    internal class DiscordConfig : BaseConfig, IConfig
+    internal class NnrDiscordConfig : BaseConfig, IConfig
     {
         [JsonIgnore]
         private const string FILEPATH = $"{DataDirectories.CONFIG}/nnr_discord_config.json";
@@ -21,9 +21,9 @@ namespace NewNewRailgun.Core.Configuration
         [JsonProperty]
         public List<ulong> BotAdminUserIds { get; private set; } = new();
 
-        public static async Task<DiscordConfig> LoadAsync()
+        public static async Task<NnrDiscordConfig> LoadAsync()
         {
-            return await BaseLoadAsync<DiscordConfig>(FILEPATH) as DiscordConfig;
+            return await BaseLoadAsync<NnrDiscordConfig>(FILEPATH) as NnrDiscordConfig;
         }
 
         public Task SaveAsync()
