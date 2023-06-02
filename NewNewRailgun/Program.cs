@@ -83,6 +83,8 @@ foreach (ServiceDescriptor service in serviceCollection)
     serviceProvider.GetService(service.ImplementationType);
 }
 
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "Service initialization completed!"));
+
 #endregion
 
 Console.ReadLine();
