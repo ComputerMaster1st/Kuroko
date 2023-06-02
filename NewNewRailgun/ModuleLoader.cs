@@ -12,19 +12,18 @@ namespace NewNewRailgun
 
         public async Task<int> ScanForModulesAsync()
         {
-            var iModuleType = typeof(INnrModule);
 
             foreach (var dll in Directory.GetFiles(DataDirectories.MODULES))
             {
                 var moduleDll = Assembly.LoadFile(dll);
 
                 var moduleSetupType = moduleDll.GetTypes()
-                    .Where(iModuleType.IsAssignableFrom)
+                    .Where(typeof(INnrModule).IsAssignableFrom)
                     .FirstOrDefault();
 
                 if (moduleSetupType is null)
                 {
-                    await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, $"Failed to load: {moduleDll.FullName}! Missing \"INnrModule\". Contact Module Developer!"));
+                    await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"Failed to load: {moduleDll.FullName}! Missing \"INnrModule\". Contact Module Developer!"));
                     continue;
                 }
 
@@ -33,7 +32,7 @@ namespace NewNewRailgun
                 _modules.Add(module);
                 _moduleAssemblies.Add(moduleDll);
 
-                await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, $"Found: {module.ModuleName}"));
+                await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"Found: {module.ModuleName}"));
             }
 
             return _moduleAssemblies.Count;
