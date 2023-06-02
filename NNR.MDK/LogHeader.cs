@@ -2,6 +2,6 @@
 {
     public abstract class LogHeader
     {
-        public const string SYSTEM = "SYSTEM";
+        public const string UNKNOWN = "UNKNOWN";
     }
 }

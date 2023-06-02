@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Microsoft.Extensions.DependencyInjection;
+using NewNewRailgun.Core;
 using NNR.MDK;
 using System.Reflection;
 
@@ -17,7 +18,7 @@ namespace NewNewRailgun
 
                 _modules.Add(module);
 
-                await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "Found: " + module.FullName));
+                await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "Found: " + module.FullName));
             }
 
             return _modules.Count;

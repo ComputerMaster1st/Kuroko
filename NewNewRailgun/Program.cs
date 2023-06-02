@@ -2,6 +2,7 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using NewNewRailgun.Core;
 using NewNewRailgun.Core.Configuration;
 using NNR.MDK;
 
@@ -9,13 +10,13 @@ using NNR.MDK;
 
 DataDirectories.CreateDirectories();
 
-await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "Now Starting New New Railgun. Please wait a few minutes to boot the operating system..."));
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "Now Starting New New Railgun. Please wait a few minutes to boot the operating system..."));
 
 NnrDiscordConfig discordConfig = await NnrDiscordConfig.LoadAsync();
 
 if (discordConfig is null)
 {
-    await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "New \"nnr_discord_config.json\" file has been generated! Please fill this in before restarting the bot!"));
+    await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "New \"nnr_discord_config.json\" file has been generated! Please fill this in before restarting the bot!"));
     return;
 }
 
@@ -51,16 +52,16 @@ serviceCollection.AddSingleton(discordConfig)
 
 int moduleCount = 0;
 
-await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "Checking modules directory..."));
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, "Checking modules directory..."));
 
 
-await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, $"{moduleCount} modules found!"));
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"{moduleCount} modules found!"));
 
 #endregion
 
 #region Start "New New Railgun"
 
-await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "Setup Completed! Beginning connection to Discord..."));
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "Setup Completed! Beginning connection to Discord..."));
 
 await discordClient.LoginAsync(TokenType.Bot, discordConfig.Token);
 await discordClient.StartAsync();

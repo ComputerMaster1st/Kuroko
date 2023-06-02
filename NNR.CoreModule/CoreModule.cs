@@ -6,7 +6,7 @@ namespace NNR.CoreModule
 {
     public class CoreModule : INnrModule
     {
-        public void RegisterToDependencyInjection(IServiceCollection serviceCollection)
+        public void RegisterToDependencyInjection(ref IServiceCollection serviceCollection)
         {
             serviceCollection.AddSingleton<DiscordLogEvent>();
         }
