@@ -1,6 +1,7 @@
 ﻿using Discord.Interactions;
 using Microsoft.Extensions.DependencyInjection;
 using NNR.MDK;
+using NNR.MDK.Attributes;
 using System.Reflection;
 using System.Runtime.Loader;
 
@@ -19,6 +20,17 @@ namespace NewNewRailgun.Core
             get
             {
                 return _assemblyContext.Assemblies.FirstOrDefault();
+            }
+        }
+
+        public int EventCount
+        {
+            get
+            {
+                return Assembly.GetTypes()
+                    .SelectMany(x => x.GetMethods())
+                    .Where(y => y.GetCustomAttributes(typeof(NnrEventAttribute), false).Length > 0)
+                    .Count();
             }
         }
 

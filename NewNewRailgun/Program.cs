@@ -7,7 +7,6 @@ using NewNewRailgun.Core;
 using NewNewRailgun.Core.Configuration;
 using NNR.MDK;
 using NNR.MDK.Attributes;
-using System.Text;
 
 #region Load Configurations
 
@@ -70,19 +69,17 @@ IServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
 
 moduleLoader.RegisterModuleCommands(interactionService, serviceProvider);
 
-var output = new StringBuilder()
-    .AppendFormat("SLASH COMMANDS     : {0}/100", interactionService.SlashCommands.Count).AppendLine()
-    .AppendFormat("MODAL COMMANDS     : {0}", interactionService.ModalCommands.Count).AppendLine()
-    .AppendFormat("COMPONENT COMMANDS : {0}", interactionService.ComponentCommands.Count).AppendLine()
-    .AppendFormat("TEXT COMMANDS      : {0}", interactionService.ContextCommands.Count).AppendLine();
-
-await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, output.ToString()));
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"EVENTS             : {moduleLoader.CountEventsLoaded()}"));
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"SLASH COMMANDS     : {interactionService.SlashCommands.Count}/100"));
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"MODAL COMMANDS     : {interactionService.ModalCommands.Count}"));
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"COMPONENT COMMANDS : {interactionService.ComponentCommands.Count}"));
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"TEXT COMMANDS      : {interactionService.ContextCommands.Count}"));
 
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "Initializing services..."));
 
 foreach (ServiceDescriptor service in serviceCollection)
 {
-    if (service.ServiceType.GetCustomAttributes(typeof(PreInitialize), false) is null)
+    if (service.ServiceType.GetCustomAttributes(typeof(PreInitializeAttribute), false) is null)
         continue;
 
     if (service.ImplementationType is null)

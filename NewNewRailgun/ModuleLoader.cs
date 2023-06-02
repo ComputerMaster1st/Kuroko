@@ -54,5 +54,15 @@ namespace NewNewRailgun
             foreach (var module in _modules)
                 module.LoadModuleCommands(interactionService, serviceProvider);
         }
+
+        public int CountEventsLoaded()
+        {
+            var count = 0;
+
+            foreach (var module in _modules)
+                count += module.EventCount;
+
+            return count;
+        }
     }
 }
