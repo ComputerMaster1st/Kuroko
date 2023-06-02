@@ -2,6 +2,7 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using NewNewRailgun;
 using NewNewRailgun.Core;
 using NewNewRailgun.Core.Configuration;
 using NNR.MDK;
@@ -50,12 +51,19 @@ serviceCollection.AddSingleton(discordConfig)
 
 #region Find & Load Modules
 
-int moduleCount = 0;
-
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, "Checking modules directory..."));
 
+ModuleLoader moduleLoader = new();
+int moduleCount = await moduleLoader.ScanForModulesAsync();
 
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"{moduleCount} modules found!"));
+
+#endregion
+
+#region Finalize Loading
+
+IServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
+Utilities.PreloadServices(serviceCollection, serviceProvider);
 
 #endregion
 
