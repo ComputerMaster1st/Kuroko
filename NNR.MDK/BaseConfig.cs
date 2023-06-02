@@ -17,11 +17,6 @@ namespace NNR.MDK.Configuration
         }
 
         protected static Task BaseSaveAsync<TConfig>(string filePath, TConfig config) where TConfig : class, IConfig
-        {
-            if (!Directory.Exists(DataDirectories.CONFIG))
-                Directory.CreateDirectory(DataDirectories.CONFIG);
-
-            return File.WriteAllTextAsync(filePath, JsonConvert.SerializeObject(config, Formatting.Indented));
-        }
+            => File.WriteAllTextAsync(filePath, JsonConvert.SerializeObject(config, Formatting.Indented));
     }
 }

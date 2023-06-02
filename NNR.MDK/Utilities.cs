@@ -15,9 +15,6 @@ namespace NNR.MDK
         {
             await _logLock.WaitAsync();
 
-            if (!Directory.Exists(DataDirectories.LOG))
-                Directory.CreateDirectory(DataDirectories.LOG);
-
             try
             {
                 await File.AppendAllTextAsync(string.Format("{0}/{1}.log",
