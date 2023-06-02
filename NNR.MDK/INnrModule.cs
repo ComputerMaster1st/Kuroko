@@ -8,6 +8,6 @@ namespace NNR.MDK
         string ModuleCodeName { get; }
         string ModuleDescription { get; }
 
-        void RegisterToDependencyInjection(ref IServiceCollection serviceCollection);
+        void RegisterToDependencyInjection(IServiceCollection serviceCollection);
     }
 }

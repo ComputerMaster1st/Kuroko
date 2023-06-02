@@ -57,7 +57,7 @@ ModuleLoader moduleLoader = new();
 int moduleCount = await moduleLoader.ScanForModulesAsync();
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"{moduleCount} modules found!"));
 
-moduleLoader.RegisterModuleDependencies(ref serviceCollection);
+moduleLoader.RegisterModuleDependencies(serviceCollection);
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, "Loaded module dependencies!"));
 
 #endregion
