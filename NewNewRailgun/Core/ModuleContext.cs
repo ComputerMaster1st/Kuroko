@@ -18,7 +18,7 @@ namespace NewNewRailgun.Core
         {
             get
             {
-                return _assemblyContext.Assemblies.First();
+                return _assemblyContext.Assemblies.FirstOrDefault();
             }
         }
 
@@ -38,8 +38,9 @@ namespace NewNewRailgun.Core
             interactionService.AddModulesAsync(Assembly, serviceProvider);
         }
 
-        public void UnloadModule(IServiceCollection serviceCollection, IServiceProvider serviceProvider)
+        public void UnloadModule(IServiceCollection serviceCollection, IServiceProvider serviceProvider, InteractionService interactionService)
         {
+            Module.UnloadCommands(interactionService);
             Module.UnloadEvents(serviceProvider);
             Module.UnregisterFromDependencyInjection(serviceCollection);
 
