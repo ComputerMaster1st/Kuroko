@@ -6,6 +6,7 @@ using NewNewRailgun;
 using NewNewRailgun.Core;
 using NewNewRailgun.Core.Configuration;
 using NNR.MDK;
+using NNR.MDK.Attributes;
 
 #region Load Configurations
 
@@ -70,7 +71,17 @@ moduleLoader.RegisterModuleCommands(interactionService, serviceProvider);
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, "Loaded module commands!"));
 
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "Initializing services..."));
-Utilities.PreloadServices(serviceCollection, serviceProvider);
+
+foreach (ServiceDescriptor service in serviceCollection)
+{
+    if (service.ServiceType.GetCustomAttributes(typeof(PreInitialize), false) is null)
+        continue;
+
+    if (service.ImplementationType is null)
+        continue;
+
+    serviceProvider.GetService(service.ImplementationType);
+}
 
 #endregion
 

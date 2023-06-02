@@ -1,7 +1,4 @@
 ﻿using Discord;
-using Microsoft.Extensions.DependencyInjection;
-using NNR.MDK.Attributes;
-using System.Collections;
 
 namespace NNR.MDK
 {
@@ -28,20 +25,6 @@ namespace NNR.MDK
             }
 
             Console.WriteLine(message);
-        }
-
-        public static void PreloadServices(IEnumerable collection, IServiceProvider services)
-        {
-            foreach (ServiceDescriptor service in collection)
-            {
-                if (service.ServiceType.GetCustomAttributes(typeof(PreInitialize), false) is null)
-                    continue;
-
-                if (service.ImplementationType is null)
-                    continue;
-
-                services.GetService(service.ImplementationType);
-            }
         }
     }
 }
