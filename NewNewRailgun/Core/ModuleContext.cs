@@ -1,4 +1,6 @@
-﻿using NNR.MDK;
+﻿using Discord.Interactions;
+using Microsoft.Extensions.DependencyInjection;
+using NNR.MDK;
 using System.Reflection;
 using System.Runtime.Loader;
 
@@ -10,7 +12,7 @@ namespace NewNewRailgun.Core
 
         public string CodeName { get; }
 
-        public INnrModule Module { get; }
+        public NnrModule Module { get; }
 
         public Assembly Assembly
         {
@@ -20,12 +22,28 @@ namespace NewNewRailgun.Core
             }
         }
 
-        public ModuleContext(AssemblyLoadContext assemblyContext, INnrModule module)
+        public ModuleContext(AssemblyLoadContext assemblyContext, NnrModule module)
         {
             _assemblyContext = assemblyContext;
 
             Module = module;
             CodeName = module.ModuleCodeName;
+        }
+
+        public void LoadModuleDependencies(IServiceCollection serviceCollection)
+            => Module.RegisterToDependencyInjection(serviceCollection);
+
+        public void LoadModuleCommands(InteractionService interactionService, IServiceProvider serviceProvider)
+        {
+            interactionService.AddModulesAsync(Assembly, serviceProvider);
+        }
+
+        public void UnloadModule(IServiceCollection serviceCollection, IServiceProvider serviceProvider)
+        {
+            Module.UnloadEvents(serviceProvider);
+            Module.UnregisterFromDependencyInjection(serviceCollection);
+
+            _assemblyContext.Unload();
         }
     }
 }

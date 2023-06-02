@@ -6,7 +6,7 @@ using NNR.MDK.Attributes;
 namespace NNR.CoreModule.Events
 {
     [PreInitialize]
-    public class DiscordLogEvent : INnrEvent
+    public class DiscordLogEvent
     {
         private readonly DiscordShardedClient _client;
 

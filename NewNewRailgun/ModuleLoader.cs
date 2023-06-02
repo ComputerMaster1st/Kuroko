@@ -21,7 +21,7 @@ namespace NewNewRailgun
 
                 var moduleAssembly = moduleAssemblyContext.Assemblies.First();
                 var moduleSetupType = moduleAssembly.GetTypes()
-                    .Where(typeof(INnrModule).IsAssignableFrom)
+                    .Where(typeof(NnrModule).IsAssignableFrom)
                     .FirstOrDefault();
 
                 if (moduleSetupType is null)
@@ -32,7 +32,7 @@ namespace NewNewRailgun
                     continue;
                 }
 
-                var module = Activator.CreateInstance(moduleSetupType) as INnrModule;
+                var module = Activator.CreateInstance(moduleSetupType) as NnrModule;
                 var moduleContext = new ModuleContext(moduleAssemblyContext, module);
 
                 _modules.Add(moduleContext);
@@ -46,22 +46,13 @@ namespace NewNewRailgun
         public void RegisterModuleDependencies(IServiceCollection serviceCollection)
         {
             foreach (var module in _modules)
-            {
-                try
-                {
-                    module.Module.RegisterToDependencyInjection(serviceCollection);
-                }
-                catch (NotImplementedException)
-                {
-                    Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"{module.CodeName} <> No dependencies to inject.")).GetAwaiter();
-                }
-            }
+                module.LoadModuleDependencies(serviceCollection);
         }
 
         public void RegisterModuleCommands(InteractionService interactionService, IServiceProvider serviceProvider)
         {
             foreach (var module in _modules)
-                interactionService.AddModulesAsync(module.Assembly, serviceProvider);
+                module.LoadModuleCommands(interactionService, serviceProvider);
         }
     }
 }
