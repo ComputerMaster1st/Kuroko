@@ -111,12 +111,12 @@ internal class Program
 
                     await LoadModules();
                     break;
-                case "addModule":
+                case string s when s.StartsWith("addModule"):
                     Console.WriteLine(new StringBuilder()
                         .AppendLine("Not Yet Implemented!")
                         .ToString());
                     break;
-                case "removeModule":
+                case string s when s.StartsWith("removeModule"):
                     Console.WriteLine(new StringBuilder()
                         .AppendLine("Not Yet Implemented!")
                         .ToString());
