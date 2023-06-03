@@ -85,11 +85,6 @@ internal class Program
         }
     }
 
-    private static async Task UnloadModules()
-    {
-
-    }
-
     private static async Task StartAndWaitConsoleAsync()
     {
         await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "For console commands, type \"help\" or press \"return\" key!"));
