@@ -105,7 +105,7 @@ internal class Program
                 case "reloadModules":
                     Console.WriteLine("Unloading Modules... ");
 
-                    _moduleLoader.UnloadAllModules(_serviceCollection, _serviceProvider, _interactionService);
+                    _moduleLoader.UnloadModules(_serviceCollection, _serviceProvider, _interactionService);
 
                     Console.WriteLine("Unloading completed! Restarting Module Loader...");
 
@@ -150,7 +150,7 @@ internal class Program
         //await _discordClient.StopAsync();
         //await _discordClient.LogoutAsync();
 
-        _moduleLoader.UnloadAllModules(_serviceCollection, _serviceProvider, _interactionService);
+        _moduleLoader.UnloadModules(_serviceCollection, _serviceProvider, _interactionService);
         _interactionService.Dispose();
         _discordClient.Dispose();
 

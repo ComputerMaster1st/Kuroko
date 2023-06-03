@@ -64,7 +64,7 @@ namespace Kuroko
             return count;
         }
 
-        public void UnloadAllModules(IServiceCollection serviceCollection, IServiceProvider serviceProvider, InteractionService interactionService)
+        public void UnloadModules(IServiceCollection serviceCollection, IServiceProvider serviceProvider, InteractionService interactionService)
         {
             foreach (var module in _modules)
             {
