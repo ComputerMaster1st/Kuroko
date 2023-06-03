@@ -94,7 +94,6 @@ internal class Program
     {
         await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "For console commands, type \"help\" or press \"return\" key!"));
 
-        string output;
         bool shutdownNow = false;
         while (!shutdownNow)
         {
@@ -102,49 +101,53 @@ internal class Program
             switch (input ?? string.Empty)
             {
                 case "discordStats":
-                    output = new StringBuilder()
+                    Console.WriteLine(new StringBuilder()
                         .AppendFormat("Shard Count  : {0}", _discordClient.Shards.Count).AppendLine()
                         .AppendFormat("Guild Count  : {0}", _discordClient.Guilds.Count).AppendLine()
                         .AppendFormat("Latency (ms) : {0}", _discordClient.Latency).AppendLine()
-                        .ToString();
+                        .ToString());
                     break;
                 case "reloadModules":
-                    output = new StringBuilder()
-                        .AppendLine("Not Yet Implemented!")
-                        .ToString();
+                    Console.WriteLine("Unloading Modules... ");
+
+                    _moduleLoader.UnloadAllModules(_serviceCollection, _serviceProvider, _interactionService);
+
+                    Console.WriteLine("Unloading completed! Restarting Module Loader...");
+
+                    await LoadModules();
                     break;
                 case "addModule":
-                    output = new StringBuilder()
+                    Console.WriteLine(new StringBuilder()
                         .AppendLine("Not Yet Implemented!")
-                        .ToString();
+                        .ToString());
                     break;
                 case "removeModule":
-                    output = new StringBuilder()
+                    Console.WriteLine(new StringBuilder()
                         .AppendLine("Not Yet Implemented!")
-                        .ToString();
+                        .ToString());
                     break;
                 case "shutdown":
-                    output = new StringBuilder()
-                        .AppendLine("Shutting down now... Goodbye!")
-                        .ToString();
+                    Console.WriteLine(new StringBuilder()
+                        .AppendLine("Shutting down now...")
+                        .ToString());
+
                     shutdownNow = true;
                     break;
                 case "":
                 case "help":
-                    output = new StringBuilder()
+                    Console.WriteLine(new StringBuilder()
                         .AppendLine("help          - Show all available commands")
                         .AppendLine("discordStats  - Show discord shard, guild & latency")
                         .AppendLine("reloadModules - Reload all modules")
                         .AppendLine("addModule     - Install a module")
                         .AppendLine("removeModule  - Remove a module")
                         .AppendLine("shutdown      - Stop & shutdown")
-                        .ToString();
+                        .ToString());
                     break;
                 default:
-                    output = "Unknown console command!";
+                    Console.WriteLine("Unknown console command!");
                     break;
             };
-            Console.WriteLine(output);
         }
 
         //await _discordClient.SetStatusAsync(UserStatus.DoNotDisturb);
@@ -156,6 +159,7 @@ internal class Program
         _interactionService.Dispose();
         _discordClient.Dispose();
 
+        Console.WriteLine("Shutdown completed! Goodbye~!");
         Environment.Exit(0);
     }
 

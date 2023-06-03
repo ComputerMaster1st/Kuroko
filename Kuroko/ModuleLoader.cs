@@ -67,7 +67,11 @@ namespace Kuroko
         public void UnloadAllModules(IServiceCollection serviceCollection, IServiceProvider serviceProvider, InteractionService interactionService)
         {
             foreach (var module in _modules)
+            {
                 module.UnloadModule(serviceCollection, serviceProvider, interactionService);
+            }
+
+            _modules.Clear();
         }
     }
 }

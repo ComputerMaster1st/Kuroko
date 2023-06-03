@@ -8,7 +8,7 @@ namespace Kuroko.CoreModule.Events
     [KurokoEvent]
     public class DiscordLogEvent : KurokoEvent
     {
-        private readonly DiscordShardedClient _client;
+        private DiscordShardedClient _client;
 
         public DiscordLogEvent(DiscordShardedClient discordClient)
         {
@@ -17,7 +17,10 @@ namespace Kuroko.CoreModule.Events
         }
 
         public override void Unload()
-            => _client.Log -= LogEvent;
+        {
+            _client.Log -= LogEvent;
+            _client = null;
+        }
 
         [KurokoEvent]
         public static Task LogEvent(LogMessage logMessage)
