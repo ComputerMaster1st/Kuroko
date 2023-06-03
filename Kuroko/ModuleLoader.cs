@@ -73,5 +73,18 @@ namespace Kuroko
 
             _modules.Clear();
         }
+
+        public bool UnloadModule(string codeName, IServiceCollection serviceCollection, IServiceProvider serviceProvider, InteractionService interactionService)
+        {
+            var module = _modules.FirstOrDefault(x => x.CodeName == codeName);
+
+            if (module is null)
+                return false;
+
+            module.UnloadModule(serviceCollection, serviceProvider, interactionService);
+            _modules.Remove(module);
+
+            return true;
+        }
     }
 }

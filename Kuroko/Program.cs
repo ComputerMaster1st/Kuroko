@@ -65,13 +65,8 @@ internal class Program
         _serviceProvider = _serviceCollection.BuildServiceProvider();
         _moduleLoader.RegisterModuleCommands(_interactionService, _serviceProvider);
 
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"EVENTS             : {_moduleLoader.CountEventsLoaded()}"));
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"SLASH COMMANDS     : {_interactionService.SlashCommands.Count}/100"));
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"MODAL COMMANDS     : {_interactionService.ModalCommands.Count}"));
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"COMPONENT COMMANDS : {_interactionService.ComponentCommands.Count}"));
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"TEXT COMMANDS      : {_interactionService.ContextCommands.Count}"));
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "--------------------------------"));
         await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "Initializing services..."));
+        await PrintModuleStatusAsync();
 
         foreach (ServiceDescriptor service in _serviceCollection)
         {
@@ -83,6 +78,17 @@ internal class Program
 
             _serviceProvider.GetService(service.ImplementationType);
         }
+    }
+
+    private static async Task PrintModuleStatusAsync()
+    {
+        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "--------------------------------"));
+        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"EVENTS             : {_moduleLoader.CountEventsLoaded()}"));
+        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"SLASH COMMANDS     : {_interactionService.SlashCommands.Count}/100"));
+        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"MODAL COMMANDS     : {_interactionService.ModalCommands.Count}"));
+        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"COMPONENT COMMANDS : {_interactionService.ComponentCommands.Count}"));
+        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"TEXT COMMANDS      : {_interactionService.ContextCommands.Count}"));
+        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "--------------------------------"));
     }
 
     private static async Task StartAndWaitConsoleAsync()
@@ -117,9 +123,23 @@ internal class Program
                         .ToString());
                     break;
                 case string s when s.StartsWith("removeModule"):
-                    Console.WriteLine(new StringBuilder()
-                        .AppendLine("Not Yet Implemented!")
-                        .ToString());
+                    string[] args = s.Split(new char[] { ' ' });
+
+                    if (args.Length < 2)
+                    {
+                        Console.WriteLine("Please specify the module to remove by it's code name. For example, \"KUROKO_CORE\".");
+                        break;
+                    }
+
+                    if (!_moduleLoader.UnloadModule(args[1], _serviceCollection, _serviceProvider, _interactionService))
+                    {
+                        Console.WriteLine("Module not found. Make sure you've typed the codename correctly.");
+                        break;
+                    }
+
+                    Console.WriteLine("Module unloaded! Reprinting module stats...");
+
+                    await PrintModuleStatusAsync();
                     break;
                 case "shutdown":
                     Console.WriteLine(new StringBuilder()
