@@ -11,7 +11,7 @@ using System.Text;
 
 internal class Program
 {
-    private static NnrDiscordConfig _discordConfig = null;
+    private static KDiscordConfig _discordConfig = null;
     private static IServiceProvider _serviceProvider = null;
 
     private static readonly DiscordShardedClient _discordClient = new(new DiscordSocketConfig()
@@ -34,7 +34,7 @@ internal class Program
 
     private static async Task CheckDiscordConfig()
     {
-        var config = await NnrDiscordConfig.LoadAsync();
+        var config = await KDiscordConfig.LoadAsync();
 
         if (config is null)
         {

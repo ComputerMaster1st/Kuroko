@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace Kuroko.Core.Configuration
 {
-    internal class NnrDiscordConfig : BaseConfig, IConfig
+    internal class KDiscordConfig : BaseConfig, IConfig
     {
         [JsonIgnore]
         private const string FILEPATH = $"{DataDirectories.CONFIG}/nnr_discord_config.json";
@@ -21,9 +21,9 @@ namespace Kuroko.Core.Configuration
         [JsonProperty]
         public List<ulong> BotAdminUserIds { get; private set; } = new();
 
-        public static async Task<NnrDiscordConfig> LoadAsync()
+        public static async Task<KDiscordConfig> LoadAsync()
         {
-            return await BaseLoadAsync<NnrDiscordConfig>(FILEPATH) as NnrDiscordConfig;
+            return await BaseLoadAsync<KDiscordConfig>(FILEPATH) as KDiscordConfig;
         }
 
         public Task SaveAsync()
