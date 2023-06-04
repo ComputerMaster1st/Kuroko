@@ -11,32 +11,55 @@ namespace Kuroko
     {
         private readonly List<ModuleContext> _modules = new();
 
+        private bool TryLoadModule(string filePath, out string moduleName)
+        {
+            var moduleAssemblyContext = new AssemblyLoadContext(null, true);
+            moduleAssemblyContext.LoadFromStream(File.OpenRead(filePath));
+
+            var moduleAssembly = moduleAssemblyContext.Assemblies.First();
+            var moduleSetupType = moduleAssembly.GetTypes()
+                .Where(typeof(KurokoModule).IsAssignableFrom)
+                .FirstOrDefault();
+
+            if (moduleSetupType is null)
+            {
+                moduleName = moduleAssembly.FullName;
+                moduleAssemblyContext.Unload();
+                return false;
+            }
+
+            var moduleContext = new ModuleContext(moduleAssemblyContext, Activator.CreateInstance(moduleSetupType) as KurokoModule);
+
+            _modules.Add(moduleContext);
+            moduleName = moduleContext.CodeName;
+
+            return true;
+        }
+
+        public bool LoadModule(string fileName, out string moduleName)
+        {
+            if (!File.Exists(DataDirectories.MODULES + "/" + fileName))
+            {
+                moduleName = string.Empty;
+                return false;
+            }
+
+            return TryLoadModule(DataDirectories.MODULES + "/" + fileName, out moduleName);
+        }
+
         public async Task<int> ScanForModulesAsync()
         {
             foreach (var dll in Directory.GetFiles(DataDirectories.MODULES))
             {
-                var moduleAssemblyContext = new AssemblyLoadContext(null, true);
-                moduleAssemblyContext.LoadFromStream(File.OpenRead(dll));
+                var moduleSuccess = TryLoadModule(dll, out string moduleName);
 
-                var moduleAssembly = moduleAssemblyContext.Assemblies.First();
-                var moduleSetupType = moduleAssembly.GetTypes()
-                    .Where(typeof(KurokoModule).IsAssignableFrom)
-                    .FirstOrDefault();
-
-                if (moduleSetupType is null)
+                if (!moduleSuccess)
                 {
-                    await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"Failed to load: {moduleAssembly.FullName}! Missing \"KurokoModule\". Contact Module Developer!"));
-
-                    moduleAssemblyContext.Unload();
+                    await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"Failed to load: {moduleName}! Missing \"KurokoModule\". Contact Module Developer!"));
                     continue;
                 }
 
-                var module = Activator.CreateInstance(moduleSetupType) as KurokoModule;
-                var moduleContext = new ModuleContext(moduleAssemblyContext, module);
-
-                _modules.Add(moduleContext);
-
-                await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"Found: {moduleContext.CodeName}"));
+                await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"Found: {moduleName}"));
             }
 
             return _modules.Count;
@@ -67,9 +90,7 @@ namespace Kuroko
         public void UnloadModules(IServiceCollection serviceCollection, IServiceProvider serviceProvider, InteractionService interactionService)
         {
             foreach (var module in _modules)
-            {
                 module.UnloadModule(serviceCollection, serviceProvider, interactionService);
-            }
 
             _modules.Clear();
         }

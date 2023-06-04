@@ -101,14 +101,14 @@ internal class Program
             var input = Console.ReadLine();
             switch (input ?? string.Empty)
             {
-                case "discordStats":
+                case "discord-stats":
                     Console.WriteLine(new StringBuilder()
                         .AppendFormat("Shard Count  : {0}", _discordClient.Shards.Count).AppendLine()
                         .AppendFormat("Guild Count  : {0}", _discordClient.Guilds.Count).AppendLine()
                         .AppendFormat("Latency (ms) : {0}", _discordClient.Latency).AppendLine()
                         .ToString());
                     break;
-                case "reloadModules":
+                case "module-reload":
                     Console.WriteLine("Unloading Modules... ");
 
                     _moduleLoader.UnloadModules(_serviceCollection, _serviceProvider, _interactionService);
@@ -117,21 +117,40 @@ internal class Program
 
                     await LoadModules();
                     break;
-                case string s when s.StartsWith("addModule"):
-                    Console.WriteLine(new StringBuilder()
-                        .AppendLine("Not Yet Implemented!")
-                        .ToString());
-                    break;
-                case string s when s.StartsWith("removeModule"):
-                    string[] args = s.Split(new char[] { ' ' });
+                case string s when s.StartsWith("module-add"):
+                    string[] addArgs = s.Split(new char[] { ' ' });
 
-                    if (args.Length < 2)
+                    if (addArgs.Length < 2)
+                    {
+                        Console.WriteLine("Please specify the module to add by it's filename. For example, \"kuroko_core.dll\".");
+                        break;
+                    }
+
+                    if (!_moduleLoader.LoadModule(addArgs[1], out string moduleName))
+                    {
+                        if (string.IsNullOrEmpty(moduleName))
+                        {
+                            Console.WriteLine("Unable to locate the module file. Please make sure its spelt correctly and is in the modules directory.");
+                            break;
+                        }
+
+                        Console.WriteLine($"Failed to load: {moduleName}! Missing \"KurokoModule\". Contact Module Developer!");
+                        break;
+                    }
+
+                    Console.WriteLine($"Module {moduleName} successfully loaded!");
+                    await PrintModuleStatusAsync();
+                    break;
+                case string s when s.StartsWith("module-remove"):
+                    string[] remArgs = s.Split(new char[] { ' ' });
+
+                    if (remArgs.Length < 2)
                     {
                         Console.WriteLine("Please specify the module to remove by it's code name. For example, \"KUROKO_CORE\".");
                         break;
                     }
 
-                    if (!_moduleLoader.UnloadModule(args[1], _serviceCollection, _serviceProvider, _interactionService))
+                    if (!_moduleLoader.UnloadModule(remArgs[1], _serviceCollection, _serviceProvider, _interactionService))
                     {
                         Console.WriteLine("Module not found. Make sure you've typed the codename correctly.");
                         break;
@@ -139,6 +158,9 @@ internal class Program
 
                     Console.WriteLine("Module unloaded! Reprinting module stats...");
 
+                    await PrintModuleStatusAsync();
+                    break;
+                case "module-stats":
                     await PrintModuleStatusAsync();
                     break;
                 case "shutdown":
@@ -151,12 +173,13 @@ internal class Program
                 case "":
                 case "help":
                     Console.WriteLine(new StringBuilder()
-                        .AppendLine("help          - Show all available commands")
-                        .AppendLine("discordStats  - Show discord shard, guild & latency")
-                        .AppendLine("reloadModules - Reload all modules")
-                        .AppendLine("addModule     - Install a module")
-                        .AppendLine("removeModule  - Remove a module")
-                        .AppendLine("shutdown      - Stop & shutdown")
+                        .AppendLine("help           - Show all available commands")
+                        .AppendLine("discord-stats  - Show discord shard, guild & latency")
+                        .AppendLine("module-reload  - Reload all modules")
+                        .AppendLine("module-add     - Install a module")
+                        .AppendLine("module-remove  - Remove a module")
+                        .AppendLine("module-stats   - Status on modules")
+                        .AppendLine("shutdown       - Stop & shutdown")
                         .ToString());
                     break;
                 default:
