@@ -95,6 +95,11 @@ internal class Program
     {
         await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "For console commands, type \"help\" or press \"return\" key!"));
 
+        //await _discordClient.SetStatusAsync(UserStatus.DoNotDisturb);
+        //await _discordClient.SetGameAsync("Shutting down...");
+        //await _discordClient.StopAsync();
+        //await _discordClient.LogoutAsync();
+
         bool shutdownNow = false;
         while (!shutdownNow)
         {
@@ -187,11 +192,6 @@ internal class Program
                     break;
             };
         }
-
-        //await _discordClient.SetStatusAsync(UserStatus.DoNotDisturb);
-        //await _discordClient.SetGameAsync("Shutting down...");
-        //await _discordClient.StopAsync();
-        //await _discordClient.LogoutAsync();
 
         _moduleLoader.UnloadModules(_serviceCollection, _serviceProvider, _interactionService);
         _interactionService.Dispose();
