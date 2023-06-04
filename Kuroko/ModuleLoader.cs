@@ -9,7 +9,7 @@ namespace Kuroko
 {
     internal class ModuleLoader
     {
-        private readonly List<ModuleContext> _modules = new();
+        public List<ModuleContext> Modules { get; } = new();
 
         private bool TryLoadModule(string filePath, out string moduleName)
         {
@@ -30,7 +30,7 @@ namespace Kuroko
 
             var moduleContext = new ModuleContext(moduleAssemblyContext, Activator.CreateInstance(moduleSetupType) as KurokoModule);
 
-            _modules.Add(moduleContext);
+            Modules.Add(moduleContext);
             moduleName = moduleContext.CodeName;
 
             return true;
@@ -62,18 +62,18 @@ namespace Kuroko
                 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"Found: {moduleName}"));
             }
 
-            return _modules.Count;
+            return Modules.Count;
         }
 
         public void RegisterModuleDependencies(IServiceCollection serviceCollection)
         {
-            foreach (var module in _modules)
+            foreach (var module in Modules)
                 module.LoadModuleDependencies(serviceCollection);
         }
 
         public void RegisterModuleCommands(InteractionService interactionService, IServiceProvider serviceProvider)
         {
-            foreach (var module in _modules)
+            foreach (var module in Modules)
                 module.LoadModuleCommands(interactionService, serviceProvider);
         }
 
@@ -81,7 +81,7 @@ namespace Kuroko
         {
             var count = 0;
 
-            foreach (var module in _modules)
+            foreach (var module in Modules)
                 count += module.EventCount;
 
             return count;
@@ -89,21 +89,21 @@ namespace Kuroko
 
         public void UnloadModules(IServiceCollection serviceCollection, IServiceProvider serviceProvider, InteractionService interactionService)
         {
-            foreach (var module in _modules)
+            foreach (var module in Modules)
                 module.UnloadModule(serviceCollection, serviceProvider, interactionService);
 
-            _modules.Clear();
+            Modules.Clear();
         }
 
         public bool UnloadModule(string codeName, IServiceCollection serviceCollection, IServiceProvider serviceProvider, InteractionService interactionService)
         {
-            var module = _modules.FirstOrDefault(x => x.CodeName == codeName);
+            var module = Modules.FirstOrDefault(x => x.CodeName == codeName);
 
             if (module is null)
                 return false;
 
             module.UnloadModule(serviceCollection, serviceProvider, interactionService);
-            _modules.Remove(module);
+            Modules.Remove(module);
 
             return true;
         }
