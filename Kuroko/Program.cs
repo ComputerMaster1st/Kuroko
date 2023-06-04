@@ -66,7 +66,6 @@ internal class Program
         _moduleLoader.RegisterModuleCommands(_interactionService, _serviceProvider);
 
         await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "Initializing services..."));
-        await PrintModuleStatusAsync();
 
         foreach (ServiceDescriptor service in _serviceCollection)
         {
@@ -78,6 +77,8 @@ internal class Program
 
             _serviceProvider.GetService(service.ImplementationType);
         }
+
+        await PrintModuleStatusAsync();
     }
 
     private static async Task PrintModuleStatusAsync()
@@ -94,11 +95,6 @@ internal class Program
     private static async Task StartAndWaitConsoleAsync()
     {
         await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "For console commands, type \"help\" or press \"return\" key!"));
-
-        //await _discordClient.SetStatusAsync(UserStatus.DoNotDisturb);
-        //await _discordClient.SetGameAsync("Shutting down...");
-        //await _discordClient.StopAsync();
-        //await _discordClient.LogoutAsync();
 
         bool shutdownNow = false;
         while (!shutdownNow)
@@ -117,6 +113,7 @@ internal class Program
                     Console.WriteLine("Unloading Modules... ");
 
                     _moduleLoader.UnloadModules(_serviceCollection, _serviceProvider, _interactionService);
+                    _serviceProvider = _serviceCollection.BuildServiceProvider();
 
                     Console.WriteLine("Unloading completed! Restarting Module Loader...");
 
@@ -142,6 +139,8 @@ internal class Program
                         Console.WriteLine($"Failed to load: {moduleName}! Missing \"KurokoModule\". Contact Module Developer!");
                         break;
                     }
+
+                    _serviceProvider = _serviceCollection.BuildServiceProvider();
 
                     Console.WriteLine($"Module {moduleName} successfully loaded!");
                     await PrintModuleStatusAsync();
