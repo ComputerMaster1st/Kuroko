@@ -140,7 +140,11 @@ internal class Program
                         break;
                     }
 
+                    var module = _moduleLoader.Modules.First(x => x.CodeName == moduleName);
+
+                    module.LoadModuleDependencies(_serviceCollection);
                     _serviceProvider = _serviceCollection.BuildServiceProvider();
+                    module.LoadModuleCommands(_interactionService, _serviceProvider);
 
                     Console.WriteLine($"Module {moduleName} successfully loaded!");
                     await PrintModuleStatusAsync();
