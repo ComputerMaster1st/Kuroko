@@ -164,8 +164,9 @@ internal class Program
                         break;
                     }
 
-                    Console.WriteLine("Module unloaded! Reprinting module stats...");
+                    _serviceProvider = _serviceCollection.BuildServiceProvider();
 
+                    Console.WriteLine("Module unloaded! Reprinting module stats...");
                     await PrintModuleStatusAsync();
                     break;
                 case "module-stats":
