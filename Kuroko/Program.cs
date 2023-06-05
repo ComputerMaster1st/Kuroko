@@ -199,6 +199,10 @@ internal class Program
 
         _moduleLoader.UnloadModules(_serviceCollection, _serviceProvider, _interactionService);
         _interactionService.Dispose();
+
+        await _discordClient.StopAsync();
+        await _discordClient.LogoutAsync();
+
         _discordClient.Dispose();
 
         Console.WriteLine("Shutdown completed! Goodbye~!");
@@ -225,10 +229,10 @@ internal class Program
 
         //await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "Beginning connection to Discord..."));
 
-        //await discordClient.LoginAsync(TokenType.Bot, discordConfig.Token);
-        //await discordClient.StartAsync();
-        //await discordClient.SetStatusAsync(UserStatus.DoNotDisturb);
-        //await discordClient.SetGameAsync("Booting...");
+        await _discordClient.LoginAsync(TokenType.Bot, _discordConfig.Token);
+        await _discordClient.StartAsync();
+        await _discordClient.SetStatusAsync(UserStatus.DoNotDisturb);
+        await _discordClient.SetGameAsync("Booting...");
 
         await StartAndWaitConsoleAsync();
     }

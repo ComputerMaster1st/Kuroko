@@ -7,7 +7,7 @@ namespace Kuroko.Core.Configuration
     internal class KDiscordConfig : BaseConfig, IConfig
     {
         [JsonIgnore]
-        private const string FILEPATH = $"{DataDirectories.CONFIG}/nnr_discord_config.json";
+        private const string FILEPATH = $"{DataDirectories.CONFIG}/kuroko_discord_config.json";
 
         [JsonProperty]
         public string Token { get; private set; } = "TOKEN GOES HERE";
