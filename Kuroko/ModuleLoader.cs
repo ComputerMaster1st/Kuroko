@@ -71,10 +71,10 @@ namespace Kuroko
                 module.LoadModuleDependencies(serviceCollection);
         }
 
-        public void RegisterModuleCommands(InteractionService interactionService, IServiceProvider serviceProvider)
+        public async Task RegisterModuleCommandsAsync(InteractionService interactionService, IServiceProvider serviceProvider)
         {
             foreach (var module in Modules)
-                module.LoadModuleCommands(interactionService, serviceProvider);
+                await module.LoadModuleCommandsAsync(interactionService, serviceProvider);
         }
 
         public int CountEventsLoaded()
@@ -87,22 +87,23 @@ namespace Kuroko
             return count;
         }
 
-        public void UnloadModules(IServiceCollection serviceCollection, IServiceProvider serviceProvider, InteractionService interactionService)
+        public async Task UnloadModulesAsync(IServiceCollection serviceCollection, IServiceProvider serviceProvider, InteractionService interactionService)
         {
             foreach (var module in Modules)
-                module.UnloadModule(serviceCollection, serviceProvider, interactionService);
+                await module.UnloadModuleAsync(serviceCollection, serviceProvider, interactionService);
 
             Modules.Clear();
         }
 
-        public bool UnloadModule(string codeName, IServiceCollection serviceCollection, IServiceProvider serviceProvider, InteractionService interactionService)
+        public async Task<bool> UnloadModuleAsync(string codeName, IServiceCollection serviceCollection, IServiceProvider serviceProvider, InteractionService interactionService)
         {
             var module = Modules.FirstOrDefault(x => x.CodeName == codeName);
 
             if (module is null)
                 return false;
 
-            module.UnloadModule(serviceCollection, serviceProvider, interactionService);
+            await module.UnloadModuleAsync(serviceCollection, serviceProvider, interactionService);
+
             Modules.Remove(module);
 
             return true;

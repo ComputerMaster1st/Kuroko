@@ -31,7 +31,7 @@ namespace Kuroko.Events
             try
             {
                 using var scope = _serviceProvider.CreateScope();
-                var ctx = new ShardedInteractionContext(_client, interaction);
+                var ctx = new KurokoInteractionContext(_client, interaction, scope.ServiceProvider);
 
                 var result = await _interactionService.ExecuteCommandAsync(ctx, scope.ServiceProvider);
             }

@@ -65,7 +65,7 @@ internal class Program
         await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "--------------------------------"));
 
         _serviceProvider = _serviceCollection.BuildServiceProvider();
-        _moduleLoader.RegisterModuleCommands(_interactionService, _serviceProvider);
+        await _moduleLoader.RegisterModuleCommandsAsync(_interactionService, _serviceProvider);
 
         await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "Initializing services..."));
 
@@ -123,7 +123,7 @@ internal class Program
                 case "module-reload":
                     Console.WriteLine("Unloading Modules... ");
 
-                    _moduleLoader.UnloadModules(_serviceCollection, _serviceProvider, _interactionService);
+                    await _moduleLoader.UnloadModulesAsync(_serviceCollection, _serviceProvider, _interactionService);
                     _serviceProvider = _serviceCollection.BuildServiceProvider();
 
                     Console.WriteLine("Unloading completed! Restarting Module Loader...");
@@ -157,7 +157,7 @@ internal class Program
 
                     module.LoadModuleDependencies(_serviceCollection);
                     _serviceProvider = _serviceCollection.BuildServiceProvider();
-                    module.LoadModuleCommands(_interactionService, _serviceProvider);
+                    await module.LoadModuleCommandsAsync(_interactionService, _serviceProvider);
                     _serviceProvider.GetRequiredService<DiscordSlashCommandEvent>().RefreshServiceProvider(_serviceProvider);
 
                     await ReregisterCommandsToDiscord();
@@ -174,7 +174,7 @@ internal class Program
                         break;
                     }
 
-                    if (!_moduleLoader.UnloadModule(remArgs[1], _serviceCollection, _serviceProvider, _interactionService))
+                    if (!await _moduleLoader.UnloadModuleAsync(remArgs[1], _serviceCollection, _serviceProvider, _interactionService))
                     {
                         Console.WriteLine("Module not found. Make sure you've typed the codename correctly.");
                         break;
@@ -216,7 +216,7 @@ internal class Program
             };
         }
 
-        _moduleLoader.UnloadModules(_serviceCollection, _serviceProvider, _interactionService);
+        await _moduleLoader.UnloadModulesAsync(_serviceCollection, _serviceProvider, _interactionService);
         _interactionService.Dispose();
 
         await _discordClient.StopAsync();

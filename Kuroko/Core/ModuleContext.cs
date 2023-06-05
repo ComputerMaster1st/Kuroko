@@ -45,18 +45,31 @@ namespace Kuroko.Core
         public void LoadModuleDependencies(IServiceCollection serviceCollection)
             => Module.RegisterToDependencyInjection(serviceCollection);
 
-        public void LoadModuleCommands(InteractionService interactionService, IServiceProvider serviceProvider)
-        {
-            interactionService.AddModulesAsync(Assembly, serviceProvider);
-        }
+        public Task LoadModuleCommandsAsync(InteractionService interactionService, IServiceProvider serviceProvider)
+            => interactionService.AddModulesAsync(Assembly, serviceProvider);
 
-        public void UnloadModule(IServiceCollection serviceCollection, IServiceProvider serviceProvider, InteractionService interactionService)
+        public async Task UnloadModuleAsync(IServiceCollection serviceCollection, IServiceProvider serviceProvider, InteractionService interactionService)
         {
-            Module.UnloadCommandsAsync(interactionService);
+            await UnloadCommandAsync(Assembly.GetTypes(), interactionService);
+
             Module.UnloadEvents(serviceProvider);
             Module.UnregisterFromDependencyInjection(serviceCollection);
 
             _assemblyContext.Unload();
+        }
+
+        private async Task UnloadCommandAsync(Type[] types, InteractionService interactionService)
+        {
+            foreach (var type in types)
+            {
+                await UnloadCommandAsync(type.GetNestedTypes(), interactionService);
+
+                if (type.GetMethods().Where(y => y.GetCustomAttributes(typeof(SlashCommandAttribute), false).Length > 0).Any())
+                {
+                    var success = await interactionService.RemoveModuleAsync(type);
+                    Console.WriteLine($"UNLOADED {success} {type.FullName}");
+                }
+            }
         }
     }
 }

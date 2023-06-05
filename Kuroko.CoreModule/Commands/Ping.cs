@@ -1,10 +1,12 @@
 ﻿using Discord.Interactions;
 using Discord.WebSocket;
+using Kuroko.MDK;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Kuroko.CoreModule.Commands
 {
     [Group("testgroup", "Just some random test group module")]
-    public class Ping : InteractionModuleBase
+    public class Ping : KurokoInteractionModuleBase
     {
         [SlashCommand("ping", "Just some ping command")]
         public Task ExecuteAsync()
@@ -13,17 +15,12 @@ namespace Kuroko.CoreModule.Commands
         }
 
         [Group("subtestgroup", "More random testing")]
-        public class PingMore : InteractionModuleBase
+        public class PingMore : KurokoInteractionModuleBase
         {
-            private readonly DiscordShardedClient _client;
-
-            public PingMore(DiscordShardedClient client)
-                => _client = client;
-
             [SlashCommand("ping", "Ping discord latency")]
             public Task ExecuteAsync()
             {
-                return RespondAsync($"Latency: {_client.Latency}ms");
+                return RespondAsync($"Latency: {Context.ServiceProvider.GetService<DiscordShardedClient>().Latency}ms");
             }
         }
     }

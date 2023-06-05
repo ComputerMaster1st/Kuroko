@@ -1,5 +1,4 @@
-﻿using Discord.Interactions;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace Kuroko.MDK
 {
@@ -14,7 +13,5 @@ namespace Kuroko.MDK
         public virtual void UnregisterFromDependencyInjection(IServiceCollection serviceCollection) { }
 
         public virtual void UnloadEvents(IServiceProvider serviceProvider) { }
-
-        public virtual Task UnloadCommandsAsync(InteractionService interactionService) { return Task.CompletedTask; }
     }
 }
