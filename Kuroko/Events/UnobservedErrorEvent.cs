@@ -10,7 +10,7 @@ namespace Kuroko.Events
     {
         public UnobservedErrorEvent()
             => TaskScheduler.UnobservedTaskException += (sender, args)
-                => Task.Factory.StartNew(() => UnobservedTaskEvent(a));
+                => Task.Factory.StartNew(() => UnobservedTaskEvent(args));
 
         private static async Task UnobservedTaskEvent(UnobservedTaskExceptionEventArgs args)
         {
