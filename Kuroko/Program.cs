@@ -4,6 +4,8 @@ using Discord.WebSocket;
 using Kuroko;
 using Kuroko.Core;
 using Kuroko.Core.Configuration;
+using Kuroko.CoreModule.Events;
+using Kuroko.Events;
 using Kuroko.MDK;
 using Kuroko.MDK.Attributes;
 using Microsoft.Extensions.DependencyInjection;
@@ -92,6 +94,15 @@ internal class Program
         await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "--------------------------------"));
     }
 
+    private static async Task ReregisterCommandsToDiscord()
+    {
+#if DEBUG
+        await _interactionService.RegisterCommandsToGuildAsync(_discordConfig.MasterGuildId);
+#else
+            await _interactionService.RegisterCommandsGloballyAsync();
+#endif
+    }
+
     private static async Task StartAndWaitConsoleAsync()
     {
         await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "For console commands, type \"help\" or press \"return\" key!"));
@@ -118,6 +129,8 @@ internal class Program
                     Console.WriteLine("Unloading completed! Restarting Module Loader...");
 
                     await LoadModules();
+                    _serviceProvider.GetRequiredService<DiscordSlashCommandEvent>().RefreshServiceProvider(_serviceProvider);
+                    await ReregisterCommandsToDiscord();
                     break;
                 case string s when s.StartsWith("module-add"):
                     string[] addArgs = s.Split(new char[] { ' ' });
@@ -145,6 +158,9 @@ internal class Program
                     module.LoadModuleDependencies(_serviceCollection);
                     _serviceProvider = _serviceCollection.BuildServiceProvider();
                     module.LoadModuleCommands(_interactionService, _serviceProvider);
+                    _serviceProvider.GetRequiredService<DiscordSlashCommandEvent>().RefreshServiceProvider(_serviceProvider);
+
+                    await ReregisterCommandsToDiscord();
 
                     Console.WriteLine($"Module {moduleName} successfully loaded!");
                     await PrintModuleStatusAsync();
@@ -165,6 +181,9 @@ internal class Program
                     }
 
                     _serviceProvider = _serviceCollection.BuildServiceProvider();
+                    _serviceProvider.GetRequiredService<DiscordSlashCommandEvent>().RefreshServiceProvider(_serviceProvider);
+
+                    await ReregisterCommandsToDiscord();
 
                     Console.WriteLine("Module unloaded! Reprinting module stats...");
                     await PrintModuleStatusAsync();
@@ -220,7 +239,11 @@ internal class Program
 
         _serviceCollection.AddSingleton(_discordConfig)
             .AddSingleton(_discordClient)
-            .AddSingleton(_interactionService);
+            .AddSingleton(_interactionService)
+            .AddSingleton<DiscordLogEvent>()
+            .AddSingleton<DiscordShardReadyEvent>()
+            .AddSingleton<DiscordSlashCommandEvent>()
+            .AddSingleton<UnobservedErrorEvent>();
 
         await LoadModules();
 

@@ -5,8 +5,8 @@ using Kuroko.MDK.Attributes;
 
 namespace Kuroko.CoreModule.Events
 {
-    [KurokoEvent]
-    public class DiscordLogEvent : KurokoEvent
+    [PreInitialize]
+    public class DiscordLogEvent
     {
         private DiscordShardedClient _client;
 
@@ -16,13 +16,6 @@ namespace Kuroko.CoreModule.Events
             _client.Log += LogEvent;
         }
 
-        public override void Unload()
-        {
-            _client.Log -= LogEvent;
-            _client = null;
-        }
-
-        [KurokoEvent]
         public static Task LogEvent(LogMessage logMessage)
             => Utilities.WriteLogAsync(logMessage);
     }
