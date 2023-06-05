@@ -61,7 +61,7 @@ internal class Program
 
         _moduleLoader.RegisterModuleDependencies(_serviceCollection);
 
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"Loaded {_serviceCollection.Count - 3} dependencies from modules!"));
+        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"Loaded {_serviceCollection.Count - 7} dependencies from modules!"));
         await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "--------------------------------"));
 
         _serviceProvider = _serviceCollection.BuildServiceProvider();
@@ -249,8 +249,7 @@ internal class Program
 
         await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "Startup completed!"));
         await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "--------------------------------"));
-
-        //await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "Beginning connection to Discord..."));
+        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "Beginning connection to Discord..."));
 
         await _discordClient.LoginAsync(TokenType.Bot, _discordConfig.Token);
         await _discordClient.StartAsync();
