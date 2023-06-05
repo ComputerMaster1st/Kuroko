@@ -1,6 +1,8 @@
-﻿using Kuroko.CoreModule.Events;
+﻿using Discord.Interactions;
+using Kuroko.CoreModule.Events;
 using Kuroko.MDK;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net.NetworkInformation;
 
 namespace Kuroko.CoreModule
 {
@@ -28,6 +30,11 @@ namespace Kuroko.CoreModule
         public override void UnloadEvents(IServiceProvider serviceProvider)
         {
             serviceProvider.GetService<DiscordLogEvent>()?.Unload();
+        }
+
+        public override async Task UnloadCommandsAsync(InteractionService interactionService)
+        {
+            await interactionService.RemoveModuleAsync<Ping>();
         }
     }
 }

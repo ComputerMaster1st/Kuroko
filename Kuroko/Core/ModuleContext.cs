@@ -52,7 +52,7 @@ namespace Kuroko.Core
 
         public void UnloadModule(IServiceCollection serviceCollection, IServiceProvider serviceProvider, InteractionService interactionService)
         {
-            Module.UnloadCommands(interactionService);
+            Module.UnloadCommandsAsync(interactionService);
             Module.UnloadEvents(serviceProvider);
             Module.UnregisterFromDependencyInjection(serviceCollection);
 

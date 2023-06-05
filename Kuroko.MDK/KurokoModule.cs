@@ -15,6 +15,6 @@ namespace Kuroko.MDK
 
         public virtual void UnloadEvents(IServiceProvider serviceProvider) { }
 
-        public virtual void UnloadCommands(InteractionService interactionService) { }
+        public virtual Task UnloadCommandsAsync(InteractionService interactionService) { return Task.CompletedTask; }
     }
 }
