@@ -62,9 +62,7 @@ namespace Kuroko.Core
         {
             foreach (var type in types)
             {
-                await UnloadCommandAsync(type.GetNestedTypes(), interactionService);
-
-                if (type.GetMethods().Where(y => y.GetCustomAttributes(typeof(SlashCommandAttribute), false).Length > 0).Any())
+                if (type.IsSubclassOf(typeof(KurokoInteractionModuleBase)))
                 {
                     var success = await interactionService.RemoveModuleAsync(type);
                     Console.WriteLine($"UNLOADED {success} {type.FullName}");
