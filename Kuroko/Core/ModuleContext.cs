@@ -50,7 +50,7 @@ namespace Kuroko.Core
 
         public async Task UnloadModuleAsync(IServiceCollection serviceCollection, IServiceProvider serviceProvider, InteractionService interactionService)
         {
-            await UnloadCommandAsync(Assembly.GetTypes(), interactionService);
+            await UnloadCommandAsync(interactionService);
 
             Module.UnloadEvents(serviceProvider);
             Module.UnregisterFromDependencyInjection(serviceCollection);
@@ -58,9 +58,9 @@ namespace Kuroko.Core
             _assemblyContext.Unload();
         }
 
-        private async Task UnloadCommandAsync(Type[] types, InteractionService interactionService)
+        private async Task UnloadCommandAsync(InteractionService interactionService)
         {
-            foreach (var type in types)
+            foreach (var type in Assembly.GetTypes())
             {
                 if (type.IsSubclassOf(typeof(KurokoInteractionModuleBase)))
                 {
