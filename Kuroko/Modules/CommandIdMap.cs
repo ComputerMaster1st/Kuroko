@@ -1,4 +1,4 @@
-﻿namespace Kuroko.Commands
+﻿namespace Kuroko.Modules
 {
     internal static class CommandIdMap
     {
