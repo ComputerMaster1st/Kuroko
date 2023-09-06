@@ -2,6 +2,8 @@
 {
     public class GuildEntity : DiscordEntity
     {
+        public virtual RoleRequestEntity RoleRequest { get; set; } = null;
+
         public GuildEntity(ulong id) : base(id) { }
     }
 }

@@ -12,7 +12,7 @@ namespace Kuroko.Database
 
         // TODO: Put Module DbSets Here
 
-
+        public DbSet<RoleRequestEntity> GuildRoleRequests { get; set; } = null;
 
         // END
 
@@ -20,9 +20,22 @@ namespace Kuroko.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
-
             // TODO: Setup Relations for your modules here
+
+            #region RoleRequest
+
+            modelBuilder.Entity<RoleRequestEntity>()
+                .HasMany(x => x.RoleIds)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<GuildEntity>()
+                .HasOne(x => x.RoleRequest)
+                .WithOne(x => x.Guild)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            #endregion
+
+            base.OnModelCreating(modelBuilder);
         }
 
         public override void Dispose()
