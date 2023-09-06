@@ -6,256 +6,132 @@ using Kuroko.Core;
 using Kuroko.Core.Configuration;
 using Kuroko.CoreModule.Events;
 using Kuroko.Events;
-using Kuroko.MDK;
 using Kuroko.MDK.Attributes;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 using System.Text;
 
-internal class Program
+DiscordShardedClient _discordClient = new(new DiscordSocketConfig()
 {
-    private static KDiscordConfig _discordConfig = null;
-    private static IServiceProvider _serviceProvider = null;
+    AlwaysDownloadUsers = true,
+    DefaultRetryMode = RetryMode.AlwaysRetry,
+    LogLevel = LogSeverity.Info,
+    MaxWaitBetweenGuildAvailablesBeforeReady = 1000,
+    GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMembers
+});
+InteractionService _interactionService = new(_discordClient, new()
+{
+    DefaultRunMode = RunMode.Sync,
+    LogLevel = LogSeverity.Info,
+    UseCompiledLambda = true
+});
+IServiceCollection _serviceCollection = new ServiceCollection();
 
-    private static readonly DiscordShardedClient _discordClient = new(new DiscordSocketConfig()
-    {
-        AlwaysDownloadUsers = true,
-        DefaultRetryMode = RetryMode.AlwaysRetry,
-        LogLevel = LogSeverity.Info,
-        MaxWaitBetweenGuildAvailablesBeforeReady = 1000,
-        GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMembers
-    });
-    private static readonly InteractionService _interactionService = new(_discordClient, new()
-    {
-        DefaultRunMode = RunMode.Sync,
-        LogLevel = LogSeverity.Info,
-        UseCompiledLambda = true
-    });
-    private static readonly ModuleLoader _moduleLoader = new();
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "Now Starting Kuroko. Please wait a few minutes to boot the operating system..."));
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "--------------------------------"));
 
-    private static readonly IServiceCollection _serviceCollection = new ServiceCollection();
+DataDirectories.CreateDirectories();
 
-    private static async Task CheckDiscordConfig()
-    {
-        var config = await KDiscordConfig.LoadAsync();
+KDiscordConfig _discordConfig = await KDiscordConfig.LoadAsync();
 
-        if (config is null)
-        {
-            await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "New \"kuroko_discord_config.json\" file has been generated! Please fill this in before restarting the bot!"));
-            return;
-        }
-
-        _discordConfig = config;
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "Mounted \"kuroko_discord_config.json\"!"));
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "--------------------------------"));
-    }
-
-    private static async Task LoadModules()
-    {
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, "Checking modules directory..."));
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "--------------------------------"));
-
-        int moduleCount = await _moduleLoader.ScanForModulesAsync();
-
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"{moduleCount} modules found!"));
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "--------------------------------"));
-
-        _moduleLoader.RegisterModuleDependencies(_serviceCollection);
-
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"Loaded {_serviceCollection.Count - 7} dependencies from modules!"));
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "--------------------------------"));
-
-        _serviceProvider = _serviceCollection.BuildServiceProvider();
-        await _moduleLoader.RegisterModuleCommandsAsync(_interactionService, _serviceProvider);
-
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "Initializing services..."));
-
-        foreach (ServiceDescriptor service in _serviceCollection)
-        {
-            if (service.ServiceType.GetCustomAttributes(typeof(PreInitializeAttribute), false) is null)
-                continue;
-
-            if (service.ImplementationType is null)
-                continue;
-
-            _serviceProvider.GetService(service.ImplementationType);
-        }
-
-        await PrintModuleStatusAsync();
-    }
-
-    private static async Task PrintModuleStatusAsync()
-    {
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "--------------------------------"));
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"EVENTS             : {_moduleLoader.CountEventsLoaded()}"));
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"SLASH COMMANDS     : {_interactionService.SlashCommands.Count}/100"));
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"MODAL COMMANDS     : {_interactionService.ModalCommands.Count}"));
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"COMPONENT COMMANDS : {_interactionService.ComponentCommands.Count}"));
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.MODLOADER, $"TEXT COMMANDS      : {_interactionService.ContextCommands.Count}"));
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "--------------------------------"));
-    }
-
-    private static async Task ReregisterCommandsToDiscord()
-    {
-#if DEBUG
-        await _interactionService.RegisterCommandsToGuildAsync(_discordConfig.MasterGuildId);
-#else
-            await _interactionService.RegisterCommandsGloballyAsync();
-#endif
-    }
-
-    private static async Task StartAndWaitConsoleAsync()
-    {
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "For console commands, type \"help\" or press \"return\" key!"));
-
-        bool shutdownNow = false;
-        while (!shutdownNow)
-        {
-            var input = Console.ReadLine();
-            switch (input ?? string.Empty)
-            {
-                case "discord-stats":
-                    Console.WriteLine(new StringBuilder()
-                        .AppendFormat("Shard Count  : {0}", _discordClient.Shards.Count).AppendLine()
-                        .AppendFormat("Guild Count  : {0}", _discordClient.Guilds.Count).AppendLine()
-                        .AppendFormat("Latency (ms) : {0}", _discordClient.Latency).AppendLine()
-                        .ToString());
-                    break;
-                case "module-reload":
-                    Console.WriteLine("Unloading Modules... ");
-
-                    await _moduleLoader.UnloadModulesAsync(_serviceCollection, _serviceProvider, _interactionService);
-                    _serviceProvider = _serviceCollection.BuildServiceProvider();
-
-                    Console.WriteLine("Unloading completed! Restarting Module Loader...");
-
-                    await LoadModules();
-                    _serviceProvider.GetRequiredService<DiscordSlashCommandEvent>().RefreshServiceProvider(_serviceProvider);
-                    await ReregisterCommandsToDiscord();
-                    break;
-                case string s when s.StartsWith("module-add"):
-                    string[] addArgs = s.Split(new char[] { ' ' });
-
-                    if (addArgs.Length < 2)
-                    {
-                        Console.WriteLine("Please specify the module to add by it's filename. For example, \"kuroko_core.dll\".");
-                        break;
-                    }
-
-                    if (!_moduleLoader.LoadModule(addArgs[1], out string moduleName))
-                    {
-                        if (string.IsNullOrEmpty(moduleName))
-                        {
-                            Console.WriteLine("Unable to locate the module file. Please make sure its spelt correctly and is in the modules directory.");
-                            break;
-                        }
-
-                        Console.WriteLine($"Failed to load: {moduleName}! Missing \"KurokoModule\". Contact Module Developer!");
-                        break;
-                    }
-
-                    var module = _moduleLoader.Modules.First(x => x.CodeName == moduleName);
-
-                    module.LoadModuleDependencies(_serviceCollection);
-                    _serviceProvider = _serviceCollection.BuildServiceProvider();
-                    await module.LoadModuleCommandsAsync(_interactionService, _serviceProvider);
-                    _serviceProvider.GetRequiredService<DiscordSlashCommandEvent>().RefreshServiceProvider(_serviceProvider);
-
-                    await ReregisterCommandsToDiscord();
-
-                    Console.WriteLine($"Module {moduleName} successfully loaded!");
-                    await PrintModuleStatusAsync();
-                    break;
-                case string s when s.StartsWith("module-remove"):
-                    string[] remArgs = s.Split(new char[] { ' ' });
-
-                    if (remArgs.Length < 2)
-                    {
-                        Console.WriteLine("Please specify the module to remove by it's code name. For example, \"KUROKO_CORE\".");
-                        break;
-                    }
-
-                    if (!await _moduleLoader.UnloadModuleAsync(remArgs[1], _serviceCollection, _serviceProvider, _interactionService))
-                    {
-                        Console.WriteLine("Module not found. Make sure you've typed the codename correctly.");
-                        break;
-                    }
-
-                    _serviceProvider = _serviceCollection.BuildServiceProvider();
-                    _serviceProvider.GetRequiredService<DiscordSlashCommandEvent>().RefreshServiceProvider(_serviceProvider);
-
-                    await ReregisterCommandsToDiscord();
-
-                    Console.WriteLine("Module unloaded! Reprinting module stats...");
-                    await PrintModuleStatusAsync();
-                    break;
-                case "module-stats":
-                    await PrintModuleStatusAsync();
-                    break;
-                case "shutdown":
-                    Console.WriteLine(new StringBuilder()
-                        .AppendLine("Shutting down now...")
-                        .ToString());
-
-                    shutdownNow = true;
-                    break;
-                case "":
-                case "help":
-                    Console.WriteLine(new StringBuilder()
-                        .AppendLine("help           - Show all available commands")
-                        .AppendLine("discord-stats  - Show discord shard, guild & latency")
-                        .AppendLine("module-reload  - Reload all modules")
-                        .AppendLine("module-add     - Install a module")
-                        .AppendLine("module-remove  - Remove a module")
-                        .AppendLine("module-stats   - Status on modules")
-                        .AppendLine("shutdown       - Stop & shutdown")
-                        .ToString());
-                    break;
-                default:
-                    Console.WriteLine("Unknown console command!");
-                    break;
-            };
-        }
-
-        await _moduleLoader.UnloadModulesAsync(_serviceCollection, _serviceProvider, _interactionService);
-        _interactionService.Dispose();
-
-        await _discordClient.StopAsync();
-        await _discordClient.LogoutAsync();
-
-        _discordClient.Dispose();
-
-        Console.WriteLine("Shutdown completed! Goodbye~!");
-        Environment.Exit(0);
-    }
-
-    private static async Task Main()
-    {
-        DataDirectories.CreateDirectories();
-
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "Now Starting Kuroko. Please wait a few minutes to boot the operating system..."));
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "--------------------------------"));
-
-        await CheckDiscordConfig();
-
-        _serviceCollection.AddSingleton(_discordConfig)
-            .AddSingleton(_discordClient)
-            .AddSingleton(_interactionService)
-            .AddSingleton<DiscordLogEvent>()
-            .AddSingleton<DiscordShardReadyEvent>()
-            .AddSingleton<DiscordSlashCommandEvent>()
-            .AddSingleton<UnobservedErrorEvent>();
-
-        await LoadModules();
-
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "Startup completed!"));
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "--------------------------------"));
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, CoreLogHeader.SYSTEM, "Beginning connection to Discord..."));
-
-        await _discordClient.LoginAsync(TokenType.Bot, _discordConfig.Token);
-        await _discordClient.StartAsync();
-        await _discordClient.SetStatusAsync(UserStatus.DoNotDisturb);
-        await _discordClient.SetGameAsync("Booting...");
-
-        await StartAndWaitConsoleAsync();
-    }
+if (_discordConfig is null)
+{
+    await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "New \"kuroko_discord_config.json\" file has been generated! Please fill this in before restarting the bot!"));
+    return;
 }
+
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "Mounted \"kuroko_discord_config.json\"!"));
+
+#region DI: Core Modules
+
+_serviceCollection.AddSingleton(_discordConfig)
+    .AddSingleton(_discordClient)
+    .AddSingleton(_interactionService);
+
+#endregion
+
+#region DI: Events
+
+_serviceCollection.AddSingleton<DiscordLogEvent>()
+    .AddSingleton<DiscordShardReadyEvent>()
+    .AddSingleton<DiscordSlashCommandEvent>()
+    .AddSingleton<UnobservedErrorEvent>();
+
+#endregion
+
+IServiceProvider _serviceProvider = _serviceCollection.BuildServiceProvider();
+
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, $"Loaded {_serviceCollection.Count - 7} dependencies from modules!"));
+
+await _interactionService.AddModulesAsync(Assembly.GetExecutingAssembly(), _serviceProvider);
+
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, $"SLASH COMMANDS     : {_interactionService.SlashCommands.Count}/100"));
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, $"MODAL COMMANDS     : {_interactionService.ModalCommands.Count}"));
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, $"COMPONENT COMMANDS : {_interactionService.ComponentCommands.Count}"));
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, $"TEXT COMMANDS      : {_interactionService.ContextCommands.Count}"));
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "Initializing services..."));
+
+foreach (ServiceDescriptor service in _serviceCollection)
+{
+    if (service.ServiceType.GetCustomAttributes(typeof(PreInitializeAttribute), false) is null)
+        continue;
+
+    if (service.ImplementationType is null)
+        continue;
+
+    _serviceProvider.GetService(service.ImplementationType);
+}
+
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "Startup completed!"));
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "Beginning connection to Discord..."));
+
+await _discordClient.LoginAsync(TokenType.Bot, _discordConfig.Token);
+await _discordClient.StartAsync();
+await _discordClient.SetStatusAsync(UserStatus.DoNotDisturb);
+await _discordClient.SetGameAsync("Booting...");
+
+await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "For console commands, type \"help\" or press \"return\" key!"));
+
+bool shutdownNow = false;
+while (!shutdownNow)
+{
+    var input = Console.ReadLine();
+    switch (input ?? string.Empty)
+    {
+        case "discord-stats":
+            Console.WriteLine(new StringBuilder()
+                .AppendFormat("Shard Count  : {0}", _discordClient.Shards.Count).AppendLine()
+                .AppendFormat("Guild Count  : {0}", _discordClient.Guilds.Count).AppendLine()
+                .AppendFormat("Latency (ms) : {0}", _discordClient.Latency).AppendLine()
+                .ToString());
+            break;
+        case "shutdown":
+            Console.WriteLine(new StringBuilder()
+                .AppendLine("Shutting down now...")
+                .ToString());
+
+            shutdownNow = true;
+            break;
+        case "":
+        case "help":
+            Console.WriteLine(new StringBuilder()
+                .AppendLine("help           - Show all available commands")
+                .AppendLine("discord-stats  - Show discord shard, guild & latency")
+                .AppendLine("shutdown       - Stop & shutdown")
+                .ToString());
+            break;
+        default:
+            Console.WriteLine("Unknown console command!");
+            break;
+    };
+}
+
+_interactionService.Dispose();
+
+await _discordClient.StopAsync();
+await _discordClient.LogoutAsync();
+
+_discordClient.Dispose();
+
+Console.WriteLine("Shutdown completed! Goodbye~!");
+Environment.Exit(0);

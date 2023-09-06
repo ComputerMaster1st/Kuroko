@@ -15,7 +15,7 @@ namespace Kuroko.Events
         private static async Task UnobservedTaskEvent(UnobservedTaskExceptionEventArgs args)
         {
             args.SetObserved();
-            await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Error, CoreLogHeader.SYSTEM, "Unobserved Exception Detected!", args.Exception));
+            await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Error, LogHeader.SYSTEM, "Unobserved Exception Detected!", args.Exception));
         }
     }
 }

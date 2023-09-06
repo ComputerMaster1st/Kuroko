@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Kuroko.MDK;
+using Kuroko.Core;
 using Kuroko.MDK.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text;
@@ -37,7 +37,7 @@ namespace Kuroko.Events
             }
             catch (Exception ex)
             {
-                await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Error, "SlashCMD", ex.Message, ex));
+                await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Error, LogHeader.SLASHCMD, ex.Message, ex));
 
                 if (interaction.Type == InteractionType.ApplicationCommand)
                     await interaction.GetOriginalResponseAsync()

@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 
-namespace Kuroko.MDK.Configuration
+namespace Kuroko.Core.Configuration
 {
-    public abstract class BaseConfig
+    internal class BaseConfig
     {
         protected static async Task<IConfig> BaseLoadAsync<TConfig>(string filePath) where TConfig : class, IConfig
         {

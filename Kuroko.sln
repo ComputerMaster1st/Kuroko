@@ -5,10 +5,6 @@ VisualStudioVersion = 17.5.33627.172
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kuroko", "Kuroko\Kuroko.csproj", "{513DBADF-9338-4BB3-BC0D-99EBE956C241}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kuroko.MDK", "Kuroko.MDK\Kuroko.MDK.csproj", "{FF131B7C-A92C-4756-872D-15D7DC82DBC0}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kuroko.CoreModule", "Kuroko.CoreModule\Kuroko.CoreModule.csproj", "{713F6CF4-52A6-40F4-9E4D-C7C985996FD3}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,14 +15,6 @@ Global
 		{513DBADF-9338-4BB3-BC0D-99EBE956C241}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{513DBADF-9338-4BB3-BC0D-99EBE956C241}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{513DBADF-9338-4BB3-BC0D-99EBE956C241}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FF131B7C-A92C-4756-872D-15D7DC82DBC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FF131B7C-A92C-4756-872D-15D7DC82DBC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FF131B7C-A92C-4756-872D-15D7DC82DBC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FF131B7C-A92C-4756-872D-15D7DC82DBC0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{713F6CF4-52A6-40F4-9E4D-C7C985996FD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{713F6CF4-52A6-40F4-9E4D-C7C985996FD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{713F6CF4-52A6-40F4-9E4D-C7C985996FD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{713F6CF4-52A6-40F4-9E4D-C7C985996FD3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
