@@ -3,7 +3,7 @@ using Discord.WebSocket;
 using Kuroko.Core;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Kuroko.Commands.Slash
+namespace Kuroko.Modules.Utilities
 {
     public class Ping : KurokoModuleBase
     {

@@ -1,5 +1,4 @@
-﻿using Kuroko.MDK;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Kuroko.Core.Configuration
 {
