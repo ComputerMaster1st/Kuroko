@@ -33,12 +33,23 @@ await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM,
 DataDirectories.CreateDirectories();
 
 KDiscordConfig _discordConfig = await KDiscordConfig.LoadAsync();
+KDatabaseConfig _databaseConfig = await KDatabaseConfig.LoadAsync();
+bool newConfig = false;
 
 if (_discordConfig is null)
 {
     await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "New \"kuroko_discord_config.json\" file has been generated! Please fill this in before restarting the bot!"));
-    return;
+    newConfig = true;
 }
+
+if (_databaseConfig is null)
+{
+    await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "New \"kuroko_db_config.json\" file has been generated! Please fill this in before restarting the bot!"));
+    newConfig = true;
+}
+
+if (newConfig)
+    return;
 
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "Mounted \"kuroko_discord_config.json\"!"));
 
