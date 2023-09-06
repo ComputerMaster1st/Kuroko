@@ -1,7 +1,7 @@
 ﻿using Discord.Interactions;
 using Discord.WebSocket;
 
-namespace Kuroko.MDK
+namespace Kuroko.Core
 {
     public class KurokoInteractionContext : ShardedInteractionContext
     {
