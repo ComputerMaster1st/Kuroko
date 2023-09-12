@@ -17,4 +17,8 @@
     <ProjectReference Include="..\Kuroko.Database\Kuroko.Database.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Modules\RoleRequest\Components\" />
+  </ItemGroup>
+
 </Project>
