@@ -8,6 +8,8 @@ namespace Kuroko
 
         public const string SeparatorCharacter = "⬤";
 
+        // TODO: Write anything out to console & output logs
+
         public static async Task WriteLogAsync(LogMessage message)
         {
             await _logLock.WaitAsync();

@@ -57,6 +57,8 @@ await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM,
 
 #region DI: Core Modules
 
+// TODO: !!! ONLY CORE SERVICES SHOULD BE ADDED HERE !!!
+
 _serviceCollection.AddSingleton(_discordConfig)
     .AddSingleton(_discordClient)
     .AddSingleton(_interactionService);
@@ -64,6 +66,8 @@ _serviceCollection.AddSingleton(_discordConfig)
 #endregion
 
 #region DI: Database
+
+// TODO: !!! DO NOT TOUCH THIS AS THIS HANDLES DATABASE CONNECTION !!!
 
 _serviceCollection.AddDbContext<DatabaseContext>(options =>
 {
@@ -75,6 +79,8 @@ _serviceCollection.AddDbContext<DatabaseContext>(options =>
 #endregion
 
 #region DI: Events
+
+// TODO: Add any events that use '[PreInitialise]' attribute here.
 
 _serviceCollection.AddSingleton<DiscordLogEvent>()
     .AddSingleton<DiscordShardReadyEvent>()
@@ -94,6 +100,8 @@ await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM,
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, $"COMPONENT COMMANDS : {_interactionService.ComponentCommands.Count}"));
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, $"TEXT COMMANDS      : {_interactionService.ContextCommands.Count}"));
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "Initializing services..."));
+
+// TODO: Any custom attributes that require to be preloaded into dependency injection can be done here.
 
 foreach (ServiceDescriptor service in _serviceCollection)
 {

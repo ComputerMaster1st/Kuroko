@@ -1,7 +1,8 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Kuroko.MDK;
-using Kuroko.MDK.Attributes;
+using Kuroko.Core.Attributes;
+
+// TODO: Example of event handling. Use [PreInitialize] to create the event handler and have it auto-load on initialization.
 
 namespace Kuroko.CoreModule.Events
 {
