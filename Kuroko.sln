@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kuroko", "Kuroko\Kuroko.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kuroko.Database", "Kuroko.Database\Kuroko.Database.csproj", "{C790C8E5-2CB6-4234-856C-DEA6E79B6484}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kuroko.Shared", "Kuroko.Shared\Kuroko.Shared.csproj", "{7EE93CBD-BDBB-47A0-A3A7-600DF83ADA7E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kuroko.Shared", "Kuroko.Shared\Kuroko.Shared.csproj", "{7EE93CBD-BDBB-47A0-A3A7-600DF83ADA7E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,8 +19,8 @@ Global
 		{513DBADF-9338-4BB3-BC0D-99EBE956C241}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{513DBADF-9338-4BB3-BC0D-99EBE956C241}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{513DBADF-9338-4BB3-BC0D-99EBE956C241}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C790C8E5-2CB6-4234-856C-DEA6E79B6484}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C790C8E5-2CB6-4234-856C-DEA6E79B6484}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C790C8E5-2CB6-4234-856C-DEA6E79B6484}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{C790C8E5-2CB6-4234-856C-DEA6E79B6484}.Debug|Any CPU.Build.0 = Release|Any CPU
 		{C790C8E5-2CB6-4234-856C-DEA6E79B6484}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C790C8E5-2CB6-4234-856C-DEA6E79B6484}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7EE93CBD-BDBB-47A0-A3A7-600DF83ADA7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

@@ -1,5 +1,6 @@
 ﻿using Kuroko.Database.Entities.Guild;
 using Kuroko.Database.Entities.User;
+using Kuroko.Shared.Configuration;
 using Microsoft.EntityFrameworkCore;
 
 namespace Kuroko.Database
@@ -14,20 +15,23 @@ namespace Kuroko.Database
 
         public DbSet<RoleRequestEntity> GuildRoleRequests { get; set; } = null;
 
-        //public DatabaseContext() { }
+#if DEBUG
+        public DatabaseContext() { }
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    base.OnConfiguring(optionsBuilder);
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
 
-        //    var config = KDatabaseConfig.LoadAsync().GetAwaiter().GetResult();
+            var config = KDatabaseConfig.LoadAsync().GetAwaiter().GetResult();
 
-        //    optionsBuilder.UseNpgsql(config.ConnectionUrl())
-        //        .EnableSensitiveDataLogging()
-        //        .UseLazyLoadingProxies();
-        //}
+            optionsBuilder.UseNpgsql(config.ConnectionUrl())
+                .EnableSensitiveDataLogging()
+                .UseLazyLoadingProxies();
+        }
+#else
 
         public DatabaseContext(DbContextOptions optionsBuilder) : base(optionsBuilder) { }
+#endif
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
