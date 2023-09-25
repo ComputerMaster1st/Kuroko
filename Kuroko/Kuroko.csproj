@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Kuroko.Database\Kuroko.Database.csproj" />
+    <ProjectReference Include="..\Kuroko.Shared\Kuroko.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

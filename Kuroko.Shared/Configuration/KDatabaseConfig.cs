@@ -2,7 +2,7 @@
 
 namespace Kuroko.Shared.Configuration
 {
-    internal class KDatabaseConfig : BaseConfig, IConfig
+    public class KDatabaseConfig : BaseConfig, IConfig
     {
         [JsonIgnore]
         private const string FILEPATH = $"{DataDirectories.CONFIG}/kuroko_db_config.json";

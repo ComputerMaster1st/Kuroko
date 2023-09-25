@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Kuroko.Shared;
 
 namespace Kuroko
 {

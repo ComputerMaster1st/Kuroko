@@ -2,7 +2,7 @@
 
 namespace Kuroko.Shared.Configuration
 {
-    internal class BaseConfig
+    public class BaseConfig
     {
         protected static async Task<IConfig> BaseLoadAsync<TConfig>(string filePath) where TConfig : class, IConfig
         {

@@ -2,7 +2,7 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using Kuroko.Core;
-using Kuroko.MDK.Attributes;
+using Kuroko.Core.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text;
 

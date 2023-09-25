@@ -1,8 +1,8 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Kuroko.Core.Configuration;
 using Kuroko.Database;
 using Kuroko.Database.Entities;
+using Kuroko.Shared.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 

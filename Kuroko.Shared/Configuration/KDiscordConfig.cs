@@ -2,7 +2,7 @@
 
 namespace Kuroko.Shared.Configuration
 {
-    internal class KDiscordConfig : BaseConfig, IConfig
+    public class KDiscordConfig : BaseConfig, IConfig
     {
         [JsonIgnore]
         private const string FILEPATH = $"{DataDirectories.CONFIG}/kuroko_discord_config.json";

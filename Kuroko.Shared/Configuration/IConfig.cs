@@ -1,6 +1,6 @@
 ﻿namespace Kuroko.Shared.Configuration
 {
-    internal interface IConfig
+    public interface IConfig
     {
         Task SaveAsync();
     }
