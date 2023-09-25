@@ -10,7 +10,7 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
 {
     [RequireUserGuildPermission(GuildPermission.ManageRoles)]
     [RequireBotGuildPermission(GuildPermission.ManageRoles)]
-    public class AddRoleComponent : KurokoModuleBase
+    public class RemoveRoleComponent : KurokoModuleBase
     {
         private static StringBuilder OutputMsg
         {
@@ -19,11 +19,11 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
                 return new StringBuilder()
                     .AppendLine("# Role Request")
                     .AppendLine("## Management")
-                    .AppendLine("### Add Roles");
+                    .AppendLine("### Remove Roles");
             }
         }
 
-        [ComponentInteraction($"{CommandIdMap.RoleRequestManageAdd}:*,*")]
+        [ComponentInteraction($"{CommandIdMap.RoleRequestManageRemove}:*,*")]
         public async Task InitialAsync(ulong interactedUserId, int index)
         {
             await DeferAsync();
@@ -43,7 +43,7 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
             await ExecuteAsync(roleRequest, index, OutputMsg);
         }
 
-        [ComponentInteraction($"{CommandIdMap.RoleRequestManageSave}:*,*")]
+        [ComponentInteraction($"{CommandIdMap.RoleRequestManageDelete}:*,*")]
         public async Task ReturningAsync(ulong interactedUserId, int index, string[] roleIds)
         {
             await DeferAsync();
@@ -54,33 +54,33 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
                 return;
             }
 
-            var properties = await Context.Database.GuildRoleRequests.CreateOrGetDataAsync(
+            var roleRequest = await Context.Database.GuildRoleRequests.CreateOrGetDataAsync(
                 Context.Database.Guilds, Context.Guild.Id, (x, y) =>
                 {
                     x.RoleRequest ??= y;
                 });
             var selectedRoleIds = roleIds.Select(ulong.Parse);
 
-            OutputMsg.AppendLine("Selected roles for public use:");
+            OutputMsg.AppendLine("Selected roles removed from public use:");
 
             foreach (var roleId in selectedRoleIds)
             {
                 var role = Context.Guild.GetRole(roleId);
+                roleRequest.RoleIds.RemoveAll(x => x.Value == roleId);
 
-                properties.RoleIds.Add(new(role.Id));
                 OutputMsg.AppendLine("* " + role.Name);
             }
 
             await Context.Database.SaveChangesAsync();
-            await ExecuteAsync(properties, index, OutputMsg);
+            await ExecuteAsync(roleRequest, index, OutputMsg);
         }
 
         private async Task ExecuteAsync(RoleRequestEntity roleRequest, int index, StringBuilder output)
         {
-            var menu = RRMenu.BuildAddMenu(Context.User as IGuildUser, roleRequest, index);
+            var menu = RRMenu.BuildRemoveMenu(Context.User as IGuildUser, roleRequest, index);
 
             if (!menu.HasOptions)
-                output.AppendLine("All roles already available! Nothing to list.");
+                output.AppendLine("Nothing to list.");
 
             await Context.Interaction.ModifyOriginalResponseAsync(x =>
             {

@@ -61,6 +61,34 @@ namespace Kuroko.Modules.RoleRequest
             return PagedSelectMenu(selectMenu, indexStart, user, CommandIdMap.RoleRequestManageAdd);
         }
 
+        public static (bool HasOptions, MessageComponent Components) BuildRemoveMenu(IGuildUser user, RoleRequestEntity properties, int indexStart)
+        {
+            var count = 0;
+            var roleIds = properties.RoleIds.Skip(indexStart).ToList();
+            var selectMenu = new SelectMenuBuilder()
+                .WithCustomId($"{CommandIdMap.RoleRequestManageDelete}:{user.Id},{indexStart}")
+                .WithMinValues(1)
+                .WithPlaceholder("Select role(s) to remove from public");
+            var guildRoles = new List<IRole>();
+
+            foreach (var roleId in roleIds)
+            {
+                var role = user.Guild.GetRole(roleId.Value);
+                guildRoles.Add(role);
+            }
+
+            foreach (var role in guildRoles.OrderByDescending(x => x.Position))
+            {
+                selectMenu.AddOption(role.Name, role.Id.ToString());
+                count++;
+
+                if (count >= 25)
+                    break;
+            }
+
+            return PagedSelectMenu(selectMenu, indexStart, user, CommandIdMap.RoleRequestManageRemove);
+        }
+
         private static (bool HasOptions, MessageComponent Components) PagedSelectMenu(
             SelectMenuBuilder builder,
             int startIndex,
