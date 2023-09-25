@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Kuroko.Core.Configuration
+namespace Kuroko.Shared.Configuration
 {
     internal class BaseConfig
     {

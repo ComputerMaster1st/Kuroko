@@ -1,4 +1,4 @@
-﻿namespace Kuroko.Core.Configuration
+﻿namespace Kuroko.Shared.Configuration
 {
     internal interface IConfig
     {
