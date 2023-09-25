@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Kuroko.Database.Entities.Guild
 {
-    public class RoleRequestEntity
+    public class RoleRequestEntity : IPropertyEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; private set; } = 0;
