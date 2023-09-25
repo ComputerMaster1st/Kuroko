@@ -5,7 +5,7 @@ namespace Kuroko.Modules.RoleRequest
 {
     public static class RRMenu
     {
-        public static MessageComponent BuildUserMenu(bool hasRolesAvailable, bool hasManageRolePermission, ulong contextUserId, StringBuilder output)
+        public static MessageComponent BuildMainMenu(bool hasRolesAvailable, bool hasManageRolePermission, ulong contextUserId, StringBuilder output)
         {
             var builder = new ComponentBuilder();
             var manageRowId = 0;

@@ -25,7 +25,7 @@ namespace Kuroko.Modules.RoleRequest
                 output.AppendFormat("**{0}** roles available for you to choose!", roleRequestData.RoleIds.Count).AppendLine();
             }
 
-            var msgComponents = RRMenu.BuildUserMenu(hasRoles, user.GuildPermissions.ManageRoles, user.Id, output);
+            var msgComponents = RRMenu.BuildMainMenu(hasRoles, user.GuildPermissions.ManageRoles, user.Id, output);
 
             await RespondAsync(output.ToString(), components: msgComponents);
         }
