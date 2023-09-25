@@ -76,7 +76,7 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
             var menu = RRMenu.BuildAddMenu(Context.Guild, roleRequest, Context.User as IGuildUser, index);
 
             if (!menu.HasOptions)
-                output.AppendLine("Oops, looks like you reached the end of the list already!");
+                output.AppendLine("All roles already available! Nothing to list.");
 
             await Context.Interaction.ModifyOriginalResponseAsync(x =>
             {
