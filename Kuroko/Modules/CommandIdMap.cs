@@ -12,8 +12,20 @@
 
         #region RoleRequest
 
+        #region Users
+
         public const string RoleRequestAssign = "rr_user_assign";
         public const string RoleRequestRemove = "rr_user_remove";
+
+        #endregion
+
+        #region Management
+
+        public const string RoleRequestManageAdd = "rr_manage_add";
+        public const string RoleRequestManageRemove = "rr_manage_remove";
+        public const string RoleRequestManageRemoveAll = "rr_manage_remove_all";
+
+        #endregion
 
         #endregion
     }

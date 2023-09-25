@@ -1,4 +1,5 @@
-﻿using Discord.Interactions;
+﻿using Discord;
+using Discord.Interactions;
 using Kuroko.Core;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
@@ -7,25 +8,26 @@ namespace Kuroko.Modules.RoleRequest
 {
     public class RoleRequest : KurokoModuleBase
     {
-        [SlashCommand("roles", "Manage my roles!")]
+        [SlashCommand("roles", "Public roles !")]
         public async Task ExecuteAsync()
         {
+            var user = Context.User as IGuildUser;
             var roleRequestData = await Context.Database.GuildRoleRequests.FirstOrDefaultAsync(x => x.Guild.Id == Context.Guild.Id);
             var output = new StringBuilder()
                 .AppendLine("# Role Request");
+            var hasRoles = false;
 
             if (roleRequestData is null || roleRequestData.RoleIds.Count < 1)
-            {
                 output.AppendLine("Role Request is currently not setup on this server.");
-
-                await RespondAsync(output.ToString(), ephemeral: true);
-
-                return;
+            else
+            {
+                hasRoles = true;
+                output.AppendFormat("**{0}** roles available for you to choose!", roleRequestData.RoleIds.Count).AppendLine();
             }
 
-            output.AppendFormat("**{0}** roles available for you to choose!", roleRequestData.RoleIds.Count).AppendLine();
+            var msgComponents = RRMenu.BuildUserMenu(hasRoles, user.GuildPermissions.ManageRoles, output);
 
-            await RespondAsync(output.ToString(), components: RRMenu.BuildUserMenu());
+            await RespondAsync(output.ToString(), components: msgComponents);
         }
     }
 }
