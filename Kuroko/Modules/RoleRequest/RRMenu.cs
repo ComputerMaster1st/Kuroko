@@ -14,8 +14,8 @@ namespace Kuroko.Modules.RoleRequest
             {
                 manageRowId = 1;
                 builder
-                    .WithButton("Assign", $"{CommandIdMap.RoleRequestAssign}:{contextUserId}", ButtonStyle.Success, row: 0)
-                    .WithButton("Remove", $"{CommandIdMap.RoleRequestRemove}:{contextUserId}", ButtonStyle.Danger, row: 0);
+                    .WithButton("Assign", $"{CommandIdMap.RoleRequestAssign}:{contextUserId},0", ButtonStyle.Success, row: 0)
+                    .WithButton("Remove", $"{CommandIdMap.RoleRequestRemove}:{contextUserId},0", ButtonStyle.Danger, row: 0);
             }
 
             if (hasManageRolePermission)
@@ -23,8 +23,8 @@ namespace Kuroko.Modules.RoleRequest
                 output.AppendLine("## Role Management");
 
                 builder
-                    .WithButton("Add Roles", $"{CommandIdMap.RoleRequestManageAdd}:{contextUserId}", ButtonStyle.Primary, row: manageRowId)
-                    .WithButton("Remove Roles", $"{CommandIdMap.RoleRequestManageRemove}:{contextUserId}", ButtonStyle.Primary, row: manageRowId)
+                    .WithButton("Add Roles", $"{CommandIdMap.RoleRequestManageAdd}:{contextUserId},0", ButtonStyle.Primary, row: manageRowId)
+                    .WithButton("Remove Roles", $"{CommandIdMap.RoleRequestManageRemove}:{contextUserId},0", ButtonStyle.Primary, row: manageRowId)
                     .WithButton("Remove All", CommandIdMap.RoleRequestManageRemoveAll, ButtonStyle.Danger, row: manageRowId);
             }
 

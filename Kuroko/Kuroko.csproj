@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Modules\RoleRequest\Components\" />
+    <Folder Include="Modules\RoleRequest\Components\User\" />
   </ItemGroup>
 
 </Project>
