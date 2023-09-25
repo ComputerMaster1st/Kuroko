@@ -6,7 +6,7 @@ namespace Kuroko.Modules.RoleRequest
 {
     public static class RRMenu
     {
-        public static MessageComponent BuildMainMenu(bool hasRolesAvailable, bool hasManageRolePermission, ulong contextUserId, StringBuilder output)
+        public static MessageComponent BuildMainMenu(bool hasRolesAvailable, IGuildUser user, StringBuilder output)
         {
             var builder = new ComponentBuilder();
             var manageRowId = 0;
@@ -15,17 +15,17 @@ namespace Kuroko.Modules.RoleRequest
             {
                 manageRowId = 1;
                 builder
-                    .WithButton("Assign", $"{CommandIdMap.RoleRequestAssign}:{contextUserId},0", ButtonStyle.Success, row: 0)
-                    .WithButton("Remove", $"{CommandIdMap.RoleRequestRemove}:{contextUserId},0", ButtonStyle.Danger, row: 0);
+                    .WithButton("Assign", $"{CommandIdMap.RoleRequestAssign}:{user.Id},0", ButtonStyle.Success, row: 0)
+                    .WithButton("Remove", $"{CommandIdMap.RoleRequestRemove}:{user.Id},0", ButtonStyle.Danger, row: 0);
             }
 
-            if (hasManageRolePermission)
+            if (user.GuildPermissions.ManageRoles)
             {
                 output.AppendLine("## Management");
 
                 builder
-                    .WithButton("Add Roles", $"{CommandIdMap.RoleRequestManageAdd}:{contextUserId},0", ButtonStyle.Primary, row: manageRowId)
-                    .WithButton("Remove Roles", $"{CommandIdMap.RoleRequestManageRemove}:{contextUserId},0", ButtonStyle.Primary, row: manageRowId)
+                    .WithButton("Add Roles", $"{CommandIdMap.RoleRequestManageAdd}:{user.Id},0", ButtonStyle.Primary, row: manageRowId)
+                    .WithButton("Remove Roles", $"{CommandIdMap.RoleRequestManageRemove}:{user.Id},0", ButtonStyle.Primary, row: manageRowId)
                     .WithButton("Remove All", CommandIdMap.RoleRequestManageRemoveAll, ButtonStyle.Danger, row: manageRowId);
             }
 
@@ -34,10 +34,10 @@ namespace Kuroko.Modules.RoleRequest
             return builder.Build();
         }
 
-        public static (bool HasOptions, MessageComponent Components) BuildAddMenu(IGuild guild, RoleRequestEntity properties, IGuildUser user, int indexStart)
+        public static (bool HasOptions, MessageComponent Components) BuildAddMenu(IGuildUser user, RoleRequestEntity properties, int indexStart)
         {
             var count = 0;
-            var roles = guild.Roles.OrderByDescending(x => x.Position)
+            var roles = user.Guild.Roles.OrderByDescending(x => x.Position)
                 .Skip(indexStart)
                 .ToList();
 
@@ -64,7 +64,7 @@ namespace Kuroko.Modules.RoleRequest
         private static (bool HasOptions, MessageComponent Components) PagedSelectMenu(
             SelectMenuBuilder builder,
             int startIndex,
-            IGuildUser user,
+            IUser user,
             string commandId)
         {
             var componentBuilder = new ComponentBuilder();
