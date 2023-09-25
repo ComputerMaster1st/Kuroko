@@ -8,8 +8,25 @@ namespace Kuroko.Modules.RoleRequest
 {
     public class RoleRequest : KurokoModuleBase
     {
-        [SlashCommand("roles", "Public roles !")]
-        public async Task ExecuteAsync()
+        [SlashCommand("roles", "Role assignment & configuration")]
+        public Task InitialAsync()
+            => ExecuteAsync();
+
+        [ComponentInteraction($"{CommandIdMap.RoleRequestMenu}:*")]
+        public async Task ReturningAsync(ulong interactedUserId)
+        {
+            await DeferAsync();
+
+            if (interactedUserId != Context.User.Id)
+            {
+                await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
+                return;
+            }
+
+            await ExecuteAsync(true);
+        }
+
+        private async Task ExecuteAsync(bool isReturning = false)
         {
             var user = Context.User as IGuildUser;
             var roleRequestData = await Context.Database.GuildRoleRequests.FirstOrDefaultAsync(x => x.Guild.Id == Context.Guild.Id);
@@ -27,7 +44,14 @@ namespace Kuroko.Modules.RoleRequest
 
             var msgComponents = RRMenu.BuildMainMenu(hasRoles, user.GuildPermissions.ManageRoles, user.Id, output);
 
-            await RespondAsync(output.ToString(), components: msgComponents);
+            if (!isReturning)
+                await RespondAsync(output.ToString(), components: msgComponents);
+            else
+                await Context.Interaction.ModifyOriginalResponseAsync(x =>
+                {
+                    x.Content = output.ToString();
+                    x.Components = msgComponents;
+                });
         }
     }
 }

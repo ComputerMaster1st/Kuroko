@@ -6,11 +6,13 @@
     {
         #region Global
 
-        public const string Exit = "normal_exit";
+        public const string Exit = "exit";
 
         #endregion
 
         #region RoleRequest
+
+        public const string RoleRequestMenu = "rr_menu";
 
         #region Users
 
@@ -24,6 +26,7 @@
         public const string RoleRequestManageAdd = "rr_manage_add";
         public const string RoleRequestManageRemove = "rr_manage_remove";
         public const string RoleRequestManageRemoveAll = "rr_manage_remove_all";
+        public const string RoleRequestManageSave = "rr_manage_save";
 
         #endregion
 
