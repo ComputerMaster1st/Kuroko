@@ -8,6 +8,7 @@ namespace Kuroko.Database.Entities.Guild
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; private set; } = 0;
 
+        public ulong GuildId { get; private set; } = 0;
         public virtual GuildEntity Guild { get; private set; } = null;
 
         public virtual List<UlongEntity> RoleIds { get; private set; } = new();

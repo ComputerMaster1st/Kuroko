@@ -14,7 +14,18 @@ namespace Kuroko.Database
 
         public DbSet<RoleRequestEntity> GuildRoleRequests { get; set; } = null;
 
-        // END
+        //public DatabaseContext() { }
+
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    base.OnConfiguring(optionsBuilder);
+
+        //    var config = KDatabaseConfig.LoadAsync().GetAwaiter().GetResult();
+
+        //    optionsBuilder.UseNpgsql(config.ConnectionUrl())
+        //        .EnableSensitiveDataLogging()
+        //        .UseLazyLoadingProxies();
+        //}
 
         public DatabaseContext(DbContextOptions optionsBuilder) : base(optionsBuilder) { }
 
@@ -28,9 +39,12 @@ namespace Kuroko.Database
                 .HasMany(x => x.RoleIds)
                 .WithOne()
                 .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<GuildEntity>()
                 .HasOne(x => x.RoleRequest)
                 .WithOne(x => x.Guild)
+                .HasForeignKey<RoleRequestEntity>(x => x.GuildId)
+                .HasPrincipalKey<GuildEntity>(x => x.Id)
                 .OnDelete(DeleteBehavior.Cascade);
 
             #endregion
