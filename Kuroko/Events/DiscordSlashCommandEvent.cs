@@ -51,7 +51,6 @@ namespace Kuroko.Events
                 return;
 
             var output = new StringBuilder();
-            var postError = true;
 
             switch (result.Error)
             {
@@ -80,8 +79,6 @@ namespace Kuroko.Events
                     output.AppendFormat("Precondition Error: {0}", result.ErrorReason);
                     break;
                 default:
-                    postError = false;
-
                     await Utilities.WriteLogAsync(new LogMessage(
                         LogSeverity.Warning,
                         "SlashCMD",
@@ -90,7 +87,7 @@ namespace Kuroko.Events
                     break;
             }
 
-            if (postError)
+            if (output.Length > 0)
                 await ctx.Interaction.RespondAsync(output.ToString(), ephemeral: true);
         }
 
