@@ -12,8 +12,19 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
     [RequireBotGuildPermission(GuildPermission.ManageRoles)]
     public class AddRoleComponent : KurokoModuleBase
     {
+        private static StringBuilder _outputMsg
+        {
+            get
+            {
+                return new StringBuilder()
+                    .AppendLine("# Role Request")
+                    .AppendLine("## Management")
+                    .AppendLine("### Add Roles");
+            }
+        }
+
         [ComponentInteraction($"{CommandIdMap.RoleRequestManageAdd}:*,*")]
-        public async Task ExecuteAsync(ulong interactedUserId, int index)
+        public async Task InitialAsync(ulong interactedUserId, int index)
         {
             await DeferAsync();
 
@@ -28,16 +39,12 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
                 {
                     x.RoleRequest ??= y;
                 });
-            var output = new StringBuilder()
-                .AppendLine("# Role Request")
-                .AppendLine("## Management")
-                .AppendLine("### Add Roles");
 
-            await EchoExecuteAsync(roleRequest, index, output);
+            await ExecuteAsync(roleRequest, index, _outputMsg);
         }
 
         [ComponentInteraction($"{CommandIdMap.RoleRequestManageSave}:*,*")]
-        public async Task ExecuteAsync(ulong interactedUserId, int index, string[] roleIds)
+        public async Task ReturningAsync(ulong interactedUserId, int index, string[] roleIds)
         {
             await DeferAsync();
 
@@ -53,25 +60,21 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
                     x.RoleRequest ??= y;
                 });
             var selectedRoleIds = roleIds.Select(x => ulong.Parse(x));
-            var output = new StringBuilder()
-                .AppendLine("# Role Request")
-                .AppendLine("## Management")
-                .AppendLine("### Add Roles")
-                .AppendLine("Selected roles for public use:");
+            _outputMsg.AppendLine("Selected roles for public use:");
 
             foreach (var roleId in selectedRoleIds)
             {
                 var role = Context.Guild.GetRole(roleId);
 
                 properties.RoleIds.Add(new(role.Id));
-                output.AppendLine("* " + role.Name);
+                _outputMsg.AppendLine("* " + role.Name);
             }
 
             await Context.Database.SaveChangesAsync();
-            await EchoExecuteAsync(properties, index, output);
+            await ExecuteAsync(properties, index, _outputMsg);
         }
 
-        private async Task EchoExecuteAsync(RoleRequestEntity roleRequest, int index, StringBuilder output)
+        private async Task ExecuteAsync(RoleRequestEntity roleRequest, int index, StringBuilder output)
         {
             var menu = RRMenu.BuildAddMenu(Context.User as IGuildUser, roleRequest, index);
 
