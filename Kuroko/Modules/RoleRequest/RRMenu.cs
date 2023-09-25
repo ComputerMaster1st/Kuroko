@@ -21,7 +21,7 @@ namespace Kuroko.Modules.RoleRequest
 
             if (hasManageRolePermission)
             {
-                output.AppendLine("## Role Management");
+                output.AppendLine("## Management");
 
                 builder
                     .WithButton("Add Roles", $"{CommandIdMap.RoleRequestManageAdd}:{contextUserId},0", ButtonStyle.Primary, row: manageRowId)
