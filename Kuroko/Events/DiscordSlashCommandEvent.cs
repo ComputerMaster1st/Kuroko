@@ -51,6 +51,7 @@ namespace Kuroko.Events
                 return;
 
             var output = new StringBuilder();
+            var postError = true;
 
             switch (result.Error)
             {
@@ -64,7 +65,7 @@ namespace Kuroko.Events
                         ex
                     ));
 
-                    output.AppendFormat("Error! Please contact developer with following: {0}", ex.Message);
+                    output.AppendFormat("Command Exception (Contact NekoTech Developer): {0}", ex.Message);
                     break;
                 case InteractionCommandError.Unsuccessful:
                     await Utilities.WriteLogAsync(new LogMessage(
@@ -73,12 +74,14 @@ namespace Kuroko.Events
                         "Slash Command Error: " + result.ErrorReason
                     ));
 
-                    output.AppendFormat("Error! {0}", result.ErrorReason);
+                    output.AppendFormat("Command Unsuccessful: {0}", result.ErrorReason);
                     break;
                 case InteractionCommandError.UnmetPrecondition:
                     output.AppendFormat("Precondition Error: {0}", result.ErrorReason);
                     break;
                 default:
+                    postError = false;
+
                     await Utilities.WriteLogAsync(new LogMessage(
                         LogSeverity.Warning,
                         "SlashCMD",
@@ -87,7 +90,8 @@ namespace Kuroko.Events
                     break;
             }
 
-            await ctx.Interaction.RespondAsync(output.ToString(), ephemeral: true);
+            if (postError)
+                await ctx.Interaction.RespondAsync(output.ToString(), ephemeral: true);
         }
 
         public void RefreshServiceProvider(IServiceProvider serviceProvider)
