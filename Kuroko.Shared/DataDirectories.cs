@@ -1,4 +1,4 @@
-﻿namespace Kuroko
+﻿namespace Kuroko.Shared
 {
     public static class DataDirectories
     {

@@ -5,21 +5,45 @@ namespace Kuroko.Database
 {
     public static class DatabaseContextExtensions
     {
-        public static Task<TDiscordEntity> GetDataAsync<TDiscordEntity>(this DbSet<TDiscordEntity> dbSet, ulong id) where TDiscordEntity : class, IDiscordEntity
-            => dbSet.FirstOrDefaultAsync(x => x.Id == id);
+        public static Task<TDiscordEntity> GetDataAsync<TDiscordEntity>(
+            this DbSet<TDiscordEntity> dbTable, ulong id)
+            where TDiscordEntity : class, IDiscordEntity
+            => dbTable.FirstOrDefaultAsync(x => x.Id == id);
 
-        public static async Task<TDiscordEntity> CreateOrGetDataAsync<TDiscordEntity>(this DbSet<TDiscordEntity> dbSet, ulong id) where TDiscordEntity : class, IDiscordEntity
+        public static async Task<TGuildPropertyEntity> CreateOrGetDataAsync<TGuildPropertyEntity, TDiscordEntity>(
+            this DbSet<TGuildPropertyEntity> dbProperty, DbSet<TDiscordEntity> dbDiscordEntity, ulong guildId,
+            Action<TDiscordEntity, TGuildPropertyEntity> guildEntityAction)
+            where TGuildPropertyEntity : class, IPropertyEntity
+            where TDiscordEntity : class, IDiscordEntity
         {
-            var entity = await dbSet.FirstOrDefaultAsync(x => x.Id == id);
+            var propertyEntity = await dbProperty.FirstOrDefaultAsync(x => x.GuildId == guildId);
 
-            if (entity != null)
-                return entity;
+            if (propertyEntity != null)
+                return propertyEntity;
 
-            entity = (TDiscordEntity)Activator.CreateInstance(typeof(TDiscordEntity), id);
+            propertyEntity = (TGuildPropertyEntity)Activator.CreateInstance(typeof(TGuildPropertyEntity));
 
-            await dbSet.AddAsync(entity);
+            await dbProperty.AddAsync(propertyEntity);
 
-            return entity;
+            var discordEntity = await dbDiscordEntity.CreateDataAsync(guildId);
+            guildEntityAction(discordEntity, propertyEntity);
+
+            return propertyEntity;
+        }
+
+        private async static Task<TDiscordEntity> CreateDataAsync<TDiscordEntity>(
+            this DbSet<TDiscordEntity> dbTable, ulong Id) where TDiscordEntity : class, IDiscordEntity
+        {
+            var data = await dbTable.GetDataAsync(Id);
+
+            if (data != null)
+                return data;
+
+            data = (TDiscordEntity)Activator.CreateInstance(typeof(TDiscordEntity), Id);
+
+            await dbTable.AddAsync(data);
+
+            return data;
         }
     }
 }

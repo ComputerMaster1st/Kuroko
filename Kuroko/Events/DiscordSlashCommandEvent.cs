@@ -2,7 +2,7 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using Kuroko.Core;
-using Kuroko.MDK.Attributes;
+using Kuroko.Core.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text;
 
@@ -64,7 +64,7 @@ namespace Kuroko.Events
                         ex
                     ));
 
-                    output.AppendFormat("Error! Please contact developer with following: {0}", ex.Message);
+                    output.AppendFormat("Command Exception (Contact NekoTech Developer): {0}", ex.Message);
                     break;
                 case InteractionCommandError.Unsuccessful:
                     await Utilities.WriteLogAsync(new LogMessage(
@@ -73,7 +73,7 @@ namespace Kuroko.Events
                         "Slash Command Error: " + result.ErrorReason
                     ));
 
-                    output.AppendFormat("Error! {0}", result.ErrorReason);
+                    output.AppendFormat("Command Unsuccessful: {0}", result.ErrorReason);
                     break;
                 case InteractionCommandError.UnmetPrecondition:
                     output.AppendFormat("Precondition Error: {0}", result.ErrorReason);
@@ -87,7 +87,8 @@ namespace Kuroko.Events
                     break;
             }
 
-            await ctx.Interaction.RespondAsync(output.ToString(), ephemeral: true);
+            if (output.Length > 0)
+                await ctx.Interaction.RespondAsync(output.ToString(), ephemeral: true);
         }
 
         public void RefreshServiceProvider(IServiceProvider serviceProvider)

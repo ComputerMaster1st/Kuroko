@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Kuroko.Modules.Utilities
 {
+    // TODO: Example slash command. Use KurokoModuleBase as it already includes the custom interaction context.
+
     public class Ping : KurokoModuleBase
     {
         [SlashCommand("ping", "Ping discord latency")]

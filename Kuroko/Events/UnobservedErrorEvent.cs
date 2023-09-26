@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Kuroko.Core;
-using Kuroko.MDK;
-using Kuroko.MDK.Attributes;
+using Kuroko.Core.Attributes;
 
 namespace Kuroko.Events
 {

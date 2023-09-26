@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Kuroko.Shared;
 
 namespace Kuroko
 {
@@ -7,6 +8,8 @@ namespace Kuroko
         private static readonly SemaphoreSlim _logLock = new(1);
 
         public const string SeparatorCharacter = "⬤";
+
+        // TODO: Write anything out to console & output logs
 
         public static async Task WriteLogAsync(LogMessage message)
         {

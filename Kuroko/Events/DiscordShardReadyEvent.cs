@@ -1,8 +1,8 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Kuroko.Core.Configuration;
-using Kuroko.MDK.Attributes;
+using Kuroko.Core.Attributes;
+using Kuroko.Shared.Configuration;
 
 namespace Kuroko.Events
 {
