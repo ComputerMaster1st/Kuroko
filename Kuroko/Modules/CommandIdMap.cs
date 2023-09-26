@@ -17,6 +17,8 @@
         #region Users
 
         public const string RoleRequestAssign = "rr_user_assign";
+        public const string RoleRequestDelete = "rr_user_delete";
+        public const string RoleRequestSave = "rr_user_save";
         public const string RoleRequestRemove = "rr_user_remove";
 
         #endregion

@@ -89,6 +89,32 @@ namespace Kuroko.Modules.RoleRequest
             return PagedSelectMenu(selectMenu, indexStart, user, CommandIdMap.RoleRequestManageRemove);
         }
 
+        public static (bool HasOptions, MessageComponent Components) BuildAssignMenu(IGuildUser user, RoleRequestEntity properties, int indexStart)
+        {
+            var count = 0;
+            var roleIds = properties.RoleIds.Skip(indexStart).ToList();
+            var selectMenu = new SelectMenuBuilder()
+                .WithCustomId($"{CommandIdMap.RoleRequestSave}:{user.Id},{indexStart}")
+                .WithMinValues(1)
+                .WithPlaceholder("Select role(s) to assign yourself");
+            var guildRoles = new List<IRole>();
+
+            foreach (var roleId in roleIds)
+                if (!user.RoleIds.Any(x => x == roleId.Value))
+                    guildRoles.Add(user.Guild.GetRole(roleId.Value));
+
+            foreach (var role in guildRoles.OrderByDescending(x => x.Position))
+            {
+                selectMenu.AddOption(role.Name, role.Id.ToString());
+                count++;
+
+                if (count >= 25)
+                    break;
+            }
+
+            return PagedSelectMenu(selectMenu, indexStart, user, CommandIdMap.RoleRequestAssign);
+        }
+
         private static (bool HasOptions, MessageComponent Components) PagedSelectMenu(
             SelectMenuBuilder builder,
             int startIndex,

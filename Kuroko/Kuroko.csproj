@@ -19,8 +19,4 @@
     <ProjectReference Include="..\Kuroko.Shared\Kuroko.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Modules\RoleRequest\Components\User\" />
-  </ItemGroup>
-
 </Project>
