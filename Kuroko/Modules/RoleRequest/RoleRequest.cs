@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Kuroko.Core.Attributes;
+using Kuroko.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 
@@ -68,13 +69,16 @@ namespace Kuroko.Modules.RoleRequest
             var msgComponents = RRMenu.BuildMainMenu(user, output, hasRoles, properties.RoleIds.Count > userRoleCount, userRoleCount > 0);
 
             if (!isReturning)
+            {
                 await RespondAsync(output.ToString(), components: msgComponents);
+                (await Context.Interaction.GetOriginalResponseAsync()).SetTimeout(1);
+            }
             else
-                await Context.Interaction.ModifyOriginalResponseAsync(x =>
+                (await Context.Interaction.ModifyOriginalResponseAsync(x =>
                 {
                     x.Content = output.ToString();
                     x.Components = msgComponents;
-                });
+                })).ResetTimeout();
         }
     }
 }
