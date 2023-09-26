@@ -60,7 +60,7 @@ namespace Kuroko.Modules.RoleRequest
                 if (role.Position >= selfHighestRole.Position || properties.RoleIds.Any(x => x.Value == role.Id) || role.Name == "@everyone")
                     continue;
 
-                selectMenu.AddOption($"[{role.Position}]" + role.Name, role.Id.ToString());
+                selectMenu.AddOption(role.Name, role.Id.ToString());
                 count++;
 
                 if (count >= 25)
