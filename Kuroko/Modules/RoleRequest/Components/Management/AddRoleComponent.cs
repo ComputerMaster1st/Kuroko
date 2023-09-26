@@ -26,13 +26,13 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
         [ComponentInteraction($"{CommandIdMap.RoleRequestManageAdd}:*,*")]
         public async Task InitialAsync(ulong interactedUserId, int index)
         {
-            await DeferAsync();
-
             if (interactedUserId != Context.User.Id)
             {
                 await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
                 return;
             }
+
+            await DeferAsync();
 
             var roleRequest = await Context.Database.GuildRoleRequests.CreateOrGetDataAsync(
                 Context.Database.Guilds, Context.Guild.Id, (x, y) =>
@@ -46,13 +46,13 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
         [ComponentInteraction($"{CommandIdMap.RoleRequestManageSave}:*,*")]
         public async Task ReturningAsync(ulong interactedUserId, int index, string[] roleIds)
         {
-            await DeferAsync();
-
             if (interactedUserId != Context.User.Id)
             {
                 await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
                 return;
             }
+
+            await DeferAsync();
 
             var properties = await Context.Database.GuildRoleRequests.CreateOrGetDataAsync(
                 Context.Database.Guilds, Context.Guild.Id, (x, y) =>

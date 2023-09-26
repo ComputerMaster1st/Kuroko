@@ -15,14 +15,13 @@ namespace Kuroko.Modules.RoleRequest
         [ComponentInteraction($"{CommandIdMap.RoleRequestMenu}:*")]
         public async Task ReturningAsync(ulong interactedUserId)
         {
-            await DeferAsync();
-
             if (interactedUserId != Context.User.Id)
             {
                 await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
                 return;
             }
 
+            await DeferAsync();
             await ExecuteAsync(true);
         }
 

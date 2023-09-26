@@ -29,7 +29,7 @@ namespace Kuroko.Modules.RoleRequest
                     .WithButton("Remove All", CommandIdMap.RoleRequestManageRemoveAll, ButtonStyle.Danger, row: manageRowId);
             }
 
-            builder.WithButton("Exit", CommandIdMap.Exit, ButtonStyle.Secondary, row: manageRowId + 1);
+            builder.WithButton("Exit", $"{CommandIdMap.Exit}:{user.Id}", ButtonStyle.Secondary, row: manageRowId + 1);
 
             return builder.Build();
         }

@@ -7,13 +7,19 @@ namespace Kuroko.Modules.Globals
 
     public class ExitComponent : KurokoModuleBase
     {
-        [ComponentInteraction(CommandIdMap.Exit)]
-        public async Task ExecuteAsync()
+        [ComponentInteraction($"{CommandIdMap.Exit}:*")]
+        public async Task ExecuteAsync(ulong interactedUserId)
         {
-            await DeferAsync();
+            if (interactedUserId != Context.User.Id)
+            {
+                await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
+                return;
+            }
 
             var msg = await Context.Interaction.GetOriginalResponseAsync();
-            await msg.DeleteAsync();
+
+            if (msg != null)
+                await msg.DeleteAsync();
         }
     }
 }
