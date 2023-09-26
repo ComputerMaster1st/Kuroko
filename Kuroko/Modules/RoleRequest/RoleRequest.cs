@@ -1,6 +1,8 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Kuroko.Core;
+using Kuroko.Core.Attributes;
+using Kuroko.Database;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 
@@ -22,6 +24,27 @@ namespace Kuroko.Modules.RoleRequest
             }
 
             await DeferAsync();
+            await ExecuteAsync(true);
+        }
+
+        [ComponentInteraction($"{CommandIdMap.RoleRequestManageReset}:*")]
+        [RequireUserGuildPermission(GuildPermission.ManageRoles)]
+        public async Task ResetAsync(ulong interactedUserId)
+        {
+            if (interactedUserId != Context.User.Id)
+            {
+                await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
+                return;
+            }
+
+            await DeferAsync();
+
+            var properties = await Context.Database.GuildRoleRequests.CreateOrGetDataAsync(Context.Database.Guilds, Context.Guild.Id, (x, y) =>
+            {
+                x.RoleRequest ??= y;
+            });
+            properties.RoleIds.Clear();
+
             await ExecuteAsync(true);
         }
 

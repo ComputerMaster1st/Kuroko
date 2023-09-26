@@ -16,6 +16,8 @@ namespace Kuroko.Modules.Globals
                 return;
             }
 
+            await DeferAsync();
+
             var msg = await Context.Interaction.GetOriginalResponseAsync();
 
             if (msg != null)

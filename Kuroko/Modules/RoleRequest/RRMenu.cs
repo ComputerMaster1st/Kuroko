@@ -26,7 +26,7 @@ namespace Kuroko.Modules.RoleRequest
                 builder
                     .WithButton("Add Roles", $"{CommandIdMap.RoleRequestManageAdd}:{user.Id},0", ButtonStyle.Primary, row: manageRowId)
                     .WithButton("Remove Roles", $"{CommandIdMap.RoleRequestManageRemove}:{user.Id},0", ButtonStyle.Primary, row: manageRowId)
-                    .WithButton("Remove All", CommandIdMap.RoleRequestManageRemoveAll, ButtonStyle.Danger, row: manageRowId);
+                    .WithButton("Remove All", $"{CommandIdMap.RoleRequestManageReset}:{user.Id}", ButtonStyle.Danger, row: manageRowId);
             }
 
             builder.WithButton("Exit", $"{CommandIdMap.Exit}:{user.Id}", ButtonStyle.Secondary, row: manageRowId + 1);

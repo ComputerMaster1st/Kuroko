@@ -26,7 +26,7 @@
         public const string RoleRequestManageAdd = "rr_manage_add";
         public const string RoleRequestManageDelete = "rr_manage_delete";
         public const string RoleRequestManageRemove = "rr_manage_remove";
-        public const string RoleRequestManageRemoveAll = "rr_manage_remove_all";
+        public const string RoleRequestManageReset = "rr_manage_reset";
         public const string RoleRequestManageSave = "rr_manage_save";
 
         #endregion

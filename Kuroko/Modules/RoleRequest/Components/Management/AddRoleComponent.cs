@@ -61,18 +61,23 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
                 });
             var selectedRoleIds = roleIds.Select(ulong.Parse);
 
-            OutputMsg.AppendLine("Selected roles for public use:");
+            var output = OutputMsg.AppendLine("Selected roles for public use:");
 
             foreach (var roleId in selectedRoleIds)
             {
                 var role = Context.Guild.GetRole(roleId);
 
-                properties.RoleIds.Add(new(role.Id));
-                OutputMsg.AppendLine("* " + role.Name);
+                if (properties.RoleIds.Any(x => x.Value == role.Id))
+                    output.AppendLine("* **Already Available** - " + role.Name);
+                else
+                {
+                    properties.RoleIds.Add(new(role.Id));
+                    output.AppendLine("* " + role.Name);
+                }
             }
 
             await Context.Database.SaveChangesAsync();
-            await ExecuteAsync(properties, index, OutputMsg);
+            await ExecuteAsync(properties, index, output);
         }
 
         private async Task ExecuteAsync(RoleRequestEntity roleRequest, int index, StringBuilder output)
