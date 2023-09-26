@@ -124,6 +124,46 @@ namespace Kuroko.Modules.RoleRequest
             return PagedSelectMenu(selectMenu, indexStart, user, CommandIdMap.RoleRequestAssign);
         }
 
+        public static (bool HasOptions, MessageComponent Components) BuildRevokeMenu(IGuildUser self, IGuildUser user, RoleRequestEntity properties, int indexStart)
+        {
+            var count = 0;
+            var roleIds = user.RoleIds.Skip(indexStart).ToList();
+            var selectMenu = new SelectMenuBuilder()
+                .WithCustomId($"{CommandIdMap.RoleRequestDelete}:{user.Id},{indexStart}")
+                .WithMinValues(1)
+                .WithPlaceholder("Select role(s) to remove from yourself");
+            var guildRoles = new List<IRole>();
+            IRole selfHighestRole = null;
+
+            foreach (var roleId in self.RoleIds)
+            {
+                var role = self.Guild.GetRole(roleId);
+
+                if (selfHighestRole is null || role.Position > selfHighestRole.Position)
+                    selfHighestRole = role;
+            }
+
+            foreach (var roleId in roleIds)
+            {
+                var role = user.Guild.GetRole(roleId);
+                guildRoles.Add(role);
+            }
+
+            foreach (var role in guildRoles.OrderByDescending(x => x.Position))
+            {
+                if (role.Position >= selfHighestRole.Position || role.Name == "@everyone")
+                    continue;
+
+                selectMenu.AddOption(role.Name, role.Id.ToString());
+                count++;
+
+                if (count >= 25)
+                    break;
+            }
+
+            return PagedSelectMenu(selectMenu, indexStart, user, CommandIdMap.RoleRequestRemove);
+        }
+
         private static (bool HasOptions, MessageComponent Components) PagedSelectMenu(
             SelectMenuBuilder builder,
             int startIndex,
