@@ -1,8 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Kuroko.Core;
 using Kuroko.Core.Attributes;
-using Kuroko.Database;
 using Kuroko.Database.Entities.Guild;
 using System.Text;
 
@@ -10,7 +8,7 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
 {
     [RequireUserGuildPermission(GuildPermission.ManageRoles)]
     [RequireBotGuildPermission(GuildPermission.ManageRoles)]
-    public class AddRoleComponent : KurokoModuleBase
+    public class AddRoleComponent : RoleRequestBase
     {
         private static StringBuilder OutputMsg
         {
@@ -33,14 +31,7 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
             }
 
             await DeferAsync();
-
-            var roleRequest = await Context.Database.GuildRoleRequests.CreateOrGetDataAsync(
-                Context.Database.Guilds, Context.Guild.Id, (x, y) =>
-                {
-                    x.RoleRequest ??= y;
-                });
-
-            await ExecuteAsync(roleRequest, index, OutputMsg);
+            await ExecuteAsync(await GetProperties(), index, OutputMsg);
         }
 
         [ComponentInteraction($"{CommandIdMap.RoleRequestManageSave}:*,*")]
@@ -54,14 +45,9 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
 
             await DeferAsync();
 
-            var properties = await Context.Database.GuildRoleRequests.CreateOrGetDataAsync(
-                Context.Database.Guilds, Context.Guild.Id, (x, y) =>
-                {
-                    x.RoleRequest ??= y;
-                });
             var selectedRoleIds = roleIds.Select(ulong.Parse);
-
             var output = OutputMsg.AppendLine("Selected roles for public use:");
+            var properties = await GetProperties();
 
             foreach (var roleId in selectedRoleIds)
             {
@@ -80,10 +66,10 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
             await ExecuteAsync(properties, index, output);
         }
 
-        private async Task ExecuteAsync(RoleRequestEntity roleRequest, int index, StringBuilder output)
+        private async Task ExecuteAsync(RoleRequestEntity properties, int index, StringBuilder output)
         {
             var self = Context.Guild.GetUser(Context.Client.CurrentUser.Id);
-            var menu = RRMenu.BuildAddMenu(self, Context.User as IGuildUser, roleRequest, index);
+            var menu = RRMenu.BuildAddMenu(self, Context.User as IGuildUser, properties, index);
 
             if (!menu.HasOptions)
                 output.AppendLine("All roles already available! Nothing to list.");

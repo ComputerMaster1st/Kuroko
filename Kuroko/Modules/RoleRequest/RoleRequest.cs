@@ -1,14 +1,12 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Kuroko.Core;
 using Kuroko.Core.Attributes;
-using Kuroko.Database;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 
 namespace Kuroko.Modules.RoleRequest
 {
-    public class RoleRequest : KurokoModuleBase
+    public class RoleRequest : RoleRequestBase
     {
         [SlashCommand("roles", "Role assignment & configuration")]
         public Task InitialAsync()
@@ -39,10 +37,7 @@ namespace Kuroko.Modules.RoleRequest
 
             await DeferAsync();
 
-            var properties = await Context.Database.GuildRoleRequests.CreateOrGetDataAsync(Context.Database.Guilds, Context.Guild.Id, (x, y) =>
-            {
-                x.RoleRequest ??= y;
-            });
+            var properties = await GetProperties();
             properties.RoleIds.Clear();
 
             await ExecuteAsync(true);

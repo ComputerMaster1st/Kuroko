@@ -1,13 +1,10 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Kuroko.Core;
-using Kuroko.Database;
-using Kuroko.Database.Entities.Guild;
 using System.Text;
 
 namespace Kuroko.Modules.RoleRequest.Components.User
 {
-    public class AssignRoleComponent : KurokoModuleBase
+    public class AssignRoleComponent : RoleRequestBase
     {
         private static StringBuilder OutputMsg => new StringBuilder()
                     .AppendLine("# Role Request")
@@ -23,14 +20,7 @@ namespace Kuroko.Modules.RoleRequest.Components.User
             }
 
             await DeferAsync();
-
-            var roleRequest = await Context.Database.GuildRoleRequests.CreateOrGetDataAsync(
-                Context.Database.Guilds, Context.Guild.Id, (x, y) =>
-                {
-                    x.RoleRequest ??= y;
-                });
-
-            await ExecuteAsync(roleRequest, index, OutputMsg);
+            await ExecuteAsync(index, OutputMsg);
         }
 
         [ComponentInteraction($"{CommandIdMap.RoleRequestSave}:*,*")]
@@ -44,11 +34,6 @@ namespace Kuroko.Modules.RoleRequest.Components.User
 
             await DeferAsync();
 
-            var roleRequest = await Context.Database.GuildRoleRequests.CreateOrGetDataAsync(
-                Context.Database.Guilds, Context.Guild.Id, (x, y) =>
-                {
-                    x.RoleRequest ??= y;
-                });
             var selectedRoleIds = roleIds.Select(ulong.Parse);
             var output = OutputMsg.AppendLine("Assiged Roles:");
             var user = Context.User as IGuildUser;
@@ -61,12 +46,12 @@ namespace Kuroko.Modules.RoleRequest.Components.User
                 output.AppendLine("* " + role.Name);
             }
 
-            await ExecuteAsync(roleRequest, index, output);
+            await ExecuteAsync(index, output);
         }
 
-        private async Task ExecuteAsync(RoleRequestEntity roleRequest, int index, StringBuilder output)
+        private async Task ExecuteAsync(int index, StringBuilder output)
         {
-            var menu = RRMenu.BuildAssignMenu(Context.User as IGuildUser, roleRequest, index);
+            var menu = RRMenu.BuildAssignMenu(Context.User as IGuildUser, await GetProperties(), index);
 
             if (!menu.HasOptions)
                 output.AppendLine()
