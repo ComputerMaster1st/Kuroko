@@ -6,7 +6,7 @@ namespace Kuroko.Modules.RoleRequest
 {
     public static class RRMenu
     {
-        public static MessageComponent BuildMainMenu(bool hasRolesAvailable, IGuildUser user, StringBuilder output)
+        public static MessageComponent BuildMainMenu(IGuildUser user, StringBuilder output, bool hasRolesAvailable, bool enableAssign, bool enableRevoke)
         {
             var builder = new ComponentBuilder();
             var manageRowId = 0;
@@ -14,14 +14,17 @@ namespace Kuroko.Modules.RoleRequest
             if (hasRolesAvailable)
             {
                 manageRowId = 1;
-                builder
-                    .WithButton("Assign", $"{CommandIdMap.RoleRequestAssign}:{user.Id},0", ButtonStyle.Success, row: 0)
-                    .WithButton("Remove", $"{CommandIdMap.RoleRequestRemove}:{user.Id},0", ButtonStyle.Danger, row: 0);
+
+                if (enableAssign)
+                    builder.WithButton("Assign", $"{CommandIdMap.RoleRequestAssign}:{user.Id},0", ButtonStyle.Success, row: 0);
+
+                if (enableRevoke)
+                    builder.WithButton("Remove", $"{CommandIdMap.RoleRequestRemove}:{user.Id},0", ButtonStyle.Danger, row: 0);
             }
 
             if (user.GuildPermissions.ManageRoles)
             {
-                output.AppendLine("## Management");
+                output.AppendLine("## Manager Edition");
 
                 builder
                     .WithButton("Add Roles", $"{CommandIdMap.RoleRequestManageAdd}:{user.Id},0", ButtonStyle.Primary, row: manageRowId)

@@ -46,20 +46,26 @@ namespace Kuroko.Modules.RoleRequest
         private async Task ExecuteAsync(bool isReturning = false)
         {
             var user = Context.User as IGuildUser;
-            var roleRequestData = await Context.Database.GuildRoleRequests.FirstOrDefaultAsync(x => x.Guild.Id == Context.Guild.Id);
+            var properties = await Context.Database.GuildRoleRequests.FirstOrDefaultAsync(x => x.Guild.Id == Context.Guild.Id);
             var output = new StringBuilder()
                 .AppendLine("# Role Request");
             var hasRoles = false;
+            var userRoleCount = 0;
 
-            if (roleRequestData is null || roleRequestData.RoleIds.Count < 1)
+            if (properties is null || properties.RoleIds.Count < 1)
                 output.AppendLine("Role Request is currently not setup on this server.");
             else
             {
+                foreach (var roleId in properties.RoleIds)
+                    if (user.RoleIds.Any(x => x == roleId.Value))
+                        userRoleCount++;
+
                 hasRoles = true;
-                output.AppendFormat("**{0}** roles available for you to choose!", roleRequestData.RoleIds.Count).AppendLine();
+                output.AppendFormat("**{0}** roles available for public use!", properties.RoleIds.Count).AppendLine();
+                output.AppendFormat("**{0}** roles available for you to choose!", properties.RoleIds.Count - userRoleCount).AppendLine();
             }
 
-            var msgComponents = RRMenu.BuildMainMenu(hasRoles, user, output);
+            var msgComponents = RRMenu.BuildMainMenu(user, output, hasRoles, properties.RoleIds.Count > userRoleCount, userRoleCount > 0);
 
             if (!isReturning)
                 await RespondAsync(output.ToString(), components: msgComponents);
