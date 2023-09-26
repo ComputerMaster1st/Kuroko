@@ -2,6 +2,7 @@
 using Discord.Interactions;
 using Kuroko.Core.Attributes;
 using Kuroko.Database.Entities.Guild;
+using Kuroko.Services;
 using System.Text;
 
 namespace Kuroko.Modules.RoleRequest.Components.Management
@@ -69,11 +70,11 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
             if (!menu.HasOptions)
                 output.AppendLine("Nothing to list.");
 
-            await Context.Interaction.ModifyOriginalResponseAsync(x =>
+            (await Context.Interaction.ModifyOriginalResponseAsync(x =>
             {
                 x.Content = output.ToString();
                 x.Components = menu.Components;
-            });
+            })).ResetTimeout();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
+using Kuroko.Services;
 using System.Text;
 
 namespace Kuroko.Modules.RoleRequest.Components.User
@@ -58,11 +59,11 @@ namespace Kuroko.Modules.RoleRequest.Components.User
                 output.AppendLine()
                     .AppendLine("Oops, looks like you reached the end of the list already!");
 
-            await Context.Interaction.ModifyOriginalResponseAsync(x =>
+            (await Context.Interaction.ModifyOriginalResponseAsync(x =>
             {
                 x.Content = output.ToString();
                 x.Components = menu.Components;
-            });
+            })).ResetTimeout();
         }
     }
 }

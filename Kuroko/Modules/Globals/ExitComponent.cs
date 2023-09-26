@@ -1,10 +1,9 @@
 ﻿using Discord.Interactions;
 using Kuroko.Core;
+using Kuroko.Services;
 
 namespace Kuroko.Modules.Globals
 {
-    // TODO: This will handle exiting of main menu
-
     public class ExitComponent : KurokoModuleBase
     {
         [ComponentInteraction($"{CommandIdMap.Exit}:*")]
@@ -21,7 +20,10 @@ namespace Kuroko.Modules.Globals
             var msg = await Context.Interaction.GetOriginalResponseAsync();
 
             if (msg != null)
+            {
+                msg.DeleteTimeout();
                 await msg.DeleteAsync();
+            }
         }
     }
 }
