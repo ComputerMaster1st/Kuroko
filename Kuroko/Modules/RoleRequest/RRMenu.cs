@@ -34,12 +34,21 @@ namespace Kuroko.Modules.RoleRequest
             return builder.Build();
         }
 
-        public static (bool HasOptions, MessageComponent Components) BuildAddMenu(IGuildUser user, RoleRequestEntity properties, int indexStart)
+        public static (bool HasOptions, MessageComponent Components) BuildAddMenu(IGuildUser self, IGuildUser user, RoleRequestEntity properties, int indexStart)
         {
             var count = 0;
             var roles = user.Guild.Roles.OrderByDescending(x => x.Position)
                 .Skip(indexStart)
                 .ToList();
+            IRole selfHighestRole = null;
+
+            foreach (var roleId in self.RoleIds)
+            {
+                var role = self.Guild.GetRole(roleId);
+
+                if (selfHighestRole is null || role.Position > selfHighestRole.Position)
+                    selfHighestRole = role;
+            }
 
             var selectMenu = new SelectMenuBuilder()
                 .WithCustomId($"{CommandIdMap.RoleRequestManageSave}:{user.Id},{indexStart}")
@@ -48,10 +57,10 @@ namespace Kuroko.Modules.RoleRequest
 
             foreach (var role in roles)
             {
-                if (properties.RoleIds.Any(x => x.Value == role.Id) || role.Name == "@everyone")
+                if (role.Position >= selfHighestRole.Position || properties.RoleIds.Any(x => x.Value == role.Id) || role.Name == "@everyone")
                     continue;
 
-                selectMenu.AddOption(role.Name, role.Id.ToString());
+                selectMenu.AddOption($"[{role.Position}]" + role.Name, role.Id.ToString());
                 count++;
 
                 if (count >= 25)

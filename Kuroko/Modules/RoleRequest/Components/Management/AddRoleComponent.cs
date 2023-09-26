@@ -82,7 +82,8 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
 
         private async Task ExecuteAsync(RoleRequestEntity roleRequest, int index, StringBuilder output)
         {
-            var menu = RRMenu.BuildAddMenu(Context.User as IGuildUser, roleRequest, index);
+            var self = Context.Guild.GetUser(Context.Client.CurrentUser.Id);
+            var menu = RRMenu.BuildAddMenu(self, Context.User as IGuildUser, roleRequest, index);
 
             if (!menu.HasOptions)
                 output.AppendLine("All roles already available! Nothing to list.");
