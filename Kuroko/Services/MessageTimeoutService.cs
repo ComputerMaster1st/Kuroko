@@ -65,13 +65,13 @@ namespace Kuroko.Services
                 Enabled = true
             };
 
-            _timer.Elapsed += ElapsedEvent;
+            _timer.Elapsed += (s, e) => Task.Factory.StartNew(() => ElapsedEvent(s, e));
         }
 
         public void ResetTimer()
             => _timer.Reset();
 
-        private async void ElapsedEvent(object sender, System.Timers.ElapsedEventArgs e)
+        private async Task ElapsedEvent(object sender, System.Timers.ElapsedEventArgs e)
         {
             _timer.Enabled = false;
             _timer.Stop();
