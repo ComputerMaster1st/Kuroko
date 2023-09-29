@@ -45,5 +45,21 @@ namespace Kuroko.Database
 
             return data;
         }
+
+        public static void Remove<TTypeEntity>(this List<TTypeEntity> entityList, TTypeEntity entity, DatabaseContext db)
+            where TTypeEntity : class, ITypeEntity
+        {
+            entityList.Remove(entity);
+            db.Set<TTypeEntity>().Remove(entity);
+        }
+
+        public static void Clear<TTypeEntity>(this List<TTypeEntity> entityList, DatabaseContext db)
+            where TTypeEntity : class, ITypeEntity
+        {
+            var temp = new List<TTypeEntity>(entityList);
+
+            entityList.Clear();
+            db.Set<TTypeEntity>().RemoveRange(temp);
+        }
     }
 }
