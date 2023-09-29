@@ -55,6 +55,24 @@ namespace Kuroko.Modules.ModLogs
             await ExecuteAsync(true, properties);
         }
 
+        [ComponentInteraction($"{CommandIdMap.ModLogChannelIgnoreReset}:*")]
+        public async Task ResetIgnoreAsync(ulong interactedUserId)
+        {
+            if (interactedUserId != Context.User.Id)
+            {
+                await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
+                return;
+            }
+
+            var properties = await GetPropertiesAsync();
+
+            properties.IgnoredChannelIds.Clear();
+
+            await Context.Database.SaveChangesAsync();
+            await DeferAsync();
+            await ExecuteAsync(true, properties);
+        }
+
         private async Task ExecuteAsync(bool isReturning = false, ModLogEntity propParam = null)
         {
             var user = Context.User as IGuildUser;
