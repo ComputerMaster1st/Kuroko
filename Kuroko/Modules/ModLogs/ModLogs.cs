@@ -21,9 +21,7 @@ namespace Kuroko.Modules.ModLogs
 
         [SlashCommand("modlogs", "Configure moderation logging")]
         public async Task EntryAsync()
-        {
-            await ExecuteAsync();
-        }
+            => await ExecuteAsync();
 
         [ComponentInteraction($"{CommandIdMap.ModLogMenu}:*")]
         public async Task ReturningAsync(ulong interactedUserId)
@@ -34,6 +32,7 @@ namespace Kuroko.Modules.ModLogs
                 return;
             }
 
+            await DeferAsync();
             await ExecuteAsync(true);
         }
 

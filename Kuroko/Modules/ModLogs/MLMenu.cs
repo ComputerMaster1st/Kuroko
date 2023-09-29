@@ -17,7 +17,7 @@ namespace Kuroko.Modules.ModLogs
         {
             var mainRow = 0;
             var componentBuilder = new ComponentBuilder()
-                .WithButton("Configure Log Channel", $"{CommandIdMap.MogLogChannel}:{user.Id},0", ButtonStyle.Primary, row: mainRow)
+                .WithButton("Configure Log Channel", $"{CommandIdMap.ModLogChannel}:{user.Id},0", ButtonStyle.Primary, row: mainRow)
                 .WithButton("Ignore Channels", $"{CommandIdMap.ModLogChannelIgnore}:{user.Id},0", ButtonStyle.Primary, row: mainRow);
 
             if (properties.IgnoredChannelIds.Count > 0)
@@ -58,7 +58,7 @@ namespace Kuroko.Modules.ModLogs
                     break;
             }
 
-            return Pagination.SelectMenu(selectMenuBuilder, indexStart, user, CommandIdMap.MogLogChannel, CommandIdMap.ModLogMenu);
+            return Pagination.SelectMenu(selectMenuBuilder, indexStart, user, CommandIdMap.ModLogChannelIgnore, CommandIdMap.ModLogMenu, true);
         }
     }
 }
