@@ -38,7 +38,7 @@
         #region ModLogs
 
         public const string ModLogMenu = "ml_menu";
-        public const string MogLogChannel = "ml_channel";
+        public const string ModLogChannel = "ml_channel";
         public const string ModLogChannelSave = "ml_channel_save";
         public const string ModLogChannelResume = "ml_channel_resume";
         public const string ModLogChannelResumeSave = "ml_channel_resume_save";
