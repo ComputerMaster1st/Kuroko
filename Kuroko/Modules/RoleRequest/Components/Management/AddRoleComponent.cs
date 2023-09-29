@@ -32,7 +32,7 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
             }
 
             await DeferAsync();
-            await ExecuteAsync(await GetProperties(), index, OutputMsg);
+            await ExecuteAsync(await GetPropertiesAsync(), index, OutputMsg);
         }
 
         [ComponentInteraction($"{CommandIdMap.RoleRequestManageSave}:*,*")]
@@ -48,7 +48,7 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
 
             var selectedRoleIds = roleIds.Select(ulong.Parse);
             var output = OutputMsg.AppendLine("Selected roles for public use:");
-            var properties = await GetProperties();
+            var properties = await GetPropertiesAsync();
 
             foreach (var roleId in selectedRoleIds)
             {

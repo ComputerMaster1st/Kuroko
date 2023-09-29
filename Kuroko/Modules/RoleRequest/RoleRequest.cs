@@ -38,7 +38,7 @@ namespace Kuroko.Modules.RoleRequest
 
             await DeferAsync();
 
-            var properties = await GetProperties();
+            var properties = await GetPropertiesAsync();
             properties.RoleIds.Clear();
 
             await ExecuteAsync(true);

@@ -52,7 +52,7 @@ namespace Kuroko.Modules.RoleRequest.Components.User
 
         private async Task ExecuteAsync(int index, StringBuilder output)
         {
-            var menu = RRMenu.BuildAssignMenu(Context.User as IGuildUser, await GetProperties(), index);
+            var menu = RRMenu.BuildAssignMenu(Context.User as IGuildUser, await GetPropertiesAsync(), index);
 
             if (!menu.HasOptions)
                 output.AppendLine()

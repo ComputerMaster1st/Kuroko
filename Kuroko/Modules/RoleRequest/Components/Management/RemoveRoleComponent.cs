@@ -32,7 +32,7 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
             }
 
             await DeferAsync();
-            await ExecuteAsync(await GetProperties(), index, OutputMsg);
+            await ExecuteAsync(await GetPropertiesAsync(), index, OutputMsg);
         }
 
         [ComponentInteraction($"{CommandIdMap.RoleRequestManageDelete}:*,*")]
@@ -46,7 +46,7 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
 
             await DeferAsync();
 
-            var properties = await GetProperties();
+            var properties = await GetPropertiesAsync();
             var selectedRoleIds = roleIds.Select(ulong.Parse);
 
             OutputMsg.AppendLine("Selected roles removed from public use:");

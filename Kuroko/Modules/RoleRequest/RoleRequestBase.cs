@@ -6,7 +6,7 @@ namespace Kuroko.Modules.RoleRequest
 {
     public abstract class RoleRequestBase : KurokoModuleBase
     {
-        protected Task<RoleRequestEntity> GetProperties()
+        protected Task<RoleRequestEntity> GetPropertiesAsync()
             => Context.Database.GuildRoleRequests.CreateOrGetDataAsync(
                 Context.Database.Guilds, Context.Guild.Id, (x, y) =>
                 {
