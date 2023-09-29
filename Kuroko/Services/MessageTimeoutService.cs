@@ -18,7 +18,7 @@ namespace Kuroko.Services
         public static void ResetTimeout(this IUserMessage msg)
         {
             var container = _containers.FirstOrDefault(x => x.MessageId == msg.Id);
-            container.ResetTimer();
+            container?.ResetTimer();
         }
 
         public static void DeleteTimeout(this IUserMessage msg)
