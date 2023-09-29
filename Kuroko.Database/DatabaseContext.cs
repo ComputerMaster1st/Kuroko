@@ -1,6 +1,5 @@
 ﻿using Kuroko.Database.Entities.Guild;
 using Kuroko.Database.Entities.User;
-using Kuroko.Shared.Configuration;
 using Microsoft.EntityFrameworkCore;
 
 namespace Kuroko.Database
@@ -14,6 +13,7 @@ namespace Kuroko.Database
         // TODO: Put Module DbSets Here
 
         public DbSet<RoleRequestEntity> GuildRoleRequests { get; set; } = null;
+        public DbSet<ModLogEntity> GuildModLogs { get; set; } = null;
 
 #if DEBUG
         public DatabaseContext() { }
@@ -48,6 +48,22 @@ namespace Kuroko.Database
                 .HasOne(x => x.RoleRequest)
                 .WithOne(x => x.Guild)
                 .HasForeignKey<RoleRequestEntity>(x => x.GuildId)
+                .HasPrincipalKey<GuildEntity>(x => x.Id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            #endregion
+
+            #region ModLogs
+
+            modelBuilder.Entity<ModLogEntity>()
+                .HasMany(x => x.IgnoredChannelIds)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<GuildEntity>()
+                .HasOne(x => x.ModLog)
+                .WithOne(x => x.Guild)
+                .HasForeignKey<ModLogEntity>(x => x.GuildId)
                 .HasPrincipalKey<GuildEntity>(x => x.Id)
                 .OnDelete(DeleteBehavior.Cascade);
 
