@@ -9,14 +9,19 @@ namespace Kuroko.Modules.Globals
             int startIndex,
             IUser user,
             string commandId,
-            string returningCommandId)
+            string returningCommandId,
+            bool isSingleSelect = false)
         {
             var componentBuilder = new ComponentBuilder();
             (bool HasOptions, MessageComponent Components) output = new();
 
             if (builder.Options.Count > 0)
             {
-                builder.WithMaxValues(builder.Options.Count);
+                if (isSingleSelect)
+                    builder.WithMaxValues(1);
+                else
+                    builder.WithMaxValues(builder.Options.Count);
+
                 componentBuilder.WithSelectMenu(builder);
                 output.HasOptions = true;
             }
