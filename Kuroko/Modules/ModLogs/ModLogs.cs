@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Kuroko.Core.Attributes;
+using Kuroko.Database;
 using Kuroko.Database.Entities.Guild;
 using Kuroko.Services;
 using System.Text;
@@ -50,7 +51,6 @@ namespace Kuroko.Modules.ModLogs
 
             properties.LogChannelId = 0;
 
-            await Context.Database.SaveChangesAsync();
             await DeferAsync();
             await ExecuteAsync(true, properties);
         }
@@ -66,10 +66,10 @@ namespace Kuroko.Modules.ModLogs
 
             var properties = await GetPropertiesAsync();
 
-            properties.IgnoredChannelIds.Clear();
+            properties.IgnoredChannelIds.Clear(Context.Database);
 
-            await Context.Database.SaveChangesAsync();
             await DeferAsync();
+            await Context.Database.SaveChangesAsync();
             await ExecuteAsync(true, properties);
         }
 

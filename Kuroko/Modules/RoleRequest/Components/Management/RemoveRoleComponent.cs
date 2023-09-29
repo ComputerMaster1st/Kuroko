@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Kuroko.Core.Attributes;
+using Kuroko.Database;
 using Kuroko.Database.Entities.Guild;
 using Kuroko.Services;
 using System.Text;
@@ -54,7 +55,8 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
             foreach (var roleId in selectedRoleIds)
             {
                 var role = Context.Guild.GetRole(roleId);
-                properties.RoleIds.RemoveAll(x => x.Value == roleId);
+                var temp = properties.RoleIds.FirstOrDefault(x => x.Value == roleId);
+                properties.RoleIds.Remove(temp, Context.Database);
 
                 OutputMsg.AppendLine("* " + role.Name);
             }
