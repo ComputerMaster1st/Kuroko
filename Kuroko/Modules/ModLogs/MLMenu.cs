@@ -16,6 +16,8 @@ namespace Kuroko.Modules.ModLogs
         public static MessageComponent BuildMenu(IGuildUser user, ModLogEntity properties)
         {
             var mainRow = 0;
+            var toggleRow = 1;
+            var exitRow = 2;
             var componentBuilder = new ComponentBuilder()
                 .WithButton("Configure Log Channel", $"{CommandIdMap.ModLogChannel}:{user.Id},0", ButtonStyle.Primary, row: mainRow)
                 .WithButton("Ignore Channels", $"{CommandIdMap.ModLogChannelIgnore}:{user.Id},0", ButtonStyle.Primary, row: mainRow);
@@ -27,19 +29,17 @@ namespace Kuroko.Modules.ModLogs
             if (properties.LogChannelId != 0)
                 componentBuilder.WithButton("Unset Logging Channel", $"{CommandIdMap.ModLogChannelDelete}:{user.Id}", ButtonStyle.Danger, row: mainRow);
 
-            componentBuilder.WithButton("Exit", $"{CommandIdMap.Exit}:{user.Id}", ButtonStyle.Secondary, row: mainRow);
-
             if (properties.LogChannelId != 0)
             {
-                var userRow = 1;
-                var msgRow = 2;
 
                 componentBuilder
-                    .WithButton("User Joined", $"{CommandIdMap.ModLogJoin}:{user.Id}", ButtonEnabled(properties.Join), row: userRow)
-                    .WithButton("User Left", $"{CommandIdMap.ModLogLeave}:{user.Id}", ButtonEnabled(properties.Leave), row: userRow)
-                    .WithButton("Message Edited", $"{CommandIdMap.ModLogMessageEdited}:{user.Id}", ButtonEnabled(properties.EditedMessages), row: msgRow)
-                    .WithButton("Message Deleted", $"{CommandIdMap.ModLogMessageDeleted}:{user.Id}", ButtonEnabled(properties.DeletedMessages), row: msgRow);
+                    .WithButton("User Joined", $"{CommandIdMap.ModLogJoin}:{user.Id}", ButtonEnabled(properties.Join), row: toggleRow)
+                    .WithButton("User Left", $"{CommandIdMap.ModLogLeave}:{user.Id}", ButtonEnabled(properties.Leave), row: toggleRow)
+                    .WithButton("Message Edited", $"{CommandIdMap.ModLogMessageEdited}:{user.Id}", ButtonEnabled(properties.EditedMessages), row: toggleRow)
+                    .WithButton("Message Deleted", $"{CommandIdMap.ModLogMessageDeleted}:{user.Id}", ButtonEnabled(properties.DeletedMessages), row: toggleRow);
             }
+
+            componentBuilder.WithButton("Exit", $"{CommandIdMap.Exit}:{user.Id}", ButtonStyle.Secondary, row: exitRow);
 
             return componentBuilder.Build();
         }
@@ -50,7 +50,7 @@ namespace Kuroko.Modules.ModLogs
             var textChannels = await user.Guild.GetTextChannelsAsync();
             var selectMenuBuilder = new SelectMenuBuilder()
                 .WithCustomId($"{CommandIdMap.ModLogChannelSave}:{user.Id}")
-                .WithMaxValues(1)
+                .WithMinValues(1)
                 .WithPlaceholder("Select a text channel to send mod logs to");
 
             foreach (var textChannel in textChannels)
@@ -63,6 +63,27 @@ namespace Kuroko.Modules.ModLogs
             }
 
             return Pagination.SelectMenu(selectMenuBuilder, indexStart, user, CommandIdMap.ModLogChannelIgnore, CommandIdMap.ModLogMenu, true);
+        }
+
+        public static async Task<(bool HasOptions, MessageComponent Components)> BuildIgnoreLogChannelMenuAsync(IGuildUser user, int indexStart)
+        {
+            var count = 0;
+            var textChannels = await user.Guild.GetTextChannelsAsync();
+            var selectMenuBuilder = new SelectMenuBuilder()
+                .WithCustomId($"{CommandIdMap.ModLogChannelIgnoreSave}:{user.Id},{indexStart}")
+                .WithMinValues(1)
+                .WithPlaceholder("Select text channels to ignore mod logging");
+
+            foreach (var textChannel in textChannels)
+            {
+                selectMenuBuilder.AddOption(textChannel.Name, textChannel.Id.ToString());
+                count++;
+
+                if (count >= 25)
+                    break;
+            }
+
+            return Pagination.SelectMenu(selectMenuBuilder, indexStart, user, CommandIdMap.ModLogChannelIgnore, CommandIdMap.ModLogMenu);
         }
     }
 }
