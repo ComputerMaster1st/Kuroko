@@ -19,4 +19,8 @@
     <ProjectReference Include="..\Kuroko.Shared\Kuroko.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Modules\ModLogs\Components\" />
+  </ItemGroup>
+
 </Project>
