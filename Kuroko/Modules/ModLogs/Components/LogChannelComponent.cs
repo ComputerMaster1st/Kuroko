@@ -9,16 +9,6 @@ namespace Kuroko.Modules.ModLogs.Components
     [RequireUserGuildPermission(GuildPermission.ManageGuild)]
     public class LogChannelComponent : ModLogBase
     {
-        private static StringBuilder OutputMsg
-        {
-            get
-            {
-                return new StringBuilder()
-                    .AppendLine("# Moderation Logging")
-                    .AppendLine("## Configure Log Channel");
-            }
-        }
-
         [ComponentInteraction($"{CommandIdMap.ModLogChannel}:*,*")]
         public async Task InitialAsync(ulong interactedUserId, int index)
         {
@@ -29,11 +19,34 @@ namespace Kuroko.Modules.ModLogs.Components
             }
 
             await DeferAsync();
-            await ExecuteAsync(index, OutputMsg);
+            await ExecuteAsync(index);
         }
 
-        private async Task ExecuteAsync(int index, StringBuilder output)
+        [ComponentInteraction($"{CommandIdMap.ModLogChannelSave}:*")]
+        public async Task ReturningAsync(ulong interactedUserId, string channelId)
         {
+            if (interactedUserId != Context.User.Id)
+            {
+                await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
+                return;
+            }
+
+            await DeferAsync();
+
+            var selectedChannelId = ulong.Parse(channelId);
+            var properties = await GetPropertiesAsync();
+
+            properties.LogChannelId = selectedChannelId;
+
+            await Context.Database.SaveChangesAsync();
+            await ExecuteAsync(0);
+        }
+
+        private async Task ExecuteAsync(int index)
+        {
+            var output = new StringBuilder()
+                .AppendLine("# Moderation Logging")
+                .AppendLine("## Configure Log Channel");
             var properties = await GetPropertiesAsync();
             var logChannel = Context.Guild.GetChannel(properties.LogChannelId);
             var logChannelTag = logChannel is null ? "**Not Set**" : $"<#{logChannel.Id}>";

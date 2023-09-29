@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Kuroko.Core.Attributes;
+using Kuroko.Database.Entities.Guild;
 using Kuroko.Services;
 using System.Text;
 
@@ -36,10 +37,28 @@ namespace Kuroko.Modules.ModLogs
             await ExecuteAsync(true);
         }
 
-        private async Task ExecuteAsync(bool isReturning = false)
+        [ComponentInteraction($"{CommandIdMap.ModLogChannelDelete}:*")]
+        public async Task UnsetAsync(ulong interactedUserId)
+        {
+            if (interactedUserId != Context.User.Id)
+            {
+                await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
+                return;
+            }
+
+            var properties = await GetPropertiesAsync();
+
+            properties.LogChannelId = 0;
+
+            await Context.Database.SaveChangesAsync();
+            await DeferAsync();
+            await ExecuteAsync(true, properties);
+        }
+
+        private async Task ExecuteAsync(bool isReturning = false, ModLogEntity propParam = null)
         {
             var user = Context.User as IGuildUser;
-            var properties = await GetPropertiesAsync();
+            var properties = propParam ?? await GetPropertiesAsync();
             var msgComponents = MLMenu.BuildMenu(user, properties);
             var logChannel = Context.Guild.GetChannel(properties.LogChannelId);
             var channelTag = (logChannel is null) ? "**Not Set**" : $"<#{logChannel.Id}>";
