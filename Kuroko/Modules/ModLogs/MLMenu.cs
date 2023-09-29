@@ -21,7 +21,11 @@ namespace Kuroko.Modules.ModLogs
                 .WithButton("Ignore Channels", $"{CommandIdMap.ModLogChannelIgnore}:{user.Id},0", ButtonStyle.Primary, row: mainRow);
 
             if (properties.IgnoredChannelIds.Count > 0)
-                componentBuilder.WithButton("Resume Channels", $"{CommandIdMap.ModLogChannelResume}:{user.Id},0", ButtonStyle.Primary, row: mainRow);
+                componentBuilder.WithButton("Resume Channels", $"{CommandIdMap.ModLogChannelResume}:{user.Id},0", ButtonStyle.Primary, row: mainRow)
+                    .WithButton("Monitor All Channels", $"{CommandIdMap.ModLogChannelIgnoreReset}:{user.Id}", ButtonStyle.Success, row: mainRow);
+
+            if (properties.LogChannelId != 0)
+                componentBuilder.WithButton("Unset Logging Channel", $"{CommandIdMap.ModLogChannelDelete}:{user.Id}", ButtonStyle.Danger, row: mainRow);
 
             componentBuilder.WithButton("Exit", $"{CommandIdMap.Exit}:{user.Id}", ButtonStyle.Secondary, row: mainRow);
 
