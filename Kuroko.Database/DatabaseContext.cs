@@ -22,7 +22,7 @@ namespace Kuroko.Database
         {
             base.OnConfiguring(optionsBuilder);
 
-            var config = KDatabaseConfig.LoadAsync().GetAwaiter().GetResult();
+            var config = Shared.Configuration.KDatabaseConfig.LoadAsync().GetAwaiter().GetResult();
 
             optionsBuilder.UseNpgsql(config.ConnectionUrl())
                 .EnableSensitiveDataLogging()
