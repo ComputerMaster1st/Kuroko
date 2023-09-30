@@ -59,7 +59,7 @@ namespace Kuroko.Modules.ModLogs.Components
             var properties = propParams ?? await GetPropertiesAsync();
             var logChannel = Context.Guild.GetChannel(properties.LogChannelId);
             var logChannelTag = logChannel is null ? "**Not Set**" : $"<#{logChannel.Id}>";
-            var menu = await MLMenu.BuildIgnoreLogChannelMenuAsync(Context.User as IGuildUser, index);
+            var menu = await MLMenu.BuildIgnoreLogChannelMenuAsync(Context.User as IGuildUser, properties, index);
 
             output.AppendLine("Currently Ignored Channels: ");
 

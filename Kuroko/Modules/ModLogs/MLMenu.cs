@@ -23,7 +23,8 @@ namespace Kuroko.Modules.ModLogs
                 .WithButton("Ignore Channels", $"{CommandIdMap.ModLogChannelIgnore}:{user.Id},0", ButtonStyle.Primary, row: mainRow);
 
             if (properties.IgnoredChannelIds.Count > 0)
-                componentBuilder.WithButton("Resume Channels", $"{CommandIdMap.ModLogChannelResume}:{user.Id},0", ButtonStyle.Primary, row: mainRow)
+                componentBuilder
+                    .WithButton("Resume Channels", $"{CommandIdMap.ModLogChannelResume}:{user.Id},0", ButtonStyle.Primary, row: mainRow)
                     .WithButton("Monitor All Channels", $"{CommandIdMap.ModLogChannelIgnoreReset}:{user.Id}", ButtonStyle.Success, row: mainRow);
 
             if (properties.LogChannelId != 0)
@@ -65,7 +66,7 @@ namespace Kuroko.Modules.ModLogs
             return Pagination.SelectMenu(selectMenuBuilder, indexStart, user, CommandIdMap.ModLogChannelIgnore, CommandIdMap.ModLogMenu, true);
         }
 
-        public static async Task<(bool HasOptions, MessageComponent Components)> BuildIgnoreLogChannelMenuAsync(IGuildUser user, int indexStart)
+        public static async Task<(bool HasOptions, MessageComponent Components)> BuildIgnoreLogChannelMenuAsync(IGuildUser user, ModLogEntity properties, int indexStart)
         {
             var count = 0;
             var textChannels = await user.Guild.GetTextChannelsAsync();
@@ -76,6 +77,9 @@ namespace Kuroko.Modules.ModLogs
 
             foreach (var textChannel in textChannels)
             {
+                if (properties.IgnoredChannelIds.Any(x => x.Value == textChannel.Id))
+                    continue;
+
                 selectMenuBuilder.AddOption(textChannel.Name, textChannel.Id.ToString());
                 count++;
 
@@ -84,6 +88,27 @@ namespace Kuroko.Modules.ModLogs
             }
 
             return Pagination.SelectMenu(selectMenuBuilder, indexStart, user, CommandIdMap.ModLogChannelIgnore, CommandIdMap.ModLogMenu);
+        }
+
+        public static async Task<(bool HasOptions, MessageComponent Components)> BuildResumeLogChannelMenuAsync(IGuildUser user, ModLogEntity properties, int indexStart)
+        {
+            var count = 0;
+            var selectMenuBuilder = new SelectMenuBuilder()
+                .WithCustomId($"{CommandIdMap.ModLogChannelResumeSave}:{user.Id},{indexStart}")
+                .WithMinValues(1)
+                .WithPlaceholder("Select text channels to resume mod logging");
+
+            foreach (var textChannelId in properties.IgnoredChannelIds)
+            {
+                var textChannel = await user.Guild.GetChannelAsync(textChannelId.Value);
+                selectMenuBuilder.AddOption(textChannel.Name, textChannel.Id.ToString());
+                count++;
+
+                if (count >= 25)
+                    break;
+            }
+
+            return Pagination.SelectMenu(selectMenuBuilder, indexStart, user, CommandIdMap.ModLogChannelResume, CommandIdMap.ModLogMenu);
         }
     }
 }
