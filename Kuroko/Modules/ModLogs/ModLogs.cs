@@ -73,6 +73,78 @@ namespace Kuroko.Modules.ModLogs
             await ExecuteAsync(true, properties);
         }
 
+        [ComponentInteraction($"{CommandIdMap.ModLogJoin}:*")]
+        public async Task JoinAsync(ulong interactedUserId)
+        {
+            if (interactedUserId != Context.User.Id)
+            {
+                await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
+                return;
+            }
+
+            var properties = await GetPropertiesAsync();
+
+            properties.Join = !properties.Join;
+
+            await DeferAsync();
+            await Context.Database.SaveChangesAsync();
+            await ExecuteAsync(true, properties);
+        }
+
+        [ComponentInteraction($"{CommandIdMap.ModLogLeave}:*")]
+        public async Task LeaveAsync(ulong interactedUserId)
+        {
+            if (interactedUserId != Context.User.Id)
+            {
+                await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
+                return;
+            }
+
+            var properties = await GetPropertiesAsync();
+
+            properties.Leave = !properties.Leave;
+
+            await DeferAsync();
+            await Context.Database.SaveChangesAsync();
+            await ExecuteAsync(true, properties);
+        }
+
+        [ComponentInteraction($"{CommandIdMap.ModLogMessageDeleted}:*")]
+        public async Task MessageDeleteAsync(ulong interactedUserId)
+        {
+            if (interactedUserId != Context.User.Id)
+            {
+                await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
+                return;
+            }
+
+            var properties = await GetPropertiesAsync();
+
+            properties.DeletedMessages = !properties.DeletedMessages;
+
+            await DeferAsync();
+            await Context.Database.SaveChangesAsync();
+            await ExecuteAsync(true, properties);
+        }
+
+        [ComponentInteraction($"{CommandIdMap.ModLogMessageEdited}:*")]
+        public async Task MessageEditAsync(ulong interactedUserId)
+        {
+            if (interactedUserId != Context.User.Id)
+            {
+                await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
+                return;
+            }
+
+            var properties = await GetPropertiesAsync();
+
+            properties.EditedMessages = !properties.EditedMessages;
+
+            await DeferAsync();
+            await Context.Database.SaveChangesAsync();
+            await ExecuteAsync(true, properties);
+        }
+
         private async Task ExecuteAsync(bool isReturning = false, ModLogEntity propParam = null)
         {
             var user = Context.User as IGuildUser;
