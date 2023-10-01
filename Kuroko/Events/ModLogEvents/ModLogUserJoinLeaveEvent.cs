@@ -17,16 +17,14 @@ namespace Kuroko.Events.ModLogEvents
             Left
         }
 
-        private readonly DiscordShardedClient _client;
         private readonly IServiceProvider _serviceProvider;
 
         public ModLogUserJoinLeaveEvent(DiscordShardedClient client, IServiceProvider services)
         {
-            _client = client;
             _serviceProvider = services;
 
-            _client.UserJoined += UserJoinedAsync;
-            _client.UserLeft += UserLeftAsync;
+            client.UserJoined += UserJoinedAsync;
+            client.UserLeft += UserLeftAsync;
         }
 
         private async Task UserJoinedAsync(SocketGuildUser arg)
