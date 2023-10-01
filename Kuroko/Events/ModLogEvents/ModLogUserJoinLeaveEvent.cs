@@ -60,32 +60,34 @@ namespace Kuroko.Events.ModLogEvents
 
         private static async Task ExecuteAsync(ITextChannel textChannel, IUser user, ModLogEntity properties, JoinType joinType)
         {
-            var embedFields = new List<EmbedFieldBuilder>();
+            var embedFields = new List<EmbedFieldBuilder>
+            {
+                new()
+                {
+                    Name = "Account Created",
+                    Value = user.CreatedAt.ToString("dd/MM/yyyy : hh:mm"),
+                    IsInline = true
+                },
+                new()
+                {
+                    Name = "Account Id",
+                    Value = user.Id,
+                    IsInline = true
+                }
+            };
+
             var embedBuilder = new EmbedBuilder()
             {
                 Color = Color.Green,
                 Title = $"{user.Mention} {joinType}!",
                 Timestamp = DateTime.UtcNow,
                 ThumbnailUrl = user.GetAvatarUrl(),
+                Fields = embedFields,
                 Footer = new()
                 {
                     Text = "Time represented as UTC 0"
                 }
             };
-
-            var accountCreated = new EmbedFieldBuilder()
-                .WithName("Account Created")
-                .WithValue(user.CreatedAt.ToString("dd/MM/yyyy : hh:mm"))
-                .WithIsInline(true);
-            embedFields.Add(accountCreated);
-
-            var accountId = new EmbedFieldBuilder()
-                .WithName("Account Id")
-                .WithValue(user.Id)
-                .WithIsInline(true);
-            embedFields.Add(accountId);
-
-            embedBuilder.WithFields(embedFields);
 
             await textChannel.SendMessageAsync(embed: embedBuilder.Build());
         }
