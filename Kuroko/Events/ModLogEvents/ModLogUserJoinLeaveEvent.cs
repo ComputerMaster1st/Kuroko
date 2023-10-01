@@ -2,7 +2,6 @@
 using Discord.WebSocket;
 using Kuroko.Core.Attributes;
 using Kuroko.Database;
-using Kuroko.Database.Entities.Guild;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -39,7 +38,7 @@ namespace Kuroko.Events.ModLogEvents
 
             var textChannel = await user.Guild.GetTextChannelAsync(properties.LogChannelId);
 
-            await ExecuteAsync(textChannel, user, properties, JoinType.Joined);
+            await ExecuteAsync(textChannel, user, JoinType.Joined);
         }
 
         private async Task UserLeftAsync(SocketGuild arg1, SocketUser arg2)
@@ -55,10 +54,10 @@ namespace Kuroko.Events.ModLogEvents
 
             var textChannel = await guild.GetTextChannelAsync(properties.LogChannelId);
 
-            await ExecuteAsync(textChannel, user, properties, JoinType.Left);
+            await ExecuteAsync(textChannel, user, JoinType.Left);
         }
 
-        private static async Task ExecuteAsync(ITextChannel textChannel, IUser user, ModLogEntity properties, JoinType joinType)
+        private static async Task ExecuteAsync(ITextChannel textChannel, IUser user, JoinType joinType)
         {
             var embedFields = new List<EmbedFieldBuilder>
             {
@@ -79,14 +78,10 @@ namespace Kuroko.Events.ModLogEvents
             var embedBuilder = new EmbedBuilder()
             {
                 Color = Color.Green,
-                Title = $"{user.Mention} {joinType}!",
+                Title = $"{user.Username} {joinType}!",
                 Timestamp = DateTime.UtcNow,
                 ThumbnailUrl = user.GetAvatarUrl(),
-                Fields = embedFields,
-                Footer = new()
-                {
-                    Text = "Time represented as UTC 0"
-                }
+                Fields = embedFields
             };
 
             await textChannel.SendMessageAsync(embed: embedBuilder.Build());
