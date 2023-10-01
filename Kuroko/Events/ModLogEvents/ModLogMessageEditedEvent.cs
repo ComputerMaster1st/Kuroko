@@ -11,12 +11,14 @@ namespace Kuroko.Events.ModLogEvents
     public class ModLogMessageEditedEvent
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly DiscordShardedClient _client;
 
         public ModLogMessageEditedEvent(DiscordShardedClient client, IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
+            _client = client;
 
-            client.MessageUpdated += MessageUpdated;
+            _client.MessageUpdated += MessageUpdated;
         }
 
         private async Task MessageUpdated(Cacheable<IMessage, ulong> before, SocketMessage after, ISocketMessageChannel channel)
@@ -31,6 +33,8 @@ namespace Kuroko.Events.ModLogEvents
             var properties = await db.GuildModLogs.FirstOrDefaultAsync(x => x.GuildId == guildChannel.Guild.Id);
 
             if (properties is null || !(properties.LogChannelId != 0 && properties.EditedMessages))
+                return;
+            if (after.Author.Id == _client.CurrentUser.Id)
                 return;
 
             var logChannel = await guildChannel.Guild.GetTextChannelAsync(properties.LogChannelId);

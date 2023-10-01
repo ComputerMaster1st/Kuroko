@@ -97,7 +97,8 @@ _serviceCollection.AddSingleton<DiscordLogEvent>()
 #region ModLog Events
 
 _serviceCollection.AddSingleton<ModLogUserJoinLeaveEvent>()
-    .AddSingleton<ModLogMessageEditedEvent>();
+    .AddSingleton<ModLogMessageEditedEvent>()
+    .AddSingleton<ModLogMessageDeletedEvent>();
 
 #endregion
 
