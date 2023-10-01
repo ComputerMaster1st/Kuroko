@@ -38,6 +38,8 @@ namespace Kuroko.Events.ModLogEvents
                 return;
             if (message != null && message.Author.Id == _client.CurrentUser.Id)
                 return;
+            if (properties.IgnoredChannelIds.Any(x => x.Value == guildChannel.Id))
+                return;
 
             var logChannel = await guildChannel.Guild.GetTextChannelAsync(properties.LogChannelId);
 
