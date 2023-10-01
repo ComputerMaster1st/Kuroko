@@ -21,7 +21,8 @@ DiscordShardedClient _discordClient = new(new DiscordSocketConfig()
     DefaultRetryMode = RetryMode.AlwaysRetry,
     LogLevel = LogSeverity.Info,
     MaxWaitBetweenGuildAvailablesBeforeReady = 1000,
-    GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMembers
+    MessageCacheSize = 1000,
+    GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMembers | GatewayIntents.GuildMessages | GatewayIntents.MessageContent
 });
 InteractionService _interactionService = new(_discordClient, new()
 {
@@ -95,7 +96,8 @@ _serviceCollection.AddSingleton<DiscordLogEvent>()
 
 #region ModLog Events
 
-_serviceCollection.AddSingleton<ModLogUserJoinLeaveEvent>();
+_serviceCollection.AddSingleton<ModLogUserJoinLeaveEvent>()
+    .AddSingleton<ModLogMessageEditedEvent>();
 
 #endregion
 
