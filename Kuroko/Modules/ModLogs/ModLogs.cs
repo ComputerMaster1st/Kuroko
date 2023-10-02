@@ -1,17 +1,19 @@
 ﻿using Discord;
 using Discord.Interactions;
+using Kuroko.Core;
 using Kuroko.Core.Attributes;
 using Kuroko.Database;
 using Kuroko.Database.Entities.Guild;
+using Kuroko.Modules.Globals;
 using Kuroko.Services;
 using System.Text;
 
 namespace Kuroko.Modules.ModLogs
 {
     [RequireUserGuildPermission(GuildPermission.ManageGuild)]
-    public class ModLogs : ModLogBase
+    public class ModLogs : KurokoModuleBase
     {
-        private StringBuilder OutputMsg
+        private static StringBuilder OutputMsg
         {
             get
             {
@@ -25,121 +27,89 @@ namespace Kuroko.Modules.ModLogs
         public async Task EntryAsync()
             => await ExecuteAsync();
 
-        [ComponentInteraction($"{CommandIdMap.ModLogMenu}:*")]
+        [ComponentInteraction($"{ModLogCommandMap.ModLogMenu}:*")]
         public async Task ReturningAsync(ulong interactedUserId)
         {
-            if (interactedUserId != Context.User.Id)
-            {
-                await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
+            if (!await IsInteractedUserAsync(interactedUserId))
                 return;
-            }
 
             await DeferAsync();
             await ExecuteAsync(true);
         }
 
-        [ComponentInteraction($"{CommandIdMap.ModLogChannelDelete}:*")]
+        [ComponentInteraction($"{ModLogCommandMap.ModLogChannelDelete}:*")]
         public async Task UnsetAsync(ulong interactedUserId)
         {
-            if (interactedUserId != Context.User.Id)
-            {
-                await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
+            if (!await IsInteractedUserAsync(interactedUserId))
                 return;
-            }
 
-            var properties = await GetPropertiesAsync();
+            var properties = await GetPropertiesAsync<ModLogEntity, GuildEntity>(Context.Guild.Id);
 
             properties.LogChannelId = 0;
 
-            await DeferAsync();
-            await ExecuteAsync(true, properties);
+            await SaveAndExecuteAsync(properties);
         }
 
-        [ComponentInteraction($"{CommandIdMap.ModLogChannelIgnoreReset}:*")]
+        [ComponentInteraction($"{ModLogCommandMap.ModLogChannelIgnoreReset}:*")]
         public async Task ResetIgnoreAsync(ulong interactedUserId)
         {
-            if (interactedUserId != Context.User.Id)
-            {
-                await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
+            if (!await IsInteractedUserAsync(interactedUserId))
                 return;
-            }
 
-            var properties = await GetPropertiesAsync();
+            var properties = await GetPropertiesAsync<ModLogEntity, GuildEntity>(Context.Guild.Id);
 
             properties.IgnoredChannelIds.Clear(Context.Database);
 
-            await DeferAsync();
-            await Context.Database.SaveChangesAsync();
-            await ExecuteAsync(true, properties);
+            await SaveAndExecuteAsync(properties);
         }
 
-        [ComponentInteraction($"{CommandIdMap.ModLogJoin}:*")]
+        [ComponentInteraction($"{ModLogCommandMap.ModLogJoin}:*")]
         public async Task JoinAsync(ulong interactedUserId)
         {
-            if (interactedUserId != Context.User.Id)
-            {
-                await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
+            if (!await IsInteractedUserAsync(interactedUserId))
                 return;
-            }
 
-            var properties = await GetPropertiesAsync();
-
-            properties.Join = !properties.Join;
-
-            await DeferAsync();
-            await Context.Database.SaveChangesAsync();
-            await ExecuteAsync(true, properties);
+            await ToggleAsync(x => x.Join = !x.Join);
         }
 
-        [ComponentInteraction($"{CommandIdMap.ModLogLeave}:*")]
+        [ComponentInteraction($"{ModLogCommandMap.ModLogLeave}:*")]
         public async Task LeaveAsync(ulong interactedUserId)
         {
-            if (interactedUserId != Context.User.Id)
-            {
-                await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
+            if (!await IsInteractedUserAsync(interactedUserId))
                 return;
-            }
 
-            var properties = await GetPropertiesAsync();
-
-            properties.Leave = !properties.Leave;
-
-            await DeferAsync();
-            await Context.Database.SaveChangesAsync();
-            await ExecuteAsync(true, properties);
+            await ToggleAsync(x => x.Leave = !x.Leave);
         }
 
-        [ComponentInteraction($"{CommandIdMap.ModLogMessageDeleted}:*")]
+        [ComponentInteraction($"{ModLogCommandMap.ModLogMessageDeleted}:*")]
         public async Task MessageDeleteAsync(ulong interactedUserId)
         {
-            if (interactedUserId != Context.User.Id)
-            {
-                await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
+            if (!await IsInteractedUserAsync(interactedUserId))
                 return;
-            }
 
-            var properties = await GetPropertiesAsync();
-
-            properties.DeletedMessages = !properties.DeletedMessages;
-
-            await DeferAsync();
-            await Context.Database.SaveChangesAsync();
-            await ExecuteAsync(true, properties);
+            await ToggleAsync(x => x.DeletedMessages = !x.DeletedMessages);
         }
 
-        [ComponentInteraction($"{CommandIdMap.ModLogMessageEdited}:*")]
+        [ComponentInteraction($"{ModLogCommandMap.ModLogMessageEdited}:*")]
         public async Task MessageEditAsync(ulong interactedUserId)
         {
-            if (interactedUserId != Context.User.Id)
-            {
-                await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
+            if (!await IsInteractedUserAsync(interactedUserId))
                 return;
-            }
 
-            var properties = await GetPropertiesAsync();
+            await ToggleAsync(x => x.EditedMessages = !x.EditedMessages);
+        }
 
-            properties.EditedMessages = !properties.EditedMessages;
+        private async Task ToggleAsync(Action<ModLogEntity> action)
+        {
+            var properties = await GetPropertiesAsync<ModLogEntity, GuildEntity>(Context.Guild.Id);
 
+            action(properties);
+
+            await SaveAndExecuteAsync(properties);
+        }
+
+        private async Task SaveAndExecuteAsync(ModLogEntity properties)
+        {
             await DeferAsync();
             await Context.Database.SaveChangesAsync();
             await ExecuteAsync(true, properties);
@@ -148,8 +118,34 @@ namespace Kuroko.Modules.ModLogs
         private async Task ExecuteAsync(bool isReturning = false, ModLogEntity propParam = null)
         {
             var user = Context.User as IGuildUser;
-            var properties = propParam ?? await GetPropertiesAsync();
-            var msgComponents = MLMenu.BuildMenu(user, properties);
+            var properties = propParam ?? await GetPropertiesAsync<ModLogEntity, GuildEntity>(Context.Guild.Id);
+            var mainRow = 0;
+            var toggleRow = 1;
+            var exitRow = 2;
+            var componentBuilder = new ComponentBuilder()
+                .WithButton("Configure Log Channel", $"{ModLogCommandMap.ModLogChannel}:{user.Id},0", ButtonStyle.Primary, row: mainRow)
+                .WithButton("Ignore Channels", $"{ModLogCommandMap.ModLogChannelIgnore}:{user.Id},0", ButtonStyle.Primary, row: mainRow);
+
+            if (properties.IgnoredChannelIds.Count > 0)
+                componentBuilder
+                    .WithButton("Resume Channels", $"{ModLogCommandMap.ModLogChannelResume}:{user.Id},0", ButtonStyle.Primary, row: mainRow)
+                    .WithButton("Monitor All Channels", $"{ModLogCommandMap.ModLogChannelIgnoreReset}:{user.Id}", ButtonStyle.Success, row: mainRow);
+
+            if (properties.LogChannelId != 0)
+                componentBuilder.WithButton("Unset Logging Channel", $"{ModLogCommandMap.ModLogChannelDelete}:{user.Id}", ButtonStyle.Danger, row: mainRow);
+
+            if (properties.LogChannelId != 0)
+            {
+                componentBuilder
+                    .WithButton("User Joined", $"{ModLogCommandMap.ModLogJoin}:{user.Id}", Pagination.IsButtonToggle(properties.Join), row: toggleRow)
+                    .WithButton("User Left", $"{ModLogCommandMap.ModLogLeave}:{user.Id}", Pagination.IsButtonToggle(properties.Leave), row: toggleRow)
+                    .WithButton("Message Edited", $"{ModLogCommandMap.ModLogMessageEdited}:{user.Id}", Pagination.IsButtonToggle(properties.EditedMessages), row: toggleRow)
+                    .WithButton("Message Deleted", $"{ModLogCommandMap.ModLogMessageDeleted}:{user.Id}", Pagination.IsButtonToggle(properties.DeletedMessages), row: toggleRow);
+            }
+
+            componentBuilder.WithButton("Exit", $"{GlobalCommandMap.Exit}:{user.Id}", ButtonStyle.Secondary, row: exitRow);
+
+            var msgComponents = componentBuilder.Build();
             var logChannel = Context.Guild.GetChannel(properties.LogChannelId);
             var channelTag = (logChannel is null) ? "**Not Set**" : $"<#{logChannel.Id}>";
             var output = OutputMsg

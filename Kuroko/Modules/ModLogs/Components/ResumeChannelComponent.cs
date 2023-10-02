@@ -1,15 +1,17 @@
 ﻿using Discord;
 using Discord.Interactions;
+using Kuroko.Core;
 using Kuroko.Database;
 using Kuroko.Database.Entities.Guild;
+using Kuroko.Modules.Globals;
 using Kuroko.Services;
 using System.Text;
 
 namespace Kuroko.Modules.ModLogs.Components
 {
-    public class ResumeChannelComponent : ModLogBase
+    public class ResumeChannelComponent : KurokoModuleBase
     {
-        [ComponentInteraction($"{CommandIdMap.ModLogChannelResume}:*,*")]
+        [ComponentInteraction($"{ModLogCommandMap.ModLogChannelResume}:*,*")]
         public async Task InitialAsync(ulong interactedUserId, int index)
         {
             if (interactedUserId != Context.User.Id)
@@ -22,7 +24,7 @@ namespace Kuroko.Modules.ModLogs.Components
             await ExecuteAsync(index);
         }
 
-        [ComponentInteraction($"{CommandIdMap.ModLogChannelResumeSave}:*,*")]
+        [ComponentInteraction($"{ModLogCommandMap.ModLogChannelResumeSave}:*,*")]
         public async Task ReturningAsync(ulong interactedUserId, int index, string[] channelIds)
         {
             if (interactedUserId != Context.User.Id)
@@ -34,7 +36,7 @@ namespace Kuroko.Modules.ModLogs.Components
             await DeferAsync();
 
             var selectedChannelIds = channelIds.Select(ulong.Parse);
-            var properties = await GetPropertiesAsync();
+            var properties = await GetPropertiesAsync<ModLogEntity, GuildEntity>(Context.Guild.Id);
 
             foreach (var channelId in selectedChannelIds)
             {
@@ -51,8 +53,25 @@ namespace Kuroko.Modules.ModLogs.Components
             var output = new StringBuilder()
                 .AppendLine("# Moderation Logging")
                 .AppendLine("## Resume Moderating Channels");
-            var properties = propParams ?? await GetPropertiesAsync();
-            var menu = await MLMenu.BuildResumeLogChannelMenuAsync(Context.User as IGuildUser, properties, index);
+            var properties = propParams ?? await GetPropertiesAsync<ModLogEntity, GuildEntity>(Context.Guild.Id);
+            var user = Context.User as IGuildUser;
+            var count = 0;
+            var selectMenuBuilder = new SelectMenuBuilder()
+                .WithCustomId($"{ModLogCommandMap.ModLogChannelResumeSave}:{user.Id},{index}")
+                .WithMinValues(1)
+                .WithPlaceholder("Select text channels to resume mod logging");
+
+            foreach (var textChannelId in properties.IgnoredChannelIds)
+            {
+                var textChannel = await user.Guild.GetChannelAsync(textChannelId.Value);
+                selectMenuBuilder.AddOption(textChannel.Name, textChannel.Id.ToString());
+                count++;
+
+                if (count >= 25)
+                    break;
+            }
+
+            var menu = Pagination.SelectMenu(selectMenuBuilder, index, user, ModLogCommandMap.ModLogChannelResume, ModLogCommandMap.ModLogMenu);
             var hasUnknownChannels = false;
 
             output.AppendLine("Currently Ignored Channels: ");

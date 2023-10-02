@@ -1,37 +1,34 @@
 ﻿using Discord;
 using Discord.Interactions;
+using Kuroko.Core;
+using Kuroko.Database.Entities.Guild;
+using Kuroko.Modules.Globals;
 using Kuroko.Services;
 using System.Text;
 
 namespace Kuroko.Modules.RoleRequest.Components.User
 {
-    public class AssignRoleComponent : RoleRequestBase
+    public class AssignRoleComponent : KurokoModuleBase
     {
         private static StringBuilder OutputMsg => new StringBuilder()
                     .AppendLine("# Role Request")
                     .AppendLine("## Assign Role");
 
-        [ComponentInteraction($"{CommandIdMap.RoleRequestAssign}:*,*")]
+        [ComponentInteraction($"{RoleRequestCommandMap.RoleRequestAssign}:*,*")]
         public async Task EntryAsync(ulong interactedUserId, int index)
         {
-            if (interactedUserId != Context.User.Id)
-            {
-                await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
+            if (!await IsInteractedUserAsync(interactedUserId))
                 return;
-            }
 
             await DeferAsync();
             await ExecuteAsync(index, OutputMsg);
         }
 
-        [ComponentInteraction($"{CommandIdMap.RoleRequestSave}:*,*")]
+        [ComponentInteraction($"{RoleRequestCommandMap.RoleRequestSave}:*,*")]
         public async Task ReturningAsync(ulong interactedUserId, int index, string[] roleIds)
         {
-            if (interactedUserId != Context.User.Id)
-            {
-                await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
+            if (!await IsInteractedUserAsync(interactedUserId))
                 return;
-            }
 
             await DeferAsync();
 
@@ -52,7 +49,30 @@ namespace Kuroko.Modules.RoleRequest.Components.User
 
         private async Task ExecuteAsync(int index, StringBuilder output)
         {
-            var menu = RRMenu.BuildAssignMenu(Context.User as IGuildUser, await GetPropertiesAsync(), index);
+            var properties = await GetPropertiesAsync<RoleRequestEntity, GuildEntity>(Context.Guild.Id);
+            var user = Context.User as IGuildUser;
+            var count = 0;
+            var roleIds = properties.RoleIds.Skip(index).ToList();
+            var selectMenu = new SelectMenuBuilder()
+                .WithCustomId($"{RoleRequestCommandMap.RoleRequestSave}:{user.Id},{index}")
+                .WithMinValues(1)
+                .WithPlaceholder("Select role(s) to assign yourself");
+            var guildRoles = new List<IRole>();
+
+            foreach (var roleId in roleIds)
+                if (!user.RoleIds.Any(x => x == roleId.Value))
+                    guildRoles.Add(user.Guild.GetRole(roleId.Value));
+
+            foreach (var role in guildRoles.OrderByDescending(x => x.Position))
+            {
+                selectMenu.AddOption(role.Name, role.Id.ToString());
+                count++;
+
+                if (count >= 25)
+                    break;
+            }
+
+            var menu = Pagination.SelectMenu(selectMenu, index, user, RoleRequestCommandMap.RoleRequestAssign, RoleRequestCommandMap.RoleRequestMenu);
 
             if (!menu.HasOptions)
                 output.AppendLine()
