@@ -143,7 +143,7 @@ namespace Kuroko.Modules.ModLogs
                     .WithButton("Message Deleted", $"{ModLogCommandMap.ModLogMessageDeleted}:{user.Id}", Pagination.IsButtonToggle(properties.DeletedMessages), row: toggleRow);
             }
 
-            componentBuilder.WithButton("Exit", $"{CommandIdMap.Exit}:{user.Id}", ButtonStyle.Secondary, row: exitRow);
+            componentBuilder.WithButton("Exit", $"{GlobalCommandMap.Exit}:{user.Id}", ButtonStyle.Secondary, row: exitRow);
 
             var msgComponents = componentBuilder.Build();
             var logChannel = Context.Guild.GetChannel(properties.LogChannelId);

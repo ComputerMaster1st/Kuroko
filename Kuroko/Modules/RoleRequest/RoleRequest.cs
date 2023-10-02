@@ -1,45 +1,42 @@
 ﻿using Discord;
 using Discord.Interactions;
+using Kuroko.Core;
 using Kuroko.Core.Attributes;
 using Kuroko.Database;
+using Kuroko.Database.Entities.Guild;
+using Kuroko.Modules.Globals;
 using Kuroko.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 
 namespace Kuroko.Modules.RoleRequest
 {
-    public class RoleRequest : RoleRequestBase
+    public class RoleRequest : KurokoModuleBase
     {
         [SlashCommand("roles", "Role assignment & configuration")]
         public Task InitialAsync()
             => ExecuteAsync();
 
-        [ComponentInteraction($"{CommandIdMap.RoleRequestMenu}:*")]
+        [ComponentInteraction($"{RoleRequestCommandMap.RoleRequestMenu}:*")]
         public async Task ReturningAsync(ulong interactedUserId)
         {
-            if (interactedUserId != Context.User.Id)
-            {
-                await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
+            if (!await IsInteractedUserAsync(interactedUserId))
                 return;
-            }
 
             await DeferAsync();
             await ExecuteAsync(true);
         }
 
-        [ComponentInteraction($"{CommandIdMap.RoleRequestManageReset}:*")]
+        [ComponentInteraction($"{RoleRequestCommandMap.RoleRequestManageReset}:*")]
         [RequireUserGuildPermission(GuildPermission.ManageRoles)]
         public async Task ResetAsync(ulong interactedUserId)
         {
-            if (interactedUserId != Context.User.Id)
-            {
-                await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
+            if (!await IsInteractedUserAsync(interactedUserId))
                 return;
-            }
 
             await DeferAsync();
 
-            var properties = await GetPropertiesAsync();
+            var properties = await GetPropertiesAsync<RoleRequestEntity, GuildEntity>(Context.Guild.Id);
             properties.RoleIds.Clear(Context.Database);
 
             await Context.Database.SaveChangesAsync();
@@ -68,7 +65,33 @@ namespace Kuroko.Modules.RoleRequest
                 output.AppendFormat("**{0}** roles available for you to choose!", properties.RoleIds.Count - userRoleCount).AppendLine();
             }
 
-            var msgComponents = RRMenu.BuildMainMenu(user, output, hasRoles, properties.RoleIds.Count > userRoleCount, userRoleCount > 0);
+            var builder = new ComponentBuilder();
+            var manageRowId = 0;
+
+            if (hasRoles)
+            {
+                manageRowId = 1;
+
+                if (properties.RoleIds.Count > userRoleCount)
+                    builder.WithButton("Assign", $"{RoleRequestCommandMap.RoleRequestAssign}:{user.Id},0", ButtonStyle.Success, row: 0);
+
+                if (userRoleCount > 0)
+                    builder.WithButton("Remove", $"{RoleRequestCommandMap.RoleRequestRemove}:{user.Id},0", ButtonStyle.Danger, row: 0);
+            }
+
+            if (user.GuildPermissions.ManageRoles)
+            {
+                output.AppendLine("## Manager Edition");
+
+                builder
+                    .WithButton("Add Roles", $"{RoleRequestCommandMap.RoleRequestManageAdd}:{user.Id},0", ButtonStyle.Primary, row: manageRowId)
+                    .WithButton("Remove Roles", $"{RoleRequestCommandMap.RoleRequestManageRemove}:{user.Id},0", ButtonStyle.Primary, row: manageRowId)
+                    .WithButton("Remove All", $"{RoleRequestCommandMap.RoleRequestManageReset}:{user.Id}", ButtonStyle.Danger, row: manageRowId);
+            }
+
+            builder.WithButton("Exit", $"{GlobalCommandMap.Exit}:{user.Id}", ButtonStyle.Secondary, row: manageRowId + 1);
+
+            var msgComponents = builder.Build();
 
             if (!isReturning)
             {

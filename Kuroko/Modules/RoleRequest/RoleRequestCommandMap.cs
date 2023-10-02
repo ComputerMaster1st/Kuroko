@@ -1,17 +1,7 @@
-﻿namespace Kuroko.Modules
+﻿namespace Kuroko.Modules.RoleRequest
 {
-    // TODO: You can setup custom command ids here so there's no need to spam it everywhere. Helps to reduce spelling errors as Discord is finicky in this regard
-
-    internal static class CommandIdMap
+    internal class RoleRequestCommandMap
     {
-        #region Global
-
-        public const string Exit = "exit";
-
-        #endregion
-
-        #region RoleRequest
-
         public const string RoleRequestMenu = "rr_menu";
 
         #region Users
@@ -30,8 +20,6 @@
         public const string RoleRequestManageRemove = "rr_manage_remove";
         public const string RoleRequestManageReset = "rr_manage_reset";
         public const string RoleRequestManageSave = "rr_manage_save";
-
-        #endregion
 
         #endregion
     }

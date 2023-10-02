@@ -1,37 +1,33 @@
 ﻿using Discord;
 using Discord.Interactions;
+using Kuroko.Core;
+using Kuroko.Modules.Globals;
 using Kuroko.Services;
 using System.Text;
 
 namespace Kuroko.Modules.RoleRequest.Components.User
 {
-    public class RevokeAssignRoleComponent : RoleRequestBase
+    public class RevokeAssignRoleComponent : KurokoModuleBase
     {
         private static StringBuilder OutputMsg => new StringBuilder()
                     .AppendLine("# Role Request")
                     .AppendLine("## Remove Role");
 
-        [ComponentInteraction($"{CommandIdMap.RoleRequestRemove}:*,*")]
+        [ComponentInteraction($"{RoleRequestCommandMap.RoleRequestRemove}:*,*")]
         public async Task EntryAsync(ulong interactedUserId, int index)
         {
-            if (interactedUserId != Context.User.Id)
-            {
-                await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
+            if (!await IsInteractedUserAsync(interactedUserId))
                 return;
-            }
 
             await DeferAsync();
             await ExecuteAsync(index, OutputMsg);
         }
 
-        [ComponentInteraction($"{CommandIdMap.RoleRequestDelete}:*,*")]
+        [ComponentInteraction($"{RoleRequestCommandMap.RoleRequestDelete}:*,*")]
         public async Task ReturningAsync(ulong interactedUserId, int index, string[] roleIds)
         {
-            if (interactedUserId != Context.User.Id)
-            {
-                await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
+            if (!await IsInteractedUserAsync(interactedUserId))
                 return;
-            }
 
             await DeferAsync();
 
@@ -52,8 +48,44 @@ namespace Kuroko.Modules.RoleRequest.Components.User
 
         private async Task ExecuteAsync(int index, StringBuilder output)
         {
-            var self = Context.Guild.GetUser(Context.Client.CurrentUser.Id);
-            var menu = RRMenu.BuildRevokeMenu(self, Context.User as IGuildUser, await GetPropertiesAsync(), index);
+            var self = Context.Guild.GetUser(Context.Client.CurrentUser.Id) as IGuildUser;
+            var user = Context.User as IGuildUser;
+            var count = 0;
+            var roleIds = user.RoleIds.Skip(index).ToList();
+            var selectMenu = new SelectMenuBuilder()
+                .WithCustomId($"{RoleRequestCommandMap.RoleRequestDelete}:{user.Id},{index}")
+                .WithMinValues(1)
+                .WithPlaceholder("Select role(s) to remove from yourself");
+            var guildRoles = new List<IRole>();
+            IRole selfHighestRole = null;
+
+            foreach (var roleId in self.RoleIds)
+            {
+                var role = self.Guild.GetRole(roleId);
+
+                if (selfHighestRole is null || role.Position > selfHighestRole.Position)
+                    selfHighestRole = role;
+            }
+
+            foreach (var roleId in roleIds)
+            {
+                var role = user.Guild.GetRole(roleId);
+                guildRoles.Add(role);
+            }
+
+            foreach (var role in guildRoles.OrderByDescending(x => x.Position))
+            {
+                if (role.Position >= selfHighestRole.Position || role.Name == "@everyone")
+                    continue;
+
+                selectMenu.AddOption(role.Name, role.Id.ToString());
+                count++;
+
+                if (count >= 25)
+                    break;
+            }
+
+            var menu = Pagination.SelectMenu(selectMenu, index, user, RoleRequestCommandMap.RoleRequestRemove, RoleRequestCommandMap.RoleRequestMenu);
 
             if (!menu.HasOptions)
                 output.AppendLine()

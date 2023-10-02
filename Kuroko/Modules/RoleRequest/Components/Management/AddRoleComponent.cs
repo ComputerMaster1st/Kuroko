@@ -1,7 +1,9 @@
 ﻿using Discord;
 using Discord.Interactions;
+using Kuroko.Core;
 using Kuroko.Core.Attributes;
 using Kuroko.Database.Entities.Guild;
+using Kuroko.Modules.Globals;
 using Kuroko.Services;
 using System.Text;
 
@@ -9,7 +11,7 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
 {
     [RequireUserGuildPermission(GuildPermission.ManageRoles)]
     [RequireBotGuildPermission(GuildPermission.ManageRoles)]
-    public class AddRoleComponent : RoleRequestBase
+    public class AddRoleComponent : KurokoModuleBase
     {
         private static StringBuilder OutputMsg
         {
@@ -22,33 +24,27 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
             }
         }
 
-        [ComponentInteraction($"{CommandIdMap.RoleRequestManageAdd}:*,*")]
+        [ComponentInteraction($"{RoleRequestCommandMap.RoleRequestManageAdd}:*,*")]
         public async Task InitialAsync(ulong interactedUserId, int index)
         {
-            if (interactedUserId != Context.User.Id)
-            {
-                await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
+            if (!await IsInteractedUserAsync(interactedUserId))
                 return;
-            }
 
             await DeferAsync();
-            await ExecuteAsync(await GetPropertiesAsync(), index, OutputMsg);
+            await ExecuteAsync(await GetPropertiesAsync<RoleRequestEntity, GuildEntity>(Context.Guild.Id), index, OutputMsg);
         }
 
-        [ComponentInteraction($"{CommandIdMap.RoleRequestManageSave}:*,*")]
+        [ComponentInteraction($"{RoleRequestCommandMap.RoleRequestManageSave}:*,*")]
         public async Task ReturningAsync(ulong interactedUserId, int index, string[] roleIds)
         {
-            if (interactedUserId != Context.User.Id)
-            {
-                await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
+            if (!await IsInteractedUserAsync(interactedUserId))
                 return;
-            }
 
             await DeferAsync();
 
             var selectedRoleIds = roleIds.Select(ulong.Parse);
             var output = OutputMsg.AppendLine("Selected roles for public use:");
-            var properties = await GetPropertiesAsync();
+            var properties = await GetPropertiesAsync<RoleRequestEntity, GuildEntity>(Context.Guild.Id);
 
             foreach (var roleId in selectedRoleIds)
             {
@@ -69,8 +65,40 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
 
         private async Task ExecuteAsync(RoleRequestEntity properties, int index, StringBuilder output)
         {
-            var self = Context.Guild.GetUser(Context.Client.CurrentUser.Id);
-            var menu = RRMenu.BuildAddMenu(self, Context.User as IGuildUser, properties, index);
+            var self = Context.Guild.GetUser(Context.Client.CurrentUser.Id) as IGuildUser;
+            var user = Context.User as IGuildUser;
+            var count = 0;
+            var roles = user.Guild.Roles.OrderByDescending(x => x.Position)
+                .Skip(index)
+                .ToList();
+            IRole selfHighestRole = null;
+
+            foreach (var roleId in self.RoleIds)
+            {
+                var role = self.Guild.GetRole(roleId);
+
+                if (selfHighestRole is null || role.Position > selfHighestRole.Position)
+                    selfHighestRole = role;
+            }
+
+            var selectMenu = new SelectMenuBuilder()
+                .WithCustomId($"{RoleRequestCommandMap.RoleRequestManageSave}:{user.Id},{index}")
+                .WithMinValues(1)
+                .WithPlaceholder("Select role(s) to make public");
+
+            foreach (var role in roles)
+            {
+                if (role.Position >= selfHighestRole.Position || properties.RoleIds.Any(x => x.Value == role.Id) || role.Name == "@everyone")
+                    continue;
+
+                selectMenu.AddOption(role.Name, role.Id.ToString());
+                count++;
+
+                if (count >= 25)
+                    break;
+            }
+
+            var menu = Pagination.SelectMenu(selectMenu, index, user, RoleRequestCommandMap.RoleRequestManageAdd, RoleRequestCommandMap.RoleRequestMenu);
 
             if (!menu.HasOptions)
                 output.AppendLine("All roles already available! Nothing to list.");
