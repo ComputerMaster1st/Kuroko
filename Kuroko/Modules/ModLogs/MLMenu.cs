@@ -19,25 +19,24 @@ namespace Kuroko.Modules.ModLogs
             var toggleRow = 1;
             var exitRow = 2;
             var componentBuilder = new ComponentBuilder()
-                .WithButton("Configure Log Channel", $"{CommandIdMap.ModLogChannel}:{user.Id},0", ButtonStyle.Primary, row: mainRow)
-                .WithButton("Ignore Channels", $"{CommandIdMap.ModLogChannelIgnore}:{user.Id},0", ButtonStyle.Primary, row: mainRow);
+                .WithButton("Configure Log Channel", $"{ModLogCommandMap.ModLogChannel}:{user.Id},0", ButtonStyle.Primary, row: mainRow)
+                .WithButton("Ignore Channels", $"{ModLogCommandMap.ModLogChannelIgnore}:{user.Id},0", ButtonStyle.Primary, row: mainRow);
 
             if (properties.IgnoredChannelIds.Count > 0)
                 componentBuilder
-                    .WithButton("Resume Channels", $"{CommandIdMap.ModLogChannelResume}:{user.Id},0", ButtonStyle.Primary, row: mainRow)
-                    .WithButton("Monitor All Channels", $"{CommandIdMap.ModLogChannelIgnoreReset}:{user.Id}", ButtonStyle.Success, row: mainRow);
+                    .WithButton("Resume Channels", $"{ModLogCommandMap.ModLogChannelResume}:{user.Id},0", ButtonStyle.Primary, row: mainRow)
+                    .WithButton("Monitor All Channels", $"{ModLogCommandMap.ModLogChannelIgnoreReset}:{user.Id}", ButtonStyle.Success, row: mainRow);
 
             if (properties.LogChannelId != 0)
-                componentBuilder.WithButton("Unset Logging Channel", $"{CommandIdMap.ModLogChannelDelete}:{user.Id}", ButtonStyle.Danger, row: mainRow);
+                componentBuilder.WithButton("Unset Logging Channel", $"{ModLogCommandMap.ModLogChannelDelete}:{user.Id}", ButtonStyle.Danger, row: mainRow);
 
             if (properties.LogChannelId != 0)
             {
-
                 componentBuilder
-                    .WithButton("User Joined", $"{CommandIdMap.ModLogJoin}:{user.Id}", ButtonEnabled(properties.Join), row: toggleRow)
-                    .WithButton("User Left", $"{CommandIdMap.ModLogLeave}:{user.Id}", ButtonEnabled(properties.Leave), row: toggleRow)
-                    .WithButton("Message Edited", $"{CommandIdMap.ModLogMessageEdited}:{user.Id}", ButtonEnabled(properties.EditedMessages), row: toggleRow)
-                    .WithButton("Message Deleted", $"{CommandIdMap.ModLogMessageDeleted}:{user.Id}", ButtonEnabled(properties.DeletedMessages), row: toggleRow);
+                    .WithButton("User Joined", $"{ModLogCommandMap.ModLogJoin}:{user.Id}", ButtonEnabled(properties.Join), row: toggleRow)
+                    .WithButton("User Left", $"{ModLogCommandMap.ModLogLeave}:{user.Id}", ButtonEnabled(properties.Leave), row: toggleRow)
+                    .WithButton("Message Edited", $"{ModLogCommandMap.ModLogMessageEdited}:{user.Id}", ButtonEnabled(properties.EditedMessages), row: toggleRow)
+                    .WithButton("Message Deleted", $"{ModLogCommandMap.ModLogMessageDeleted}:{user.Id}", ButtonEnabled(properties.DeletedMessages), row: toggleRow);
             }
 
             componentBuilder.WithButton("Exit", $"{CommandIdMap.Exit}:{user.Id}", ButtonStyle.Secondary, row: exitRow);
@@ -50,7 +49,7 @@ namespace Kuroko.Modules.ModLogs
             var count = 0;
             var textChannels = await user.Guild.GetTextChannelsAsync();
             var selectMenuBuilder = new SelectMenuBuilder()
-                .WithCustomId($"{CommandIdMap.ModLogChannelSave}:{user.Id}")
+                .WithCustomId($"{ModLogCommandMap.ModLogChannelSave}:{user.Id}")
                 .WithMinValues(1)
                 .WithPlaceholder("Select a text channel to send mod logs to");
 
@@ -63,7 +62,7 @@ namespace Kuroko.Modules.ModLogs
                     break;
             }
 
-            return Pagination.SelectMenu(selectMenuBuilder, indexStart, user, CommandIdMap.ModLogChannelIgnore, CommandIdMap.ModLogMenu, true);
+            return Pagination.SelectMenu(selectMenuBuilder, indexStart, user, ModLogCommandMap.ModLogChannelIgnore, ModLogCommandMap.ModLogMenu, true);
         }
 
         public static async Task<(bool HasOptions, MessageComponent Components)> BuildIgnoreLogChannelMenuAsync(IGuildUser user, ModLogEntity properties, int indexStart)
@@ -71,7 +70,7 @@ namespace Kuroko.Modules.ModLogs
             var count = 0;
             var textChannels = await user.Guild.GetTextChannelsAsync();
             var selectMenuBuilder = new SelectMenuBuilder()
-                .WithCustomId($"{CommandIdMap.ModLogChannelIgnoreSave}:{user.Id},{indexStart}")
+                .WithCustomId($"{ModLogCommandMap.ModLogChannelIgnoreSave}:{user.Id},{indexStart}")
                 .WithMinValues(1)
                 .WithPlaceholder("Select text channels to ignore mod logging");
 
@@ -87,14 +86,14 @@ namespace Kuroko.Modules.ModLogs
                     break;
             }
 
-            return Pagination.SelectMenu(selectMenuBuilder, indexStart, user, CommandIdMap.ModLogChannelIgnore, CommandIdMap.ModLogMenu);
+            return Pagination.SelectMenu(selectMenuBuilder, indexStart, user, ModLogCommandMap.ModLogChannelIgnore, ModLogCommandMap.ModLogMenu);
         }
 
         public static async Task<(bool HasOptions, MessageComponent Components)> BuildResumeLogChannelMenuAsync(IGuildUser user, ModLogEntity properties, int indexStart)
         {
             var count = 0;
             var selectMenuBuilder = new SelectMenuBuilder()
-                .WithCustomId($"{CommandIdMap.ModLogChannelResumeSave}:{user.Id},{indexStart}")
+                .WithCustomId($"{ModLogCommandMap.ModLogChannelResumeSave}:{user.Id},{indexStart}")
                 .WithMinValues(1)
                 .WithPlaceholder("Select text channels to resume mod logging");
 
@@ -108,7 +107,7 @@ namespace Kuroko.Modules.ModLogs
                     break;
             }
 
-            return Pagination.SelectMenu(selectMenuBuilder, indexStart, user, CommandIdMap.ModLogChannelResume, CommandIdMap.ModLogMenu);
+            return Pagination.SelectMenu(selectMenuBuilder, indexStart, user, ModLogCommandMap.ModLogChannelResume, ModLogCommandMap.ModLogMenu);
         }
     }
 }

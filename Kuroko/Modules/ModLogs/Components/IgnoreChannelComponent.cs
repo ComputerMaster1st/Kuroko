@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
+using Kuroko.Core;
 using Kuroko.Core.Attributes;
 using Kuroko.Database.Entities.Guild;
 using Kuroko.Services;
@@ -8,9 +9,9 @@ using System.Text;
 namespace Kuroko.Modules.ModLogs.Components
 {
     [RequireUserGuildPermission(GuildPermission.ManageGuild)]
-    public class IgnoreChannelComponent : ModLogBase
+    public class IgnoreChannelComponent : KurokoModuleBase
     {
-        [ComponentInteraction($"{CommandIdMap.ModLogChannelIgnore}:*,*")]
+        [ComponentInteraction($"{ModLogCommandMap.ModLogChannelIgnore}:*,*")]
         public async Task InitialAsync(ulong interactedUserId, int index)
         {
             if (interactedUserId != Context.User.Id)
@@ -23,7 +24,7 @@ namespace Kuroko.Modules.ModLogs.Components
             await ExecuteAsync(index);
         }
 
-        [ComponentInteraction($"{CommandIdMap.ModLogChannelIgnoreSave}:*,*")]
+        [ComponentInteraction($"{ModLogCommandMap.ModLogChannelIgnoreSave}:*,*")]
         public async Task ReturningAsync(ulong interactedUserId, int index, string[] channelIds)
         {
             if (interactedUserId != Context.User.Id)
@@ -35,7 +36,7 @@ namespace Kuroko.Modules.ModLogs.Components
             await DeferAsync();
 
             var selectedChannelIds = channelIds.Select(ulong.Parse);
-            var properties = await GetPropertiesAsync();
+            var properties = await GetPropertiesAsync<ModLogEntity, GuildEntity>(Context.Guild.Id);
 
             foreach (var channelId in selectedChannelIds)
             {
@@ -56,7 +57,7 @@ namespace Kuroko.Modules.ModLogs.Components
             var output = new StringBuilder()
                 .AppendLine("# Moderation Logging")
                 .AppendLine("## Configure Ignore Channels");
-            var properties = propParams ?? await GetPropertiesAsync();
+            var properties = propParams ?? await GetPropertiesAsync<ModLogEntity, GuildEntity>(Context.Guild.Id);
             var menu = await MLMenu.BuildIgnoreLogChannelMenuAsync(Context.User as IGuildUser, properties, index);
 
             output.AppendLine("Currently Ignored Channels: ");
