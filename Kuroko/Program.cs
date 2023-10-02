@@ -7,6 +7,7 @@ using Kuroko.Core.Attributes;
 using Kuroko.CoreModule.Events;
 using Kuroko.Database;
 using Kuroko.Events;
+using Kuroko.Events.ModLogEvents;
 using Kuroko.Shared;
 using Kuroko.Shared.Configuration;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +21,8 @@ DiscordShardedClient _discordClient = new(new DiscordSocketConfig()
     DefaultRetryMode = RetryMode.AlwaysRetry,
     LogLevel = LogSeverity.Info,
     MaxWaitBetweenGuildAvailablesBeforeReady = 1000,
-    GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMembers
+    MessageCacheSize = 1000,
+    GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMembers | GatewayIntents.GuildMessages | GatewayIntents.MessageContent
 });
 InteractionService _interactionService = new(_discordClient, new()
 {
@@ -83,10 +85,22 @@ _serviceCollection.AddDbContext<DatabaseContext>(options =>
 
 // TODO: Add any events that use '[PreInitialise]' attribute here.
 
+#region Base Events
+
 _serviceCollection.AddSingleton<DiscordLogEvent>()
     .AddSingleton<DiscordShardReadyEvent>()
     .AddSingleton<DiscordSlashCommandEvent>()
     .AddSingleton<UnobservedErrorEvent>();
+
+#endregion
+
+#region ModLog Events
+
+_serviceCollection.AddSingleton<ModLogUserJoinLeaveEvent>()
+    .AddSingleton<ModLogMessageEditedEvent>()
+    .AddSingleton<ModLogMessageDeletedEvent>();
+
+#endregion
 
 #endregion
 

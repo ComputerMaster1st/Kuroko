@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Kuroko.Database.Entities.Guild;
+using Kuroko.Modules.Globals;
 using System.Text;
 
 namespace Kuroko.Modules.RoleRequest
@@ -70,7 +71,7 @@ namespace Kuroko.Modules.RoleRequest
                     break;
             }
 
-            return PagedSelectMenu(selectMenu, indexStart, user, CommandIdMap.RoleRequestManageAdd);
+            return Pagination.SelectMenu(selectMenu, indexStart, user, CommandIdMap.RoleRequestManageAdd, CommandIdMap.RoleRequestMenu);
         }
 
         public static (bool HasOptions, MessageComponent Components) BuildRemoveMenu(IGuildUser user, RoleRequestEntity properties, int indexStart)
@@ -98,7 +99,7 @@ namespace Kuroko.Modules.RoleRequest
                     break;
             }
 
-            return PagedSelectMenu(selectMenu, indexStart, user, CommandIdMap.RoleRequestManageRemove);
+            return Pagination.SelectMenu(selectMenu, indexStart, user, CommandIdMap.RoleRequestManageRemove, CommandIdMap.RoleRequestMenu);
         }
 
         public static (bool HasOptions, MessageComponent Components) BuildAssignMenu(IGuildUser user, RoleRequestEntity properties, int indexStart)
@@ -124,7 +125,7 @@ namespace Kuroko.Modules.RoleRequest
                     break;
             }
 
-            return PagedSelectMenu(selectMenu, indexStart, user, CommandIdMap.RoleRequestAssign);
+            return Pagination.SelectMenu(selectMenu, indexStart, user, CommandIdMap.RoleRequestAssign, CommandIdMap.RoleRequestMenu);
         }
 
         public static (bool HasOptions, MessageComponent Components) BuildRevokeMenu(IGuildUser self, IGuildUser user, RoleRequestEntity properties, int indexStart)
@@ -164,38 +165,7 @@ namespace Kuroko.Modules.RoleRequest
                     break;
             }
 
-            return PagedSelectMenu(selectMenu, indexStart, user, CommandIdMap.RoleRequestRemove);
-        }
-
-        private static (bool HasOptions, MessageComponent Components) PagedSelectMenu(
-            SelectMenuBuilder builder,
-            int startIndex,
-            IUser user,
-            string commandId)
-        {
-            var componentBuilder = new ComponentBuilder();
-            (bool HasOptions, MessageComponent Components) output = new();
-
-            if (builder.Options.Count > 0)
-            {
-                builder.WithMaxValues(builder.Options.Count);
-                componentBuilder.WithSelectMenu(builder);
-                output.HasOptions = true;
-            }
-            else
-                output.HasOptions = false;
-
-            if (startIndex > 0)
-                componentBuilder.WithButton("<<--", $"{commandId}:{user.Id},{startIndex - 25}", ButtonStyle.Primary);
-
-            if (builder.Options.Count >= 25)
-                componentBuilder.WithButton("-->>", $"{commandId}:{user.Id},{startIndex + 25}", ButtonStyle.Primary);
-
-            componentBuilder.WithButton("Back To Menu", $"{CommandIdMap.RoleRequestMenu}:{user.Id}", ButtonStyle.Secondary);
-
-            output.Components = componentBuilder.Build();
-
-            return output;
+            return Pagination.SelectMenu(selectMenu, indexStart, user, CommandIdMap.RoleRequestRemove, CommandIdMap.RoleRequestMenu);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Kuroko.Core.Attributes;
+using Kuroko.Database;
 using Kuroko.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
@@ -38,9 +39,10 @@ namespace Kuroko.Modules.RoleRequest
 
             await DeferAsync();
 
-            var properties = await GetProperties();
-            properties.RoleIds.Clear();
+            var properties = await GetPropertiesAsync();
+            properties.RoleIds.Clear(Context.Database);
 
+            await Context.Database.SaveChangesAsync();
             await ExecuteAsync(true);
         }
 

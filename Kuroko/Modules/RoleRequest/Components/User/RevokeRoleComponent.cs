@@ -53,7 +53,7 @@ namespace Kuroko.Modules.RoleRequest.Components.User
         private async Task ExecuteAsync(int index, StringBuilder output)
         {
             var self = Context.Guild.GetUser(Context.Client.CurrentUser.Id);
-            var menu = RRMenu.BuildRevokeMenu(self, Context.User as IGuildUser, await GetProperties(), index);
+            var menu = RRMenu.BuildRevokeMenu(self, Context.User as IGuildUser, await GetPropertiesAsync(), index);
 
             if (!menu.HasOptions)
                 output.AppendLine()

@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Kuroko.Core.Attributes;
+using Kuroko.Database;
 using Kuroko.Database.Entities.Guild;
 using Kuroko.Services;
 using System.Text;
@@ -32,7 +33,7 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
             }
 
             await DeferAsync();
-            await ExecuteAsync(await GetProperties(), index, OutputMsg);
+            await ExecuteAsync(await GetPropertiesAsync(), index, OutputMsg);
         }
 
         [ComponentInteraction($"{CommandIdMap.RoleRequestManageDelete}:*,*")]
@@ -46,7 +47,7 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
 
             await DeferAsync();
 
-            var properties = await GetProperties();
+            var properties = await GetPropertiesAsync();
             var selectedRoleIds = roleIds.Select(ulong.Parse);
 
             OutputMsg.AppendLine("Selected roles removed from public use:");
@@ -54,7 +55,8 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
             foreach (var roleId in selectedRoleIds)
             {
                 var role = Context.Guild.GetRole(roleId);
-                properties.RoleIds.RemoveAll(x => x.Value == roleId);
+                var temp = properties.RoleIds.FirstOrDefault(x => x.Value == roleId);
+                properties.RoleIds.Remove(temp, Context.Database);
 
                 OutputMsg.AppendLine("* " + role.Name);
             }

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Kuroko.Database.Entities
 {
-    public class UlongEntity
+    public class UlongEntity : ITypeEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; private set; } = 0;
