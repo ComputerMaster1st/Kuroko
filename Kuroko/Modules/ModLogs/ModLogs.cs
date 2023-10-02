@@ -4,6 +4,7 @@ using Kuroko.Core;
 using Kuroko.Core.Attributes;
 using Kuroko.Database;
 using Kuroko.Database.Entities.Guild;
+using Kuroko.Modules.Globals;
 using Kuroko.Services;
 using System.Text;
 
@@ -118,7 +119,33 @@ namespace Kuroko.Modules.ModLogs
         {
             var user = Context.User as IGuildUser;
             var properties = propParam ?? await GetPropertiesAsync<ModLogEntity, GuildEntity>(Context.Guild.Id);
-            var msgComponents = MLMenu.BuildMenu(user, properties);
+            var mainRow = 0;
+            var toggleRow = 1;
+            var exitRow = 2;
+            var componentBuilder = new ComponentBuilder()
+                .WithButton("Configure Log Channel", $"{ModLogCommandMap.ModLogChannel}:{user.Id},0", ButtonStyle.Primary, row: mainRow)
+                .WithButton("Ignore Channels", $"{ModLogCommandMap.ModLogChannelIgnore}:{user.Id},0", ButtonStyle.Primary, row: mainRow);
+
+            if (properties.IgnoredChannelIds.Count > 0)
+                componentBuilder
+                    .WithButton("Resume Channels", $"{ModLogCommandMap.ModLogChannelResume}:{user.Id},0", ButtonStyle.Primary, row: mainRow)
+                    .WithButton("Monitor All Channels", $"{ModLogCommandMap.ModLogChannelIgnoreReset}:{user.Id}", ButtonStyle.Success, row: mainRow);
+
+            if (properties.LogChannelId != 0)
+                componentBuilder.WithButton("Unset Logging Channel", $"{ModLogCommandMap.ModLogChannelDelete}:{user.Id}", ButtonStyle.Danger, row: mainRow);
+
+            if (properties.LogChannelId != 0)
+            {
+                componentBuilder
+                    .WithButton("User Joined", $"{ModLogCommandMap.ModLogJoin}:{user.Id}", Pagination.IsButtonToggle(properties.Join), row: toggleRow)
+                    .WithButton("User Left", $"{ModLogCommandMap.ModLogLeave}:{user.Id}", Pagination.IsButtonToggle(properties.Leave), row: toggleRow)
+                    .WithButton("Message Edited", $"{ModLogCommandMap.ModLogMessageEdited}:{user.Id}", Pagination.IsButtonToggle(properties.EditedMessages), row: toggleRow)
+                    .WithButton("Message Deleted", $"{ModLogCommandMap.ModLogMessageDeleted}:{user.Id}", Pagination.IsButtonToggle(properties.DeletedMessages), row: toggleRow);
+            }
+
+            componentBuilder.WithButton("Exit", $"{CommandIdMap.Exit}:{user.Id}", ButtonStyle.Secondary, row: exitRow);
+
+            var msgComponents = componentBuilder.Build();
             var logChannel = Context.Guild.GetChannel(properties.LogChannelId);
             var channelTag = (logChannel is null) ? "**Not Set**" : $"<#{logChannel.Id}>";
             var output = OutputMsg

@@ -3,6 +3,7 @@ using Discord.Interactions;
 using Kuroko.Core;
 using Kuroko.Core.Attributes;
 using Kuroko.Database.Entities.Guild;
+using Kuroko.Modules.Globals;
 using Kuroko.Services;
 using System.Text;
 
@@ -58,7 +59,27 @@ namespace Kuroko.Modules.ModLogs.Components
                 .AppendLine("# Moderation Logging")
                 .AppendLine("## Configure Ignore Channels");
             var properties = propParams ?? await GetPropertiesAsync<ModLogEntity, GuildEntity>(Context.Guild.Id);
-            var menu = await MLMenu.BuildIgnoreLogChannelMenuAsync(Context.User as IGuildUser, properties, index);
+            var count = 0;
+            var user = Context.User as IGuildUser;
+            var textChannels = await user.Guild.GetTextChannelsAsync();
+            var selectMenuBuilder = new SelectMenuBuilder()
+                .WithCustomId($"{ModLogCommandMap.ModLogChannelIgnoreSave}:{user.Id},{index}")
+                .WithMinValues(1)
+                .WithPlaceholder("Select text channels to ignore mod logging");
+
+            foreach (var textChannel in textChannels)
+            {
+                if (properties.IgnoredChannelIds.Any(x => x.Value == textChannel.Id))
+                    continue;
+
+                selectMenuBuilder.AddOption(textChannel.Name, textChannel.Id.ToString());
+                count++;
+
+                if (count >= 25)
+                    break;
+            }
+
+            var menu = Pagination.SelectMenu(selectMenuBuilder, index, user, ModLogCommandMap.ModLogChannelIgnore, ModLogCommandMap.ModLogMenu);
 
             output.AppendLine("Currently Ignored Channels: ");
 

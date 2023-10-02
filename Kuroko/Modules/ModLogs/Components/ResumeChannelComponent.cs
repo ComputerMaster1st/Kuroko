@@ -3,6 +3,7 @@ using Discord.Interactions;
 using Kuroko.Core;
 using Kuroko.Database;
 using Kuroko.Database.Entities.Guild;
+using Kuroko.Modules.Globals;
 using Kuroko.Services;
 using System.Text;
 
@@ -53,7 +54,24 @@ namespace Kuroko.Modules.ModLogs.Components
                 .AppendLine("# Moderation Logging")
                 .AppendLine("## Resume Moderating Channels");
             var properties = propParams ?? await GetPropertiesAsync<ModLogEntity, GuildEntity>(Context.Guild.Id);
-            var menu = await MLMenu.BuildResumeLogChannelMenuAsync(Context.User as IGuildUser, properties, index);
+            var user = Context.User as IGuildUser;
+            var count = 0;
+            var selectMenuBuilder = new SelectMenuBuilder()
+                .WithCustomId($"{ModLogCommandMap.ModLogChannelResumeSave}:{user.Id},{index}")
+                .WithMinValues(1)
+                .WithPlaceholder("Select text channels to resume mod logging");
+
+            foreach (var textChannelId in properties.IgnoredChannelIds)
+            {
+                var textChannel = await user.Guild.GetChannelAsync(textChannelId.Value);
+                selectMenuBuilder.AddOption(textChannel.Name, textChannel.Id.ToString());
+                count++;
+
+                if (count >= 25)
+                    break;
+            }
+
+            var menu = Pagination.SelectMenu(selectMenuBuilder, index, user, ModLogCommandMap.ModLogChannelResume, ModLogCommandMap.ModLogMenu);
             var hasUnknownChannels = false;
 
             output.AppendLine("Currently Ignored Channels: ");

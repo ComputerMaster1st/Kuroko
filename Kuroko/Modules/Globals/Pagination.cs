@@ -2,7 +2,7 @@
 
 namespace Kuroko.Modules.Globals
 {
-    public static class Pagination
+    internal static class Pagination
     {
         public static (bool HasOptions, MessageComponent Components) SelectMenu(
             SelectMenuBuilder builder,
@@ -39,6 +39,13 @@ namespace Kuroko.Modules.Globals
             output.Components = componentBuilder.Build();
 
             return output;
+        }
+
+        public static ButtonStyle IsButtonToggle(bool isEnabled)
+        {
+            if (isEnabled)
+                return ButtonStyle.Success;
+            return ButtonStyle.Secondary;
         }
     }
 }
