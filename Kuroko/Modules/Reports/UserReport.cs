@@ -10,7 +10,7 @@ namespace Kuroko.Modules.Reports
     public class UserReport : KurokoModuleBase
     {
         [UserCommand("Report User")]
-        public Task TestAsync(IUser user)
+        public Task ReportUserAsync(IUser user)
         {
             return Context.Interaction.RespondWithModalAsync<ReportUserModal>($"{ReportsCommandMap.ReportUserModal}:{user.Id}", modifyModal: (x) =>
             {
