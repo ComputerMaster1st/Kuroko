@@ -4,6 +4,7 @@
     {
         public virtual RoleRequestEntity RoleRequest { get; set; } = null;
         public virtual ModLogEntity ModLog { get; set; } = null;
+        public virtual ReportsEntity Reports { get; set; } = null;
 
         public GuildEntity(ulong id) : base(id) { }
     }

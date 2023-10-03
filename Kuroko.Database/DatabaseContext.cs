@@ -18,6 +18,7 @@ namespace Kuroko.Database
 
         public DbSet<RoleRequestEntity> GuildRoleRequests { get; internal set; } = null;
         public DbSet<ModLogEntity> GuildModLogs { get; internal set; } = null;
+        public DbSet<ReportsEntity> GuildReports { get; internal set; } = null;
 
 #if DEBUG
         public DatabaseContext() { }
@@ -68,6 +69,22 @@ namespace Kuroko.Database
                 .HasOne(x => x.ModLog)
                 .WithOne(x => x.Guild)
                 .HasForeignKey<ModLogEntity>(x => x.GuildId)
+                .HasPrincipalKey<GuildEntity>(x => x.Id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            #endregion
+
+            #region Reports
+
+            modelBuilder.Entity<ReportsEntity>()
+                .HasMany(x => x.ReportHandlers)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<GuildEntity>()
+                .HasOne(x => x.Reports)
+                .WithOne(x => x.Guild)
+                .HasForeignKey<ReportsEntity>(x => x.GuildId)
                 .HasPrincipalKey<GuildEntity>(x => x.Id)
                 .OnDelete(DeleteBehavior.Cascade);
 
