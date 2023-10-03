@@ -59,7 +59,7 @@ namespace Kuroko.Modules.Reports
             else if (category != null)
                 categoryName = category.Name;
 
-            if (properties.ReportCategoryId != 0 && transcript is null)
+            if (properties.TranscriptsChannelId != 0 && transcript is null)
                 transcriptChannelName = "**_Missing Channel! Please Fix!_**";
             else if (transcript != null)
                 transcriptChannelName = transcript.Mention;
@@ -95,7 +95,7 @@ namespace Kuroko.Modules.Reports
                     ButtonStyle.Primary,
                     row: menusRow)
                 .WithButton("Report Transcript Channel",
-                    $"{ReportsCommandMap.ReportTranscript}:{user.Id}",
+                    $"{ReportsCommandMap.ReportTranscript}:{user.Id},0",
                     ButtonStyle.Primary,
                     row: menusRow)
                 .WithButton("Add Handlers",
