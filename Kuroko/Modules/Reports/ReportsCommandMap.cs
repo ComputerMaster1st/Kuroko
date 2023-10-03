@@ -2,7 +2,23 @@
 {
     internal static class ReportsCommandMap
     {
-        #region ReportUserModal
+        public const string ReportMenu = "rp_menu";
+
+        #region Report Configuration
+
+        public const string ReportAutomateMessages = "rp_automate_msg";
+        public const string ReportCategory = "rp_category";
+        public const string ReportCategorySave = "rp_category_save";
+
+        public const string ReportTranscript = "rp_transcript";
+        public const string ReportTranscriptSave = "rp_transcript_save";
+
+        public const string ReportHandlersAdd = "rp_handlers_add";
+        public const string ReportHandlersRemove = "rp_handlers_remove";
+
+        #endregion
+
+        #region Report User Modal
 
         public const string ReportUserModal = "ru_modal";
         public const string ReportUserModalRules = "ru_modal_reason";
