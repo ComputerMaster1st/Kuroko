@@ -11,7 +11,7 @@ namespace Kuroko.Database.Entities.Guild
         public ulong GuildId { get; private set; } = 0;
         public virtual GuildEntity Guild { get; private set; } = null;
 
-        public ulong ReportCategoryId { get; set; } = 0
+        public ulong ReportCategoryId { get; set; } = 0;
         public ulong TranscriptsChannelId { get; set; } = 0;
 
         public bool RecordMessages { get; set; } = false;
@@ -19,7 +19,7 @@ namespace Kuroko.Database.Entities.Guild
         public virtual List<ReportHandler> ReportHandlers { get; private set; } = new();
     }
 
-    public class ReportHandler
+    public class ReportHandler : ITypeEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; private set; } = 0;

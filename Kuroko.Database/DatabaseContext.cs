@@ -9,6 +9,7 @@ namespace Kuroko.Database
     {
         // INTERNAL USE ONLY! Use extension methods provided by DatabaseContextExtensions.cs
         internal DbSet<UlongEntity> UlongEntity { get; set; } = null;
+        internal DbSet<ReportHandler> ReportHandler { get; set; } = null;
 
         // Root containers. Should only contain foreign keys
         public DbSet<GuildEntity> Guilds { get; internal set; } = null;
