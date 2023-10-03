@@ -48,7 +48,7 @@ namespace Kuroko.Modules.Reports.Components
             var category = Context.Guild.GetCategoryChannel(properties.ReportCategoryId);
 
             if (properties.ReportCategoryId != 0 && category is null)
-                categoryName = "_Deleted Category! Please Fix!_";
+                categoryName = "**_Missing Category! Please Fix!_**";
             else if (category != null)
                 categoryName = category.Name;
 

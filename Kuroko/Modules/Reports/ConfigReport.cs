@@ -55,12 +55,12 @@ namespace Kuroko.Modules.Reports
             var transcript = Context.Guild.GetTextChannel(properties.TranscriptsChannelId);
 
             if (properties.ReportCategoryId != 0 && category is null)
-                categoryName = "_Deleted Category! Please Fix!_";
+                categoryName = "_Missing Category! Please Fix!_";
             else if (category != null)
                 categoryName = category.Name;
 
             if (properties.ReportCategoryId != 0 && transcript is null)
-                transcriptChannelName = "**_Deleted Channel! Please Fix!_**";
+                transcriptChannelName = "**_Missing Channel! Please Fix!_**";
             else if (transcript != null)
                 transcriptChannelName = transcript.Mention;
 
@@ -77,14 +77,14 @@ namespace Kuroko.Modules.Reports
 
                     if (role is null)
                     {
-                        output.AppendLine($"* {handler.Name} : _Role missing! Please Fix!_");
+                        output.AppendLine($"* {handler.Name} : **_Role missing! Please Fix!_**");
                         continue;
                     }
 
                     output.AppendLine($"* {handler.Name} : {role.Name}");
                 }
             else
-                output.AppendLine("* No handlers configured. Please set them up.");
+                output.AppendLine("* **No handlers configured. Please set them up.**");
 
             var menusRow = 0;
             var togglesRow = 1;
