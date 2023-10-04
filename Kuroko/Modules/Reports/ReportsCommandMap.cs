@@ -14,7 +14,11 @@
         public const string ReportTranscriptSave = "rp_transcript_save";
 
         public const string ReportHandlersAdd = "rp_handlers_add";
+        public const string ReportHandlersAddConfirm = "rp_handlers_add_confirm";
+        public const string ReportHandlersName = "rp_handlers_name";
+        public const string ReportHandlersSave = "rp_handlers_save";
         public const string ReportHandlersRemove = "rp_handlers_remove";
+        public const string ReportHandlersDelete = "rp_handlers_delete";
 
         #endregion
 

@@ -77,14 +77,17 @@ namespace Kuroko.Modules.Reports
 
                     if (role is null)
                     {
-                        output.AppendLine($"* {handler.Name} : **_Role missing! Please Fix!_**");
+                        output.AppendLine($"* {handler.Name} : **_(Role missing! Please Fix!)_**");
                         continue;
                     }
 
-                    output.AppendLine($"* {handler.Name} : {role.Name}");
+                    output.AppendLine($"* {handler.Name} : **{role.Name}**");
                 }
             else
                 output.AppendLine("* **No handlers configured. Please set them up.**");
+
+            output.AppendLine("## NOTICE!")
+                .AppendLine("Enabling \"Automated Message Log Generation\" will record all messages from all channels that are not ignored by ModLogs. We recommend you to make your server aware that all messages are being recorded for moderation purposes. Disabling the feature will result in all recorded messages deleted as per Discord's developer policy.");
 
             var menusRow = 0;
             var togglesRow = 1;
@@ -99,15 +102,18 @@ namespace Kuroko.Modules.Reports
                     ButtonStyle.Primary,
                     row: menusRow)
                 .WithButton("Add Handlers",
-                    $"{ReportsCommandMap.ReportHandlersAdd}:{user.Id}",
+                    $"{ReportsCommandMap.ReportHandlersAdd}:{user.Id},0",
                     ButtonStyle.Primary,
-                    row: menusRow)
-                .WithButton("Remove Handlers",
-                    $"{ReportsCommandMap.ReportHandlersRemove}:{user.Id}",
+                    row: menusRow);
+
+            if (properties.ReportHandlers.Count > 0)
+                componentBuilder.WithButton("Remove Handlers",
+                    $"{ReportsCommandMap.ReportHandlersRemove}:{user.Id},0",
                     ButtonStyle.Danger,
-                    row: menusRow)
-                .WithButton("Automated Message Log Generation",
-                    $"{ReportsCommandMap.ReportAutomateMessages}:{user.Id},{properties.RecordMessages}",
+                    row: menusRow);
+
+            componentBuilder.WithButton("Automated Message Log Generation",
+                    $"{ReportsCommandMap.ReportAutomateMessages}:{user.Id}",
                     Pagination.IsButtonToggle(properties.RecordMessages),
                     row: togglesRow)
                 .WithButton("Exit",
