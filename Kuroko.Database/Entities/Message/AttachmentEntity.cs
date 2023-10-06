@@ -20,5 +20,8 @@ namespace Kuroko.Database.Entities.Message
             Base64Bytes = Convert.ToBase64String(bytes);
             FileSize = bytes.LongLength;
         }
+
+        public byte[] GetBytes()
+            => Convert.FromBase64String(Base64Bytes);
     }
 }
