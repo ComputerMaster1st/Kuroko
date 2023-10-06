@@ -1,12 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Kuroko.Database.Entities.Guild;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Kuroko.Database.Entities.Message
 {
-    public class MessageEntity : IDiscordEntity
+    public class MessageEntity : IDiscordEntity, IPropertyEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
         public ulong Id { get; private set; } = 0;
+
+        public ulong GuildId { get; private set; } = 0;
+        public virtual GuildEntity Guild { get; private set; } = null;
 
         public DateTimeOffset CreatedAt { get; private set; } = DateTimeOffset.UtcNow;
         public DateTimeOffset? DeletedAt { get; set; } = null;

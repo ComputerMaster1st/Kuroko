@@ -9,19 +9,28 @@ namespace Kuroko.Database.Entities.Message
         public ulong Id { get; private set; } = 0;
 
         public string FileName { get; private set; } = string.Empty;
-        public long FileSize { get; private set; } = 0;
-
         public string Base64Bytes { get; private set; } = string.Empty;
 
-        public AttachmentEntity(ulong attachmentId, string fileName, byte[] bytes)
+        [NotMapped]
+        public long FileSize
+        {
+            get
+            {
+                return GetBytes().LongLength;
+            }
+        }
+
+        public AttachmentEntity(ulong attachmentId, string fileName, string base64Bytes)
         {
             Id = attachmentId;
             FileName = fileName;
-            Base64Bytes = Convert.ToBase64String(bytes);
-            FileSize = bytes.LongLength;
+            Base64Bytes = base64Bytes;
         }
 
         public byte[] GetBytes()
             => Convert.FromBase64String(Base64Bytes);
+
+        public Stream GetStream()
+            => new MemoryStream(GetBytes());
     }
 }
