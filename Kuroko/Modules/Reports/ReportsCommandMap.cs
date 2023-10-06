@@ -25,6 +25,7 @@
         #region Report User Modal
 
         public const string ReportUserModal = "ru_modal";
+        public const string ReportUserModalSubject = "ru_modal_subject";
         public const string ReportUserModalRules = "ru_modal_reason";
         public const string ReportUserModalDescription = "ru_modal_description";
 
