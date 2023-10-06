@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Kuroko.Database.Entities.Message;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Kuroko.Database.Entities.Guild
@@ -29,6 +30,8 @@ namespace Kuroko.Database.Entities.Guild
 
         public Severity Severity { get; set; } = Severity.Unknown;
 
+        public virtual List<MessageEntity> Messages { get; private set; } = new();
+
         [NotMapped]
         public long CreatedAtEpoch
         {
@@ -47,16 +50,5 @@ namespace Kuroko.Database.Entities.Guild
             SubmitterId = submitterId;
             ReportedUserId = reportedUserId;
         }
-
-
-        // TODO: List of tickets
-
-        // messages, attachments
-
-        // messages will need:
-        // msg id, created at, edited list, deleted at (null), content
-
-        // edited msg will need:
-        // id, edited at, content
     }
 }
