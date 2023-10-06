@@ -1,5 +1,6 @@
 ﻿using Kuroko.Database.Entities;
 using Kuroko.Database.Entities.Guild;
+using Kuroko.Database.Entities.Message;
 using Kuroko.Database.Entities.User;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,16 +11,20 @@ namespace Kuroko.Database
         // INTERNAL USE ONLY! Use extension methods provided by DatabaseContextExtensions.cs
         internal DbSet<UlongEntity> UlongEntity { get; set; } = null;
         internal DbSet<ReportHandler> ReportHandler { get; set; } = null;
+        internal DbSet<AttachmentEntity> AttachmentEntity { get; set; } = null;
+        internal DbSet<EditedMessageEntity> EditedMessageEntity { get; set; } = null;
 
         // Root containers. Should only contain foreign keys
         public DbSet<GuildEntity> Guilds { get; internal set; } = null;
         public DbSet<UserEntity> Users { get; internal set; } = null;
+        public DbSet<MessageEntity> Messages { get; set; } = null;
 
         // TODO: Put Module DbSets Here
 
         public DbSet<RoleRequestEntity> GuildRoleRequests { get; internal set; } = null;
         public DbSet<ModLogEntity> GuildModLogs { get; internal set; } = null;
         public DbSet<ReportsEntity> GuildReports { get; internal set; } = null;
+        public DbSet<TicketEntity> Tickets { get; internal set; } = null;
 
 #if DEBUG
         public DatabaseContext() { }
@@ -87,6 +92,42 @@ namespace Kuroko.Database
                 .WithOne(x => x.Guild)
                 .HasForeignKey<ReportsEntity>(x => x.GuildId)
                 .HasPrincipalKey<GuildEntity>(x => x.Id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            #endregion
+
+            #region Messages
+
+            modelBuilder.Entity<MessageEntity>()
+                .HasMany(x => x.EditedMessages)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<MessageEntity>()
+                .HasMany(x => x.Attachments)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<GuildEntity>()
+                .HasMany(x => x.Messages)
+                .WithOne(x => x.Guild)
+                .HasForeignKey(x => x.GuildId)
+                .HasPrincipalKey(x => x.Id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            #endregion
+
+            #region Tickets
+
+            modelBuilder.Entity<TicketEntity>()
+                .HasMany(x => x.Messages)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<GuildEntity>()
+                .HasMany(x => x.Tickets)
+                .WithOne(x => x.Guild)
+                .HasForeignKey(x => x.GuildId)
+                .HasPrincipalKey(x => x.Id)
                 .OnDelete(DeleteBehavior.Cascade);
 
             #endregion
