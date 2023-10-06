@@ -17,20 +17,6 @@ namespace Kuroko.Database.Entities.Guild
         public bool RecordMessages { get; set; } = false;
 
         public virtual List<ReportHandler> ReportHandlers { get; private set; } = new();
-
-
-
-        // TODO: List of tickets
-
-
-        // ticket will need:
-        // id, header/subject, rules violated, description, reporter, reported, created at, closed at, threat level, messages, attachments
-
-        // messages will need:
-        // msg id, created at, edited list, deleted at (null), content
-
-        // edited msg will need:
-        // id, edited at, content
     }
 
     public class ReportHandler : ITypeEntity
