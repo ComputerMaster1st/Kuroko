@@ -21,9 +21,9 @@ namespace Kuroko.Database.Entities.Message
 
         public virtual List<AttachmentEntity> Attachments { get; private set; } = new();
 
-        public MessageEntity(ulong messageId, string content)
+        public MessageEntity(ulong id, string content)
         {
-            Id = messageId;
+            Id = id;
             Content = content;
         }
     }
