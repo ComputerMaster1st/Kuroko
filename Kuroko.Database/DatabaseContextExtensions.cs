@@ -10,7 +10,7 @@ namespace Kuroko.Database
             where TDiscordEntity : class, IDiscordEntity
             => dbTable.FirstOrDefaultAsync(x => x.Id == id);
 
-        public static async Task<TGuildPropertyEntity> CreateOrGetDataAsync<TGuildPropertyEntity, TDiscordEntity>(
+        public static async Task<TGuildPropertyEntity> CreateOrGetPropertiesAsync<TGuildPropertyEntity, TDiscordEntity>(
             this DbSet<TGuildPropertyEntity> dbProperty, DbSet<TDiscordEntity> dbDiscordEntity, ulong guildId,
             Action<TDiscordEntity, TGuildPropertyEntity> guildEntityAction)
             where TGuildPropertyEntity : class, IPropertyEntity
@@ -25,13 +25,13 @@ namespace Kuroko.Database
 
             await dbProperty.AddAsync(propertyEntity);
 
-            var discordEntity = await dbDiscordEntity.CreateDataAsync(guildId);
+            var discordEntity = await dbDiscordEntity.GetOrCreateRootAsync(guildId);
             guildEntityAction(discordEntity, propertyEntity);
 
             return propertyEntity;
         }
 
-        private async static Task<TDiscordEntity> CreateDataAsync<TDiscordEntity>(
+        public async static Task<TDiscordEntity> GetOrCreateRootAsync<TDiscordEntity>(
             this DbSet<TDiscordEntity> dbTable, ulong Id) where TDiscordEntity : class, IDiscordEntity
         {
             var data = await dbTable.GetDataAsync(Id);
