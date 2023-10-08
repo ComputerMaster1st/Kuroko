@@ -23,7 +23,7 @@ namespace Kuroko.Core
         {
             var set = Context.Database.Set<TPropertyEntity>();
             var rootSet = Context.Database.Set<TDiscordEntity>();
-            var result = await set.CreateOrGetDataAsync(rootSet, id, (x, y) =>
+            var result = await set.CreateOrGetPropertiesAsync(rootSet, id, (x, y) =>
             {
                 var properties = x.GetType().GetProperties();
                 var property = properties.FirstOrDefault(x => x.PropertyType == typeof(TPropertyEntity));
