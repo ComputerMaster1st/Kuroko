@@ -9,7 +9,7 @@ namespace Kuroko.Database.Entities.Guild
         Critical,
         Major,
         Minor,
-        Unknown
+        Unassigned
     }
 
     public class TicketEntity : IPropertyEntity
@@ -18,6 +18,8 @@ namespace Kuroko.Database.Entities.Guild
         public int Id { get; private set; } = 0;
         public ulong GuildId { get; private set; } = 0;
         public virtual GuildEntity Guild { get; private set; } = null;
+        public ulong ChannelId { get; private set; } = 0;
+        public ulong SummaryMessageId { get; set; } = 0;
 
         public string Subject { get; private set; } = string.Empty;
         public string RulesViolated { get; private set; } = string.Empty;
@@ -28,7 +30,7 @@ namespace Kuroko.Database.Entities.Guild
 
         public DateTimeOffset CreatedAt { get; private set; } = DateTime.UtcNow;
 
-        public Severity Severity { get; set; } = Severity.Unknown;
+        public Severity Severity { get; set; } = Severity.Unassigned;
 
         public virtual List<MessageEntity> Messages { get; private set; } = new();
 
@@ -41,9 +43,10 @@ namespace Kuroko.Database.Entities.Guild
             }
         }
 
-        public TicketEntity(string subject, string rulesViolated, string description,
+        public TicketEntity(ulong channelId, string subject, string rulesViolated, string description,
             ulong submitterId, ulong reportedUserId)
         {
+            ChannelId = channelId;
             Subject = subject;
             RulesViolated = rulesViolated;
             Description = description;
