@@ -59,7 +59,6 @@ namespace Kuroko.Modules.Reports.Components
         [ComponentInteraction($"{TicketsCommandMap.Severity}:*")]
         public async Task SeverityAsync(int ticketId, string result)
         {
-            // TODO: Modify Ticket w/ new severity
             var ticket = await Context.Database.Tickets.FirstOrDefaultAsync(x => x.Id == ticketId);
             var severity = Enum.Parse<Severity>(result);
 
