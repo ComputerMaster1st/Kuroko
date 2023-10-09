@@ -37,9 +37,13 @@ namespace Kuroko
         {
             var dir = Directory.CreateDirectory(Path.Combine(DataDirectories.TEMPZIPS, zipName));
             var file = zipName + ".zip";
+            var filePath = Path.Combine(dir.ToString(), file);
 
-            using var zip = new ZipFile(file, Encoding.UTF8);
-            zip.AddDirectory(directory.ToString());
+            if (File.Exists(filePath))
+                File.Delete(filePath);
+
+            using var zip = new ZipFile(filePath, Encoding.UTF8);
+            zip.AddDirectory(directory.FullName);
             zip.CompressionLevel = CompressionLevel.BestCompression;
             zip.MaxOutputSegmentSize = 20 * 1024 * 1024;
             zip.Save();
