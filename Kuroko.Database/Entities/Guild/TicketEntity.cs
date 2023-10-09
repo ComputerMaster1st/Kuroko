@@ -12,7 +12,7 @@ namespace Kuroko.Database.Entities.Guild
         Unassigned
     }
 
-    public class TicketEntity : IPropertyEntity
+    public class TicketEntity : IPropertyEntity, ITypeEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; private set; } = 0;
@@ -20,6 +20,7 @@ namespace Kuroko.Database.Entities.Guild
         public virtual GuildEntity Guild { get; private set; } = null;
         public ulong ChannelId { get; private set; } = 0;
         public ulong SummaryMessageId { get; set; } = 0;
+        public int ReportHandlerId { get; set; } = -1;
 
         public string Subject { get; private set; } = string.Empty;
         public string RulesViolated { get; private set; } = string.Empty;
