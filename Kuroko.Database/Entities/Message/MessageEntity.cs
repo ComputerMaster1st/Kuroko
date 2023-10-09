@@ -11,6 +11,7 @@ namespace Kuroko.Database.Entities.Message
 
         public ulong GuildId { get; private set; } = 0;
         public virtual GuildEntity Guild { get; private set; } = null;
+        public ulong UserId { get; private set; } = 0;
 
         public DateTimeOffset CreatedAt { get; private set; } = DateTimeOffset.UtcNow;
         public DateTimeOffset? DeletedAt { get; set; } = null;
