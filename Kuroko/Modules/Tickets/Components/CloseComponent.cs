@@ -124,31 +124,37 @@ namespace Kuroko.Modules.Tickets.Components
 
                 if (msg.Attachments.Count > 0)
                 {
-                    output.AppendLine("═══════════════════ [ Attachment Chain ] ═══════════════════")
+                    output.AppendLine("─────────────────── [ Attachment Chain ] ───────────────────")
                         .AppendLine();
                     var attachmentDir = directory.CreateSubdirectory("attachments");
 
                     foreach (var attachment in msg.Attachments)
                     {
+                        var filePath = Path.Combine(attachmentDir.ToString(), $"{attachment.Id}_{attachment.FileName}");
                         var bytes = attachment.GetBytes();
+
+                        using (FileStream file = File.OpenWrite(filePath))
+                        {
+                            await file.WriteAsync(bytes);
+                        }
+
+                        var mimes = FileMimeType.GetFromBytes(bytes);
+                        var mime = mimes.OrderByDescending(x => x.Points).FirstOrDefault();
 
                         output
                             .AppendLine("Attachment ID : " + attachment.Id)
                             .AppendLine("Name          : " + attachment.FileName)
                             .AppendLine("Size (Bytes)  : " + attachment.FileSize)
-                            .AppendLine("MIME Type     : " + FileMimeType.GetFromBytes(bytes))
+                            .AppendLine("MIME Type     : " + mime is null ? "No Mime Type Found" : mime.MimeType)
                             .AppendLine();
-
-                        using FileStream file = File.OpenWrite(Path.Combine(attachmentDir.ToString(), $"{attachment.Id}_{attachment.FileName}"));
-                        await file.WriteAsync(bytes);
                     }
 
-                    output.AppendLine("════════════════════════════════════════════════════════════");
+                    output.AppendLine("────────────────────────────────────────────────────────────");
                 }
 
                 if (msg.EditedMessages.Count > 0)
                 {
-                    output.AppendLine("═════════════════ [ Edited Message Chain ] ═════════════════");
+                    output.AppendLine("───────────────── [ Edited Message Chain ] ─────────────────");
 
                     foreach (var edited in msg.EditedMessages)
                     {
@@ -160,7 +166,7 @@ namespace Kuroko.Modules.Tickets.Components
                             .AppendLine("────────────────────────────────────────────────────────────");
                     }
 
-                    output.AppendLine("════════════════════════════════════════════════════════════");
+                    output.AppendLine("────────────────────────────────────────────────────────────");
                 }
 
                 if (msg.DeletedAt.HasValue)
