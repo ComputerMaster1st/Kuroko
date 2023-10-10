@@ -11,6 +11,7 @@ namespace Kuroko.Database.Entities.Message
 
         public ulong GuildId { get; private set; } = 0;
         public virtual GuildEntity Guild { get; private set; } = null;
+        public ulong ChannelId { get; private set; } = 0;
         public ulong UserId { get; private set; } = 0;
 
         public DateTimeOffset CreatedAt { get; private set; } = DateTimeOffset.UtcNow;
@@ -22,9 +23,11 @@ namespace Kuroko.Database.Entities.Message
 
         public virtual List<AttachmentEntity> Attachments { get; private set; } = new();
 
-        public MessageEntity(ulong id, string content)
+        public MessageEntity(ulong id, ulong channelId, ulong userId, string content)
         {
             Id = id;
+            ChannelId = channelId;
+            UserId = userId;
             Content = content;
         }
     }
