@@ -8,6 +8,7 @@ using Kuroko.CoreModule.Events;
 using Kuroko.Database;
 using Kuroko.Events;
 using Kuroko.Events.ModLogEvents;
+using Kuroko.Events.TicketEvents;
 using Kuroko.Shared;
 using Kuroko.Shared.Configuration;
 using Microsoft.EntityFrameworkCore;
@@ -99,6 +100,12 @@ _serviceCollection.AddSingleton<DiscordLogEvent>()
 _serviceCollection.AddSingleton<ModLogUserJoinLeaveEvent>()
     .AddSingleton<ModLogMessageEditedEvent>()
     .AddSingleton<ModLogMessageDeletedEvent>();
+
+#endregion
+
+#region Ticket Events
+
+_serviceCollection.AddSingleton<TicketMessageNewEvent>();
 
 #endregion
 
