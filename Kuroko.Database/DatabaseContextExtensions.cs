@@ -46,6 +46,19 @@ namespace Kuroko.Database
             return data;
         }
 
+        public static void Add<TDiscordEntity, TPropertyEntity>(this List<TPropertyEntity> ticketMessageList, TPropertyEntity msg, TDiscordEntity root)
+            where TPropertyEntity : class, IPropertyEntity
+            where TDiscordEntity : class, IDiscordEntity
+        {
+            var properties = root.GetType().GetProperties();
+            var property = properties.FirstOrDefault(x => x.PropertyType == typeof(List<TPropertyEntity>));
+
+            var value = property.GetValue(root) as List<TPropertyEntity>;
+
+            value.Add(msg);
+            ticketMessageList.Add(msg);
+        }
+
         public static void Remove<TTypeEntity>(this List<TTypeEntity> entityList, TTypeEntity entity, DatabaseContext db)
             where TTypeEntity : class, ITypeEntity
         {
