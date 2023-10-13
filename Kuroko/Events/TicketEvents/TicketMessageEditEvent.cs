@@ -1,4 +1,3 @@
-using System;
 using Discord;
 using Discord.WebSocket;
 using Kuroko.Core.Attributes;
@@ -8,35 +7,30 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Kuroko.Events.TicketEvents
 {
-	[PreInitialize]
-	public class TicketMessageEditEvent
-	{
-		private readonly IServiceProvider _services;
-		
-		public TicketMessageEditEvent(DiscordShardedClient client, IServiceProvider services)
-		{
-			_services = services;
+    [PreInitialize]
+    public class TicketMessageEditEvent
+    {
+        private readonly IServiceProvider _services;
 
-			client.MessageUpdated += (before, after, channel) => Task.Factory.StartNew(() => MessageUpdated(after));
-		}
-		
-		private async Task MessageUpdated(SocketMessage after)
-		{
-			var msg = after as IUserMessage;
+        public TicketMessageEditEvent(DiscordShardedClient client, IServiceProvider services)
+        {
+            _services = services;
 
-			using var db = _services.GetRequiredService<DatabaseContext>();
-			
-			var ticket = await db.Tickets.FirstOrDefaultAsync(x => x.ChannelId == msg.Channel.Id);
+            client.MessageUpdated += (before, after, channel) => Task.Factory.StartNew(() => MessageUpdated(after));
+        }
 
-            if (ticket is null)
+        private async Task MessageUpdated(SocketMessage after)
+        {
+            var msg = after as IUserMessage;
+
+            using var db = _services.GetRequiredService<DatabaseContext>();
+
+            var msgEntity = await db.Messages.FirstOrDefaultAsync(x => x.Id == msg.Id);
+
+            if (msgEntity is null)
                 return;
 
-			var msgEntity = await db.Messages.FirstOrDefaultAsync(x => x.Id == msg.Id);
-
-			if (msgEntity is null)
-				return;
-
-			msgEntity.EditedMessages.Add(new(msg.Content));
-		}
-	}
+            msgEntity.EditedMessages.Add(new(msg.Content));
+        }
+    }
 }
