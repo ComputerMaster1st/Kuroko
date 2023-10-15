@@ -22,6 +22,7 @@
         public const string ModLogMessageEdited = "ml_message_edited";
         public const string ModLogJoin = "ml_join";
         public const string ModLogLeave = "ml_leave";
+        public const string ModLogDownloadAttachment = "ml_download";
 
         #endregion
     }

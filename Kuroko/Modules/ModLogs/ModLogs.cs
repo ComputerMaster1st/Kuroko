@@ -99,6 +99,15 @@ namespace Kuroko.Modules.ModLogs
             await ToggleAsync(x => x.EditedMessages = !x.EditedMessages);
         }
 
+        [ComponentInteraction($"{ModLogCommandMap.ModLogDownloadAttachment}:*")]
+        public async Task DownloadAsync(ulong interactedUserId)
+        {
+            if (!await IsInteractedUserAsync(interactedUserId))
+                return;
+
+            await ToggleAsync(x => x.SaveAttachments = !x.SaveAttachments);
+        }
+
         private async Task ToggleAsync(Action<ModLogEntity> action)
         {
             var properties = await GetPropertiesAsync<ModLogEntity, GuildEntity>(Context.Guild.Id);
@@ -140,7 +149,8 @@ namespace Kuroko.Modules.ModLogs
                     .WithButton("User Joined", $"{ModLogCommandMap.ModLogJoin}:{user.Id}", Pagination.IsButtonToggle(properties.Join), row: toggleRow)
                     .WithButton("User Left", $"{ModLogCommandMap.ModLogLeave}:{user.Id}", Pagination.IsButtonToggle(properties.Leave), row: toggleRow)
                     .WithButton("Message Edited", $"{ModLogCommandMap.ModLogMessageEdited}:{user.Id}", Pagination.IsButtonToggle(properties.EditedMessages), row: toggleRow)
-                    .WithButton("Message Deleted", $"{ModLogCommandMap.ModLogMessageDeleted}:{user.Id}", Pagination.IsButtonToggle(properties.DeletedMessages), row: toggleRow);
+                    .WithButton("Message Deleted", $"{ModLogCommandMap.ModLogMessageDeleted}:{user.Id}", Pagination.IsButtonToggle(properties.DeletedMessages), row: toggleRow)
+                    .WithButton("Download Attachments", $"{ModLogCommandMap.ModLogDownloadAttachment}:{user.Id}", Pagination.IsButtonToggle(properties.SaveAttachments), row: toggleRow);
             }
 
             componentBuilder.WithButton("Exit", $"{GlobalCommandMap.Exit}:{user.Id}", ButtonStyle.Secondary, row: exitRow);
