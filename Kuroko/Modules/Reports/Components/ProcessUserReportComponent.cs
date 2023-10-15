@@ -14,7 +14,7 @@ namespace Kuroko.Modules.Reports.Components
     [RequireBotGuildPermission(GuildPermission.ManageChannels)]
     public class ProcessUserReportComponent : KurokoModuleBase
     {
-        [ModalInteraction($"{ReportsCommandMap.ReportUserModal}:*")]
+        [ModalInteraction($"{ReportsCommandMap.USER_MODAL}:*")]
         public async Task CreateAsync(ulong reportedUserId, ReportUserModal modal)
         {
             var reportProperties = await GetPropertiesAsync<ReportsEntity, GuildEntity>(Context.Guild.Id);
@@ -38,7 +38,7 @@ namespace Kuroko.Modules.Reports.Components
         }
 
         [RequireUserGuildPermission(GuildPermission.ManageMessages)]
-        [ComponentInteraction($"{TicketsCommandMap.Escalate}:*")]
+        [ComponentInteraction($"{TicketsCommandMap.HANDLER_CHANGE}:*")]
         public async Task EscalateAsync(int ticketId, string result)
         {
             var ticket = await Context.Database.Tickets.FirstOrDefaultAsync(x => x.Id == ticketId);
@@ -56,7 +56,7 @@ namespace Kuroko.Modules.Reports.Components
         }
 
         [RequireUserGuildPermission(GuildPermission.ManageMessages)]
-        [ComponentInteraction($"{TicketsCommandMap.Severity}:*")]
+        [ComponentInteraction($"{TicketsCommandMap.SEVERITY}:*")]
         public async Task SeverityAsync(int ticketId, string result)
         {
             var ticket = await Context.Database.Tickets.FirstOrDefaultAsync(x => x.Id == ticketId);
@@ -74,7 +74,7 @@ namespace Kuroko.Modules.Reports.Components
             var reportProperties = propParam ?? await GetPropertiesAsync<ReportsEntity, GuildEntity>(Context.Guild.Id);
             var escalateSelectMenu = new SelectMenuBuilder()
             {
-                CustomId = $"{TicketsCommandMap.Escalate}:{ticket.Id}",
+                CustomId = $"{TicketsCommandMap.HANDLER_CHANGE}:{ticket.Id}",
                 MaxValues = 1,
                 MinValues = 1,
                 Placeholder = "Select Handler Type"
@@ -98,7 +98,7 @@ namespace Kuroko.Modules.Reports.Components
 
             var severitySelectMenu = new SelectMenuBuilder()
             {
-                CustomId = $"{TicketsCommandMap.Severity}:{ticket.Id}",
+                CustomId = $"{TicketsCommandMap.SEVERITY}:{ticket.Id}",
                 MaxValues = 1,
                 MinValues = 1,
                 Placeholder = "Select Severity",
@@ -143,7 +143,7 @@ namespace Kuroko.Modules.Reports.Components
             var componentBuilder = new ComponentBuilder()
                 .WithSelectMenu(escalateSelectMenu, 0)
                 .WithSelectMenu(severitySelectMenu, 0)
-                .WithButton("Close Ticket", $"{TicketsCommandMap.CloseTicket}:{ticket.Id}", ButtonStyle.Secondary, row: 1);
+                .WithButton("Close Ticket", $"{TicketsCommandMap.CLOSE}:{ticket.Id}", ButtonStyle.Secondary, row: 1);
 
             var channel = Context.Guild.GetTextChannel(ticket.ChannelId);
 

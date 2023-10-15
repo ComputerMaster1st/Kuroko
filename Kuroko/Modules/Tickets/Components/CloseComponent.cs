@@ -11,7 +11,7 @@ namespace Kuroko.Modules.Tickets.Components
 {
     public class CloseComponent : KurokoModuleBase
     {
-        [ComponentInteraction($"{TicketsCommandMap.CloseTicket}:*")]
+        [ComponentInteraction($"{TicketsCommandMap.CLOSE}:*")]
         public async Task ExecuteAsync(int ticketId)
         {
             var properties = await GetPropertiesAsync<ReportsEntity, GuildEntity>(Context.Guild.Id);

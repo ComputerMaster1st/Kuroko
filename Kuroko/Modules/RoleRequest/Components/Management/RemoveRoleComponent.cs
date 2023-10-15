@@ -25,7 +25,7 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
             }
         }
 
-        [ComponentInteraction($"{RoleRequestCommandMap.RoleRequestManageRemove}:*,*")]
+        [ComponentInteraction($"{RoleRequestCommandMap.MANAGE_REMOVE}:*,*")]
         public async Task InitialAsync(ulong interactedUserId, int index)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
@@ -35,7 +35,7 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
             await ExecuteAsync(await GetPropertiesAsync<RoleRequestEntity, GuildEntity>(Context.Guild.Id), index, OutputMsg);
         }
 
-        [ComponentInteraction($"{RoleRequestCommandMap.RoleRequestManageDelete}:*,*")]
+        [ComponentInteraction($"{RoleRequestCommandMap.MANAGE_DELETE}:*,*")]
         public async Task ReturningAsync(ulong interactedUserId, int index, string[] roleIds)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
@@ -67,7 +67,7 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
             var user = Context.User as IGuildUser;
             var roleIds = properties.RoleIds.Skip(index).ToList();
             var selectMenu = new SelectMenuBuilder()
-                .WithCustomId($"{RoleRequestCommandMap.RoleRequestManageDelete}:{user.Id},{index}")
+                .WithCustomId($"{RoleRequestCommandMap.MANAGE_DELETE}:{user.Id},{index}")
                 .WithMinValues(1)
                 .WithPlaceholder("Select role(s) to remove from public");
             var guildRoles = new List<IRole>();
@@ -87,7 +87,7 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
                     break;
             }
 
-            var menu = Pagination.SelectMenu(selectMenu, index, user, RoleRequestCommandMap.RoleRequestManageRemove, RoleRequestCommandMap.RoleRequestMenu);
+            var menu = Pagination.SelectMenu(selectMenu, index, user, RoleRequestCommandMap.MANAGE_REMOVE, RoleRequestCommandMap.RoleRequestMenu);
 
             if (!menu.HasOptions)
                 output.AppendLine("Nothing to list.");

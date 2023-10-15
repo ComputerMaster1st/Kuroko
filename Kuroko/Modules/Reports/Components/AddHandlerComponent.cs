@@ -15,7 +15,7 @@ namespace Kuroko.Modules.Reports.Components
     [RequireBotGuildPermission(GuildPermission.ManageChannels)]
     public class AddHandlerComponent : KurokoModuleBase
     {
-        [ComponentInteraction($"{ReportsCommandMap.ReportHandlersAdd}:*,*")]
+        [ComponentInteraction($"{ReportsCommandMap.HANDLER_ADD}:*,*")]
         public async Task InitialAsync(ulong interactedUserId, int index)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
@@ -24,7 +24,7 @@ namespace Kuroko.Modules.Reports.Components
             await ExecuteAsync(index);
         }
 
-        [ComponentInteraction($"{ReportsCommandMap.ReportHandlersAddConfirm}:*")]
+        [ComponentInteraction($"{ReportsCommandMap.HANDLER_ADD_CONFIRM}:*")]
         public async Task ConfirmAsync(ulong interactedUserId, string roleId)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
@@ -33,13 +33,13 @@ namespace Kuroko.Modules.Reports.Components
             var role = Context.Guild.GetRole(ulong.Parse(roleId));
 
             await Context.Interaction.RespondWithModalAsync<AddHandlerModal>(
-                $"{ReportsCommandMap.ReportHandlersSave}:{Context.User.Id},{roleId}", modifyModal: x =>
+                $"{ReportsCommandMap.HANDLER_SAVE}:{Context.User.Id},{roleId}", modifyModal: x =>
                 {
                     x.Title = $"Add \"{role.Name}\" as handler";
                 });
         }
 
-        [ModalInteraction($"{ReportsCommandMap.ReportHandlersSave}:*,*")]
+        [ModalInteraction($"{ReportsCommandMap.HANDLER_SAVE}:*,*")]
         public async Task SaveAsync(ulong interactedUserId, ulong roleId, AddHandlerModal modal)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
@@ -113,12 +113,12 @@ namespace Kuroko.Modules.Reports.Components
 
             var selectMenuBuilder = new SelectMenuBuilder()
             {
-                CustomId = $"{ReportsCommandMap.ReportHandlersAddConfirm}:{user.Id}",
+                CustomId = $"{ReportsCommandMap.HANDLER_ADD_CONFIRM}:{user.Id}",
                 MinValues = 1,
                 Placeholder = "Select a role to use set as handler",
                 Options = selectOptions
             };
-            var menu = Pagination.SelectMenu(selectMenuBuilder, index, user, ReportsCommandMap.ReportHandlersAdd, ReportsCommandMap.ReportMenu, true);
+            var menu = Pagination.SelectMenu(selectMenuBuilder, index, user, ReportsCommandMap.HANDLER_ADD, ReportsCommandMap.MENU, true);
 
             (await Context.Interaction.ModifyOriginalResponseAsync(x =>
             {

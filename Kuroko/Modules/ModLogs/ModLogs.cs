@@ -27,7 +27,7 @@ namespace Kuroko.Modules.ModLogs
         public async Task EntryAsync()
             => await ExecuteAsync();
 
-        [ComponentInteraction($"{ModLogCommandMap.ModLogMenu}:*")]
+        [ComponentInteraction($"{ModLogCommandMap.MENU}:*")]
         public async Task ReturningAsync(ulong interactedUserId)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
@@ -37,7 +37,7 @@ namespace Kuroko.Modules.ModLogs
             await ExecuteAsync(true);
         }
 
-        [ComponentInteraction($"{ModLogCommandMap.ModLogChannelDelete}:*")]
+        [ComponentInteraction($"{ModLogCommandMap.CHANNEL_DELETE}:*")]
         public async Task UnsetAsync(ulong interactedUserId)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
@@ -50,7 +50,7 @@ namespace Kuroko.Modules.ModLogs
             await SaveAndExecuteAsync(properties);
         }
 
-        [ComponentInteraction($"{ModLogCommandMap.ModLogChannelIgnoreReset}:*")]
+        [ComponentInteraction($"{ModLogCommandMap.CHANNEL_IGNORE_RESET}:*")]
         public async Task ResetIgnoreAsync(ulong interactedUserId)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
@@ -63,7 +63,7 @@ namespace Kuroko.Modules.ModLogs
             await SaveAndExecuteAsync(properties);
         }
 
-        [ComponentInteraction($"{ModLogCommandMap.ModLogJoin}:*")]
+        [ComponentInteraction($"{ModLogCommandMap.JOIN}:*")]
         public async Task JoinAsync(ulong interactedUserId)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
@@ -72,7 +72,7 @@ namespace Kuroko.Modules.ModLogs
             await ToggleAsync(x => x.Join = !x.Join);
         }
 
-        [ComponentInteraction($"{ModLogCommandMap.ModLogLeave}:*")]
+        [ComponentInteraction($"{ModLogCommandMap.LEAVE}:*")]
         public async Task LeaveAsync(ulong interactedUserId)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
@@ -81,7 +81,7 @@ namespace Kuroko.Modules.ModLogs
             await ToggleAsync(x => x.Leave = !x.Leave);
         }
 
-        [ComponentInteraction($"{ModLogCommandMap.ModLogMessageDeleted}:*")]
+        [ComponentInteraction($"{ModLogCommandMap.MESSAGE_DELETED}:*")]
         public async Task MessageDeleteAsync(ulong interactedUserId)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
@@ -90,7 +90,7 @@ namespace Kuroko.Modules.ModLogs
             await ToggleAsync(x => x.DeletedMessages = !x.DeletedMessages);
         }
 
-        [ComponentInteraction($"{ModLogCommandMap.ModLogMessageEdited}:*")]
+        [ComponentInteraction($"{ModLogCommandMap.MESSAGE_EDITED}:*")]
         public async Task MessageEditAsync(ulong interactedUserId)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
@@ -99,7 +99,7 @@ namespace Kuroko.Modules.ModLogs
             await ToggleAsync(x => x.EditedMessages = !x.EditedMessages);
         }
 
-        [ComponentInteraction($"{ModLogCommandMap.ModLogDownloadAttachment}:*")]
+        [ComponentInteraction($"{ModLogCommandMap.DOWNLOAD_ATTACHMENT}:*")]
         public async Task DownloadAsync(ulong interactedUserId)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
@@ -132,28 +132,28 @@ namespace Kuroko.Modules.ModLogs
             var toggleRow = 1;
             var exitRow = 2;
             var componentBuilder = new ComponentBuilder()
-                .WithButton("Configure Log Channel", $"{ModLogCommandMap.ModLogChannel}:{user.Id},0", ButtonStyle.Primary, row: mainRow)
-                .WithButton("Ignore Channels", $"{ModLogCommandMap.ModLogChannelIgnore}:{user.Id},0", ButtonStyle.Primary, row: mainRow);
+                .WithButton("Configure Log Channel", $"{ModLogCommandMap.CHANNEL}:{user.Id},0", ButtonStyle.Primary, row: mainRow)
+                .WithButton("Ignore Channels", $"{ModLogCommandMap.CHANNEL_IGNORE}:{user.Id},0", ButtonStyle.Primary, row: mainRow);
 
             if (properties.IgnoredChannelIds.Count > 0)
                 componentBuilder
-                    .WithButton("Resume Channels", $"{ModLogCommandMap.ModLogChannelResume}:{user.Id},0", ButtonStyle.Primary, row: mainRow)
-                    .WithButton("Monitor All Channels", $"{ModLogCommandMap.ModLogChannelIgnoreReset}:{user.Id}", ButtonStyle.Success, row: mainRow);
+                    .WithButton("Resume Channels", $"{ModLogCommandMap.CHANNEL_RESUME}:{user.Id},0", ButtonStyle.Primary, row: mainRow)
+                    .WithButton("Monitor All Channels", $"{ModLogCommandMap.CHANNEL_IGNORE_RESET}:{user.Id}", ButtonStyle.Success, row: mainRow);
 
             if (properties.LogChannelId != 0)
-                componentBuilder.WithButton("Unset Logging Channel", $"{ModLogCommandMap.ModLogChannelDelete}:{user.Id}", ButtonStyle.Danger, row: mainRow);
+                componentBuilder.WithButton("Unset Logging Channel", $"{ModLogCommandMap.CHANNEL_DELETE}:{user.Id}", ButtonStyle.Danger, row: mainRow);
 
             if (properties.LogChannelId != 0)
             {
                 componentBuilder
-                    .WithButton("User Joined", $"{ModLogCommandMap.ModLogJoin}:{user.Id}", Pagination.IsButtonToggle(properties.Join), row: toggleRow)
-                    .WithButton("User Left", $"{ModLogCommandMap.ModLogLeave}:{user.Id}", Pagination.IsButtonToggle(properties.Leave), row: toggleRow)
-                    .WithButton("Message Edited", $"{ModLogCommandMap.ModLogMessageEdited}:{user.Id}", Pagination.IsButtonToggle(properties.EditedMessages), row: toggleRow)
-                    .WithButton("Message Deleted", $"{ModLogCommandMap.ModLogMessageDeleted}:{user.Id}", Pagination.IsButtonToggle(properties.DeletedMessages), row: toggleRow)
-                    .WithButton("Download Attachments", $"{ModLogCommandMap.ModLogDownloadAttachment}:{user.Id}", Pagination.IsButtonToggle(properties.SaveAttachments), row: toggleRow);
+                    .WithButton("User Joined", $"{ModLogCommandMap.JOIN}:{user.Id}", Pagination.IsButtonToggle(properties.Join), row: toggleRow)
+                    .WithButton("User Left", $"{ModLogCommandMap.LEAVE}:{user.Id}", Pagination.IsButtonToggle(properties.Leave), row: toggleRow)
+                    .WithButton("Message Edited", $"{ModLogCommandMap.MESSAGE_EDITED}:{user.Id}", Pagination.IsButtonToggle(properties.EditedMessages), row: toggleRow)
+                    .WithButton("Message Deleted", $"{ModLogCommandMap.MESSAGE_DELETED}:{user.Id}", Pagination.IsButtonToggle(properties.DeletedMessages), row: toggleRow)
+                    .WithButton("Download Attachments", $"{ModLogCommandMap.DOWNLOAD_ATTACHMENT}:{user.Id}", Pagination.IsButtonToggle(properties.SaveAttachments), row: toggleRow);
             }
 
-            componentBuilder.WithButton("Exit", $"{GlobalCommandMap.Exit}:{user.Id}", ButtonStyle.Secondary, row: exitRow);
+            componentBuilder.WithButton("Exit", $"{GlobalCommandMap.EXIT}:{user.Id}", ButtonStyle.Secondary, row: exitRow);
 
             var msgComponents = componentBuilder.Build();
             var logChannel = Context.Guild.GetChannel(properties.LogChannelId);

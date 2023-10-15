@@ -19,7 +19,7 @@ namespace Kuroko.Modules.Reports
             return ExecuteAsync();
         }
 
-        [ComponentInteraction($"{ReportsCommandMap.ReportMenu}:*")]
+        [ComponentInteraction($"{ReportsCommandMap.MENU}:*")]
         public async Task ReturningAsync(ulong interactedUserId)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
@@ -29,7 +29,7 @@ namespace Kuroko.Modules.Reports
             await ExecuteAsync(true);
         }
 
-        [ComponentInteraction($"{ReportsCommandMap.ReportAutomateMessages}:*")]
+        [ComponentInteraction($"{ReportsCommandMap.AUTOMATE_MESSAGE}:*")]
         public async Task AutomateMessagesAsync(ulong interactedUserId)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
@@ -94,30 +94,30 @@ namespace Kuroko.Modules.Reports
             var exitRow = 2;
             var componentBuilder = new ComponentBuilder()
                 .WithButton("Report Category",
-                    $"{ReportsCommandMap.ReportCategory}:{user.Id},0",
+                    $"{ReportsCommandMap.CATEGORY}:{user.Id},0",
                     ButtonStyle.Primary,
                     row: menusRow)
                 .WithButton("Report Transcript Channel",
-                    $"{ReportsCommandMap.ReportTranscript}:{user.Id},0",
+                    $"{ReportsCommandMap.TRANSCRIPT}:{user.Id},0",
                     ButtonStyle.Primary,
                     row: menusRow)
                 .WithButton("Add Handlers",
-                    $"{ReportsCommandMap.ReportHandlersAdd}:{user.Id},0",
+                    $"{ReportsCommandMap.HANDLER_ADD}:{user.Id},0",
                     ButtonStyle.Primary,
                     row: menusRow);
 
             if (properties.ReportHandlers.Count > 0)
                 componentBuilder.WithButton("Remove Handlers",
-                    $"{ReportsCommandMap.ReportHandlersRemove}:{user.Id},0",
+                    $"{ReportsCommandMap.HANDLER_REMOVE}:{user.Id},0",
                     ButtonStyle.Danger,
                     row: menusRow);
 
             componentBuilder.WithButton("Automated Message Log Generation",
-                    $"{ReportsCommandMap.ReportAutomateMessages}:{user.Id}",
+                    $"{ReportsCommandMap.AUTOMATE_MESSAGE}:{user.Id}",
                     Pagination.IsButtonToggle(properties.RecordMessages),
                     row: togglesRow)
                 .WithButton("Exit",
-                    $"{GlobalCommandMap.Exit}:{user.Id}",
+                    $"{GlobalCommandMap.EXIT}:{user.Id}",
                     ButtonStyle.Secondary,
                     row: exitRow);
 

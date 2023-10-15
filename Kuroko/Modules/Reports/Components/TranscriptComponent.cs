@@ -13,7 +13,7 @@ namespace Kuroko.Modules.Reports.Components
     [RequireBotGuildPermission(GuildPermission.ManageChannels)]
     public class TranscriptComponent : KurokoModuleBase
     {
-        [ComponentInteraction($"{ReportsCommandMap.ReportTranscript}:*,*")]
+        [ComponentInteraction($"{ReportsCommandMap.TRANSCRIPT}:*,*")]
         public async Task InitialAsync(ulong interactedUserId, int index)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
@@ -22,7 +22,7 @@ namespace Kuroko.Modules.Reports.Components
             await ExecuteAsync(index);
         }
 
-        [ComponentInteraction($"{ReportsCommandMap.ReportTranscriptSave}:*,*")]
+        [ComponentInteraction($"{ReportsCommandMap.TRANSCRIPT_SAVE}:*,*")]
         public async Task ReturningAsync(ulong interactedUserId, int index, string result)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
@@ -79,12 +79,12 @@ namespace Kuroko.Modules.Reports.Components
 
             var selectMenuBuilder = new SelectMenuBuilder()
             {
-                CustomId = $"{ReportsCommandMap.ReportTranscriptSave}:{user.Id},0",
+                CustomId = $"{ReportsCommandMap.TRANSCRIPT_SAVE}:{user.Id},0",
                 MinValues = 1,
                 Placeholder = "Select a channel to use for transcripts",
                 Options = selectOptions
             };
-            var menu = Pagination.SelectMenu(selectMenuBuilder, index, user, ReportsCommandMap.ReportCategory, ReportsCommandMap.ReportMenu, true);
+            var menu = Pagination.SelectMenu(selectMenuBuilder, index, user, ReportsCommandMap.CATEGORY, ReportsCommandMap.MENU, true);
 
             (await Context.Interaction.ModifyOriginalResponseAsync(x =>
             {

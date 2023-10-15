@@ -2,9 +2,9 @@
 {
     internal static class TicketsCommandMap
     {
-        public const string CloseTicket = "tk_close";
+        public const string CLOSE = "tk_close";
 
-        public const string Escalate = "tk_escalate";
-        public const string Severity = "tk_severity";
+        public const string HANDLER_CHANGE = "tk_handler_change";
+        public const string SEVERITY = "tk_severity";
     }
 }

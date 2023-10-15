@@ -14,7 +14,7 @@ namespace Kuroko.Modules.RoleRequest.Components.User
                     .AppendLine("# Role Request")
                     .AppendLine("## Assign Role");
 
-        [ComponentInteraction($"{RoleRequestCommandMap.RoleRequestAssign}:*,*")]
+        [ComponentInteraction($"{RoleRequestCommandMap.ASSIGN}:*,*")]
         public async Task EntryAsync(ulong interactedUserId, int index)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
@@ -24,7 +24,7 @@ namespace Kuroko.Modules.RoleRequest.Components.User
             await ExecuteAsync(index, OutputMsg);
         }
 
-        [ComponentInteraction($"{RoleRequestCommandMap.RoleRequestSave}:*,*")]
+        [ComponentInteraction($"{RoleRequestCommandMap.SAVE}:*,*")]
         public async Task ReturningAsync(ulong interactedUserId, int index, string[] roleIds)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
@@ -54,7 +54,7 @@ namespace Kuroko.Modules.RoleRequest.Components.User
             var count = 0;
             var roleIds = properties.RoleIds.Skip(index).ToList();
             var selectMenu = new SelectMenuBuilder()
-                .WithCustomId($"{RoleRequestCommandMap.RoleRequestSave}:{user.Id},{index}")
+                .WithCustomId($"{RoleRequestCommandMap.SAVE}:{user.Id},{index}")
                 .WithMinValues(1)
                 .WithPlaceholder("Select role(s) to assign yourself");
             var guildRoles = new List<IRole>();
@@ -72,7 +72,7 @@ namespace Kuroko.Modules.RoleRequest.Components.User
                     break;
             }
 
-            var menu = Pagination.SelectMenu(selectMenu, index, user, RoleRequestCommandMap.RoleRequestAssign, RoleRequestCommandMap.RoleRequestMenu);
+            var menu = Pagination.SelectMenu(selectMenu, index, user, RoleRequestCommandMap.ASSIGN, RoleRequestCommandMap.RoleRequestMenu);
 
             if (!menu.HasOptions)
                 output.AppendLine()

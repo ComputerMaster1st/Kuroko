@@ -14,7 +14,7 @@ namespace Kuroko.Modules.Reports.Components
     [RequireBotGuildPermission(GuildPermission.ManageChannels)]
     public class RemoveHandlerComponent : KurokoModuleBase
     {
-        [ComponentInteraction($"{ReportsCommandMap.ReportHandlersRemove}:*,*")]
+        [ComponentInteraction($"{ReportsCommandMap.HANDLER_REMOVE}:*,*")]
         public async Task InitialAsync(ulong interactedUserId, int index)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
@@ -23,7 +23,7 @@ namespace Kuroko.Modules.Reports.Components
             await ExecuteAsync(index);
         }
 
-        [ComponentInteraction($"{ReportsCommandMap.ReportHandlersDelete}:*")]
+        [ComponentInteraction($"{ReportsCommandMap.HANDLER_DELETE}:*")]
         public async Task ReturningAsync(ulong interactedUserId, string handlerId)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
@@ -73,12 +73,12 @@ namespace Kuroko.Modules.Reports.Components
 
             var selectMenuBuilder = new SelectMenuBuilder()
             {
-                CustomId = $"{ReportsCommandMap.ReportHandlersDelete}:{user.Id}",
+                CustomId = $"{ReportsCommandMap.HANDLER_DELETE}:{user.Id}",
                 MinValues = 1,
                 Placeholder = "Select a handler to remove",
                 Options = selectOptions
             };
-            var menu = Pagination.SelectMenu(selectMenuBuilder, index, user, ReportsCommandMap.ReportHandlersAdd, ReportsCommandMap.ReportMenu, true);
+            var menu = Pagination.SelectMenu(selectMenuBuilder, index, user, ReportsCommandMap.HANDLER_ADD, ReportsCommandMap.MENU, true);
 
             (await Context.Interaction.ModifyOriginalResponseAsync(x =>
             {

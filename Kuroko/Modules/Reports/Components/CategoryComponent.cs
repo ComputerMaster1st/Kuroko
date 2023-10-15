@@ -13,7 +13,7 @@ namespace Kuroko.Modules.Reports.Components
     [RequireBotGuildPermission(GuildPermission.ManageChannels)]
     public class CategoryComponent : KurokoModuleBase
     {
-        [ComponentInteraction($"{ReportsCommandMap.ReportCategory}:*,*")]
+        [ComponentInteraction($"{ReportsCommandMap.CATEGORY}:*,*")]
         public async Task InitialAsync(ulong interactedUserId, int index)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
@@ -22,7 +22,7 @@ namespace Kuroko.Modules.Reports.Components
             await ExecuteAsync(index);
         }
 
-        [ComponentInteraction($"{ReportsCommandMap.ReportCategorySave}:*,*")]
+        [ComponentInteraction($"{ReportsCommandMap.CATEGORY_SAVE}:*,*")]
         public async Task ReturningAsync(ulong interactedUserId, int index, string result)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
@@ -79,12 +79,12 @@ namespace Kuroko.Modules.Reports.Components
 
             var selectMenuBuilder = new SelectMenuBuilder()
             {
-                CustomId = $"{ReportsCommandMap.ReportCategorySave}:{user.Id},0",
+                CustomId = $"{ReportsCommandMap.CATEGORY_SAVE}:{user.Id},0",
                 MinValues = 1,
                 Placeholder = "Select a category to use for reports",
                 Options = selectOptions
             };
-            var menu = Pagination.SelectMenu(selectMenuBuilder, index, user, ReportsCommandMap.ReportCategory, ReportsCommandMap.ReportMenu, true);
+            var menu = Pagination.SelectMenu(selectMenuBuilder, index, user, ReportsCommandMap.CATEGORY, ReportsCommandMap.MENU, true);
 
             (await Context.Interaction.ModifyOriginalResponseAsync(x =>
             {
