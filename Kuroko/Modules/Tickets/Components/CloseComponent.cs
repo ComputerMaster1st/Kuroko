@@ -119,7 +119,7 @@ namespace Kuroko.Modules.Tickets.Components
                 var reportedMsg = await Context.Database.Messages.FirstOrDefaultAsync(x => x.Id == ticket.ReportedMessageId);
                 await AddMessageToTranscriptAsync(reportedMsg, output, directory);
 
-                Context.Database.Remove(reportedMsg);
+                Context.Database.Messages.Remove(reportedMsg);
 
                 output.AppendLine();
             }
