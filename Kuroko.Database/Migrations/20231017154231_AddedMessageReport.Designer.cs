@@ -3,6 +3,7 @@ using System;
 using Kuroko.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Kuroko.Database.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20231017154231_AddedMessageReport")]
+    partial class AddedMessageReport
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -169,8 +172,8 @@ namespace Kuroko.Database.Migrations
                     b.Property<int>("ReportHandlerId")
                         .HasColumnType("integer");
 
-                    b.Property<decimal?>("ReportedMessageId")
-                        .HasColumnType("numeric(20,0)");
+                    b.Property<string>("ReportedContent")
+                        .HasColumnType("text");
 
                     b.Property<decimal>("ReportedUserId")
                         .HasColumnType("numeric(20,0)");

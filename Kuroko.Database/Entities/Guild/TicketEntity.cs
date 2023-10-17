@@ -12,6 +12,13 @@ namespace Kuroko.Database.Entities.Guild
         Unassigned
     }
 
+    public enum TicketType
+    {
+        ReportMessage,
+        ReportUser,
+        Unspecified
+    }
+
     public class TicketEntity : IPropertyEntity, ITypeEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -22,12 +29,14 @@ namespace Kuroko.Database.Entities.Guild
         public ulong SummaryMessageId { get; set; } = 0;
         public int ReportHandlerId { get; set; } = -1;
 
+        public TicketType Type { get; private set; } = TicketType.Unspecified;
         public string Subject { get; private set; } = string.Empty;
         public string RulesViolated { get; private set; } = string.Empty;
         public string Description { get; private set; } = string.Empty;
 
         public ulong SubmitterId { get; private set; } = 0;
         public ulong ReportedUserId { get; private set; } = 0;
+        public ulong? ReportedMessageId { get; private set; } = null;
 
         public DateTimeOffset CreatedAt { get; private set; } = DateTime.UtcNow;
 
@@ -44,15 +53,17 @@ namespace Kuroko.Database.Entities.Guild
             }
         }
 
-        public TicketEntity(ulong channelId, string subject, string rulesViolated, string description,
-            ulong submitterId, ulong reportedUserId)
+        public TicketEntity(TicketType type, ulong channelId, string subject, string rulesViolated, string description,
+            ulong submitterId, ulong reportedUserId, ulong? reportedMessageId = null)
         {
+            Type = type;
             ChannelId = channelId;
             Subject = subject;
             RulesViolated = rulesViolated;
             Description = description;
             SubmitterId = submitterId;
             ReportedUserId = reportedUserId;
+            ReportedMessageId = reportedMessageId;
         }
     }
 }
