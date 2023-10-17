@@ -3,6 +3,7 @@ using Discord.Interactions;
 using Kuroko.Core;
 using Kuroko.Database;
 using Kuroko.Database.Entities.Guild;
+using Kuroko.Database.Entities.Message;
 using Kuroko.Shared;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
@@ -107,83 +108,96 @@ namespace Kuroko.Modules.Tickets.Components
                 .AppendLine("/// DESCRIPTION")
                 .AppendLine()
                 .AppendLine(ticket.Description ?? "None Provided!")
-                .AppendLine()
-                .AppendLine("/// MESSAGES")
                 .AppendLine();
 
 
-            // TODO: Move code from foreach loop into own method to allow transcripting of reported msg
-            // Then add reported msg chain to transcript
-
-
-            foreach (var msg in ticket.Messages)
+            if (ticket.ReportedMessageId.HasValue)
             {
-                var user = Context.Guild.GetUser(msg.UserId);
-                var userName = user is null ? msg.UserId.ToString() : user.GlobalName ?? user.Username;
+                output.AppendLine("/// REPORTED MESSAGE")
+                    .AppendLine();
 
-                output
-                    .AppendLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-                    .AppendLine($"{userName} : {msg.CreatedAt.UtcDateTime}")
-                    .AppendLine()
-                    .AppendLine(msg.Content);
+                var reportedMsg = await Context.Database.Messages.FirstOrDefaultAsync(x => x.Id == ticket.ReportedMessageId);
+                await AddMessageToTranscriptAsync(reportedMsg, output, directory);
 
-                if (msg.Attachments.Count > 0)
-                {
-                    output.AppendLine("─────────────────── [ Attachment Chain ] ───────────────────")
-                        .AppendLine();
-                    var attachmentDir = directory.CreateSubdirectory("attachments");
+                Context.Database.Remove(reportedMsg);
 
-                    foreach (var attachment in msg.Attachments)
-                    {
-                        var filePath = Path.Combine(attachmentDir.ToString(), $"{attachment.Id}_{attachment.FileName}");
-                        var bytes = attachment.GetBytes();
-
-                        using (FileStream file = File.OpenWrite(filePath))
-                        {
-                            await file.WriteAsync(bytes);
-                        }
-
-                        var mimes = FileMimeType.GetFromBytes(bytes);
-                        var mime = mimes.OrderByDescending(x => x.Points).FirstOrDefault();
-
-                        output
-                            .AppendLine("Attachment ID : " + attachment.Id)
-                            .AppendLine("Name          : " + attachment.FileName)
-                            .AppendLine("Size (Bytes)  : " + attachment.FileSize)
-                            .AppendLine("MIME Type     : " + mime is null ? "No Mime Type Found" : mime.MimeType)
-                            .AppendLine();
-                    }
-
-                    output.AppendLine("────────────────────────────────────────────────────────────");
-                }
-
-                if (msg.EditedMessages.Count > 0)
-                {
-                    output.AppendLine("───────────────── [ Edited Message Chain ] ─────────────────");
-
-                    foreach (var edited in msg.EditedMessages)
-                    {
-                        output
-                            .AppendLine("────────────────────────────────────────────────────────────")
-                            .AppendLine(edited.EditedAt.UtcDateTime.ToString())
-                            .AppendLine()
-                            .AppendLine(edited.Content)
-                            .AppendLine("────────────────────────────────────────────────────────────");
-                    }
-
-                    output.AppendLine("────────────────────────────────────────────────────────────");
-                }
-
-                if (msg.DeletedAt.HasValue)
-                {
-                    output.AppendLine()
-                        .AppendLine($">>> [ Message Deleted At {msg.DeletedAt.Value.UtcDateTime} ] <<<");
-                }
-
-                output.AppendLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                output.AppendLine();
             }
 
+            output.AppendLine("/// MESSAGES")
+                .AppendLine();
+
+            foreach (var msg in ticket.Messages)
+                await AddMessageToTranscriptAsync(msg, output, directory);
+
             return output.ToString();
+        }
+
+        private async Task AddMessageToTranscriptAsync(MessageEntity msg, StringBuilder output, DirectoryInfo directory)
+        {
+            var user = Context.Guild.GetUser(msg.UserId);
+            var userName = user is null ? msg.UserId.ToString() : user.GlobalName ?? user.Username;
+
+            output
+                .AppendLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+                .AppendLine($"{userName} : {msg.CreatedAt.UtcDateTime}")
+                .AppendLine()
+                .AppendLine(msg.Content);
+
+            if (msg.Attachments.Count > 0)
+            {
+                output.AppendLine("─────────────────── [ Attachment Chain ] ───────────────────")
+                    .AppendLine();
+                var attachmentDir = directory.CreateSubdirectory("attachments");
+
+                foreach (var attachment in msg.Attachments)
+                {
+                    var filePath = Path.Combine(attachmentDir.ToString(), $"{attachment.Id}_{attachment.FileName}");
+                    var bytes = attachment.GetBytes();
+
+                    using (FileStream file = File.OpenWrite(filePath))
+                    {
+                        await file.WriteAsync(bytes);
+                    }
+
+                    var mimes = FileMimeType.GetFromBytes(bytes);
+                    var mime = mimes.OrderByDescending(x => x.Points).FirstOrDefault();
+
+                    output
+                        .AppendLine("Attachment ID : " + attachment.Id)
+                        .AppendLine("Name          : " + attachment.FileName)
+                        .AppendLine("Size (Bytes)  : " + attachment.FileSize)
+                        .AppendLine("MIME Type     : " + mime is null ? "No Mime Type Found" : mime.MimeType)
+                        .AppendLine();
+                }
+
+                output.AppendLine("────────────────────────────────────────────────────────────");
+            }
+
+            if (msg.EditedMessages.Count > 0)
+            {
+                output.AppendLine("───────────────── [ Edited Message Chain ] ─────────────────");
+
+                foreach (var edited in msg.EditedMessages)
+                {
+                    output
+                        .AppendLine("────────────────────────────────────────────────────────────")
+                        .AppendLine(edited.EditedAt.UtcDateTime.ToString())
+                        .AppendLine()
+                        .AppendLine(edited.Content)
+                        .AppendLine("────────────────────────────────────────────────────────────");
+                }
+
+                output.AppendLine("────────────────────────────────────────────────────────────");
+            }
+
+            if (msg.DeletedAt.HasValue)
+            {
+                output.AppendLine()
+                    .AppendLine($">>> [ Message Deleted At {msg.DeletedAt.Value.UtcDateTime} ] <<<");
+            }
+
+            output.AppendLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         }
     }
 }
