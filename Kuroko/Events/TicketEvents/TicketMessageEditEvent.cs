@@ -10,18 +10,23 @@ namespace Kuroko.Events.TicketEvents
     [PreInitialize]
     public class TicketMessageEditEvent
     {
+        private readonly DiscordShardedClient _client;
         private readonly IServiceProvider _services;
 
         public TicketMessageEditEvent(DiscordShardedClient client, IServiceProvider services)
         {
+            _client = client;
             _services = services;
 
-            client.MessageUpdated += (before, after, channel) => Task.Factory.StartNew(() => MessageUpdated(after));
+            _client.MessageUpdated += (before, after, channel) => Task.Factory.StartNew(() => MessageUpdated(after));
         }
 
         private async Task MessageUpdated(SocketMessage after)
         {
             var msg = after as IUserMessage;
+
+            if (msg.Author.Id == _client.CurrentUser.Id)
+                return;
 
             using var db = _services.GetRequiredService<DatabaseContext>();
 

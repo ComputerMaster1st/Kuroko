@@ -11,19 +11,24 @@ namespace Kuroko.Events.TicketEvents
     [PreInitialize]
     public class TicketMessageNewEvent
     {
+        private readonly DiscordShardedClient _client;
         private readonly IServiceProvider _services;
         private readonly HttpClient _httpClient = new();
 
         public TicketMessageNewEvent(DiscordShardedClient client, IServiceProvider services)
         {
+            _client = client;
             _services = services;
 
-            client.MessageReceived += (arg) => Task.Factory.StartNew(() => MessageReceived(arg));
+            _client.MessageReceived += (arg) => Task.Factory.StartNew(() => MessageReceived(arg));
         }
 
         private async Task MessageReceived(SocketMessage arg)
         {
             var msg = arg as IUserMessage;
+
+            if (msg.Author.Id == _client.CurrentUser.Id)
+                return;
 
             using var db = _services.GetRequiredService<DatabaseContext>();
 
