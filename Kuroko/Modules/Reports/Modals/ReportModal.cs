@@ -8,17 +8,17 @@ namespace Kuroko.Modules.Reports.Modals
         public string Title => "Report";
 
         [InputLabel("Subject")]
-        [ModalTextInput(ReportsCommandMap.USER_MODAL_SUBJECT, TextInputStyle.Short, "Required", maxLength: 150)]
+        [ModalTextInput(ReportsCommandMap.MODAL_SUBJECT, TextInputStyle.Short, "Required", maxLength: 150)]
         [RequiredInput]
         public string Subject { get; set; } = string.Empty;
 
         [InputLabel("Violating Rules")]
-        [ModalTextInput(ReportsCommandMap.USER_MODAL_VIOLATED, TextInputStyle.Short, "Required", maxLength: 300)]
+        [ModalTextInput(ReportsCommandMap.MODAL_VIOLATED, TextInputStyle.Short, "Required", maxLength: 300)]
         [RequiredInput]
         public string Rules { get; set; } = string.Empty;
 
         [InputLabel("Description")]
-        [ModalTextInput(ReportsCommandMap.USER_MODAL_DESCRIPTION, TextInputStyle.Paragraph, "Optional")]
+        [ModalTextInput(ReportsCommandMap.MODAL_DESCRIPTION, TextInputStyle.Paragraph, "Optional")]
         public string Description { get; set; } = string.Empty;
     }
 }

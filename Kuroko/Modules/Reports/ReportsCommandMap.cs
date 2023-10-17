@@ -22,12 +22,14 @@
 
         #endregion
 
-        #region Report User Modal
+        #region Report Modal
 
-        public const string USER_MODAL = "ru_modal";
-        public const string USER_MODAL_SUBJECT = "ru_modal_subject";
-        public const string USER_MODAL_VIOLATED = "ru_modal_violated";
-        public const string USER_MODAL_DESCRIPTION = "ru_modal_description";
+        public const string REPORT_USER = "rp_report_user";
+        public const string REPORT_MESSAGE = "rp_report_message";
+
+        public const string MODAL_SUBJECT = "rp_modal_subject";
+        public const string MODAL_VIOLATED = "rp_modal_violated";
+        public const string MODAL_DESCRIPTION = "rp_modal_description";
 
         #endregion
     }

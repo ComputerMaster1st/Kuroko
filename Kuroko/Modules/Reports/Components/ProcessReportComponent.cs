@@ -12,9 +12,9 @@ using System.Text;
 namespace Kuroko.Modules.Reports.Components
 {
     [RequireBotGuildPermission(GuildPermission.ManageChannels)]
-    public class ProcessUserReportComponent : KurokoModuleBase
+    public class ProcessReportComponent : KurokoModuleBase
     {
-        [ModalInteraction($"{ReportsCommandMap.USER_MODAL}:*")]
+        [ModalInteraction($"{ReportsCommandMap.REPORT_USER}:*")]
         public async Task CreateAsync(ulong reportedUserId, ReportModal modal)
         {
             var reportProperties = await GetPropertiesAsync<ReportsEntity, GuildEntity>(Context.Guild.Id);
