@@ -5,14 +5,14 @@ using Kuroko.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Kuroko.Events.TicketEvents
+namespace Kuroko.Events.GlobalEvents
 {
     [PreInitialize]
-    public class TicketMessageDeleteEvent
+    public class MessageDeleteEvent
     {
         private readonly IServiceProvider _services;
 
-        public TicketMessageDeleteEvent(DiscordShardedClient client, IServiceProvider services)
+        public MessageDeleteEvent(DiscordShardedClient client, IServiceProvider services)
         {
             _services = services;
 
