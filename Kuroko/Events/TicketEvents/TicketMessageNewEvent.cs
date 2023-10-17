@@ -56,5 +56,4 @@ namespace Kuroko.Events.TicketEvents
             }
         }
     }
-
 }

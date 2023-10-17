@@ -7,6 +7,7 @@ using Kuroko.Core.Attributes;
 using Kuroko.CoreModule.Events;
 using Kuroko.Database;
 using Kuroko.Events;
+using Kuroko.Events.GlobalEvents;
 using Kuroko.Events.ModLogEvents;
 using Kuroko.Events.TicketEvents;
 using Kuroko.Shared;
@@ -106,8 +107,8 @@ _serviceCollection.AddSingleton<ModLogUserJoinLeaveEvent>()
 #region Ticket Events
 
 _serviceCollection.AddSingleton<TicketMessageNewEvent>()
-    .AddSingleton<TicketMessageEditEvent>()
-    .AddSingleton<TicketMessageDeleteEvent>();
+    .AddSingleton<MessageEditEvent>()
+    .AddSingleton<MessageDeleteEvent>();
 
 #endregion
 
