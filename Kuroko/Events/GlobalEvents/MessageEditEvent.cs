@@ -5,15 +5,15 @@ using Kuroko.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Kuroko.Events.TicketEvents
+namespace Kuroko.Events.GlobalEvents
 {
     [PreInitialize]
-    public class TicketMessageEditEvent
+    public class MessageEditEvent
     {
         private readonly DiscordShardedClient _client;
         private readonly IServiceProvider _services;
 
-        public TicketMessageEditEvent(DiscordShardedClient client, IServiceProvider services)
+        public MessageEditEvent(DiscordShardedClient client, IServiceProvider services)
         {
             _client = client;
             _services = services;
