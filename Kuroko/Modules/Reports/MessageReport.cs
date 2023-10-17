@@ -7,10 +7,10 @@ using Kuroko.Modules.Reports.Modals;
 namespace Kuroko.Modules.Reports
 {
     [RequireBotGuildPermission(GuildPermission.ManageChannels)]
-    public class UserReport : KurokoModuleBase
+    public class MessageReport : KurokoModuleBase
     {
-        [UserCommand("Report User")]
-        public Task ReportUserAsync(IUser user)
+        [UserCommand("Report Message")]
+        public Task ReportMessage(IUserMessage msg)
         {
             return Context.Interaction.RespondWithModalAsync<ReportModal>($"{ReportsCommandMap.USER_MODAL}:{user.Id}", modifyModal: (x) =>
             {

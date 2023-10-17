@@ -3,9 +3,9 @@ using Discord.Interactions;
 
 namespace Kuroko.Modules.Reports.Modals
 {
-    public class ReportUserModal : IModal
+    public class ReportModal : IModal
     {
-        public string Title => "Report User";
+        public string Title => "Report";
 
         [InputLabel("Subject")]
         [ModalTextInput(ReportsCommandMap.USER_MODAL_SUBJECT, TextInputStyle.Short, "Required", maxLength: 150)]

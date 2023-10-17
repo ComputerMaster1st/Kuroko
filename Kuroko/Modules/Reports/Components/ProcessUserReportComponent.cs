@@ -15,7 +15,7 @@ namespace Kuroko.Modules.Reports.Components
     public class ProcessUserReportComponent : KurokoModuleBase
     {
         [ModalInteraction($"{ReportsCommandMap.USER_MODAL}:*")]
-        public async Task CreateAsync(ulong reportedUserId, ReportUserModal modal)
+        public async Task CreateAsync(ulong reportedUserId, ReportModal modal)
         {
             var reportProperties = await GetPropertiesAsync<ReportsEntity, GuildEntity>(Context.Guild.Id);
             var guildRoot = await Context.Database.Guilds.GetOrCreateRootAsync(Context.Guild.Id);
