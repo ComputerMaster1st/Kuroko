@@ -111,6 +111,11 @@ namespace Kuroko.Modules.Tickets.Components
                 .AppendLine("/// MESSAGES")
                 .AppendLine();
 
+
+            // TODO: Move code from foreach loop into own method to allow transcripting of reported msg
+            // Then add reported msg chain to transcript
+
+
             foreach (var msg in ticket.Messages)
             {
                 var user = Context.Guild.GetUser(msg.UserId);
