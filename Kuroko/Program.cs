@@ -4,12 +4,7 @@ using Discord.WebSocket;
 using Kuroko;
 using Kuroko.Core;
 using Kuroko.Core.Attributes;
-using Kuroko.CoreModule.Events;
 using Kuroko.Database;
-using Kuroko.Events;
-using Kuroko.Events.GlobalEvents;
-using Kuroko.Events.ModLogEvents;
-using Kuroko.Events.TicketEvents;
 using Kuroko.Shared;
 using Kuroko.Shared.Configuration;
 using Microsoft.EntityFrameworkCore;
@@ -83,34 +78,17 @@ _serviceCollection.AddDbContext<DatabaseContext>(options =>
 
 #endregion
 
-#region DI: Events
+var myAssembly = Assembly.GetExecutingAssembly();
 
-// TODO: Add any events that use '[PreInitialise]' attribute here.
+#region DI: Event Loader
 
-#region Base Events
+foreach (var type in myAssembly.GetTypes())
+{
+    if (type.GetCustomAttribute<KurokoEventAttribute>(false) is null)
+        continue;
 
-_serviceCollection.AddSingleton<DiscordLogEvent>()
-    .AddSingleton<DiscordShardReadyEvent>()
-    .AddSingleton<DiscordSlashCommandEvent>()
-    .AddSingleton<UnobservedErrorEvent>();
-
-#endregion
-
-#region ModLog Events
-
-_serviceCollection.AddSingleton<ModLogUserJoinLeaveEvent>()
-    .AddSingleton<ModLogMessageEditedEvent>()
-    .AddSingleton<ModLogMessageDeletedEvent>();
-
-#endregion
-
-#region Ticket Events
-
-_serviceCollection.AddSingleton<TicketMessageNewEvent>()
-    .AddSingleton<MessageEditEvent>()
-    .AddSingleton<MessageDeleteEvent>();
-
-#endregion
+    _serviceCollection.AddSingleton(type);
+}
 
 #endregion
 
@@ -118,7 +96,7 @@ IServiceProvider _serviceProvider = _serviceCollection.BuildServiceProvider();
 
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, $"Loaded {_serviceCollection.Count - 7} dependencies from modules!"));
 
-await _interactionService.AddModulesAsync(Assembly.GetExecutingAssembly(), _serviceProvider);
+await _interactionService.AddModulesAsync(myAssembly, _serviceProvider);
 
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, $"SLASH COMMANDS     : {_interactionService.SlashCommands.Count}/100"));
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, $"MODAL COMMANDS     : {_interactionService.ModalCommands.Count}"));

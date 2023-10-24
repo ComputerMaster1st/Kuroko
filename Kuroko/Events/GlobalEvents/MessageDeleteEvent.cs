@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Kuroko.Events.GlobalEvents
 {
-    [PreInitialize]
+    [PreInitialize, KurokoEvent]
     public class MessageDeleteEvent
     {
         private readonly IServiceProvider _services;

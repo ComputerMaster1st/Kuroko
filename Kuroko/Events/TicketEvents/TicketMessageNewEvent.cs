@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Kuroko.Events.TicketEvents
 {
-    [PreInitialize]
+    [PreInitialize, KurokoEvent]
     public class TicketMessageNewEvent
     {
         private readonly DiscordShardedClient _client;

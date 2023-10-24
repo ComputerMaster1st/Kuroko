@@ -4,7 +4,7 @@ using Kuroko.Core.Attributes;
 
 namespace Kuroko.Events
 {
-    [PreInitialize]
+    [PreInitialize, KurokoEvent]
     internal class UnobservedErrorEvent
     {
         public UnobservedErrorEvent()

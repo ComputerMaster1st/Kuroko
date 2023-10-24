@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Kuroko.Events.ModLogEvents
 {
-    [PreInitialize]
+    [PreInitialize, KurokoEvent]
     public class ModLogUserJoinLeaveEvent
     {
         private enum JoinType
