@@ -1,5 +1,4 @@
-﻿using Discord;
-using Discord.WebSocket;
+﻿using Discord.WebSocket;
 using Kuroko.Core.Attributes;
 using Kuroko.Database;
 using Kuroko.Modules.Reports;
@@ -19,10 +18,10 @@ namespace Kuroko.Events.TicketEvents
             _client = client;
             _services = services;
 
-            client.MessageUpdated += (a, b, c) => Task.Factory.StartNew(() => MessageUpdatedAsync(a, b, c));
+            client.MessageUpdated += (b, a, c) => Task.Factory.StartNew(() => MessageUpdatedAsync(a));
         }
 
-        private async Task MessageUpdatedAsync(Cacheable<IMessage, ulong> before, SocketMessage after, ISocketMessageChannel chn)
+        private async Task MessageUpdatedAsync(SocketMessage after)
         {
             using var db = _services.GetRequiredService<DatabaseContext>();
 
