@@ -4,10 +4,11 @@ namespace Kuroko.Modules.Reports
 {
     public static class ReportedMessageBuilder
     {
-        public static Embed Build(string content, DateTimeOffset timestamp)
+        public static Embed Build(string content, DateTimeOffset? timestamp, string title = null)
         {
             var embedBuilder = new EmbedBuilder()
             {
+                Title = title ?? "Original Reported Message Content",
                 Color = Color.Magenta,
                 Timestamp = timestamp,
                 Description = content
