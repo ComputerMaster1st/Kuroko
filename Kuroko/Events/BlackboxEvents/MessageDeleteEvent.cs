@@ -5,7 +5,7 @@ using Kuroko.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Kuroko.Events.GlobalEvents
+namespace Kuroko.Events.BlackboxEvents
 {
     [PreInitialize, KurokoEvent]
     public class MessageDeleteEvent
