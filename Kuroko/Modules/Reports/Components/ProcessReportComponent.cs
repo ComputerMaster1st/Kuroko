@@ -24,29 +24,39 @@ namespace Kuroko.Modules.Reports.Components
         {
             var ticket = await CreateAsync(TicketType.ReportMessage, reportedMsgId, modal);
             var reportedMsg = await Context.Channel.GetMessageAsync(reportedMsgId);
-
-            if (reportedMsg.Attachments.Count == 0)
-                return;
-
-            var channel = Context.Guild.GetTextChannel(ticket.ChannelId);
             var attachments = new List<FileAttachment>();
 
-            var msgEntity = new MessageEntity(reportedMsg.Id, reportedMsg.Channel.Id, reportedMsg.Author.Id, reportedMsg.Content);
+            MessageEntity msgEntity = await Context.Database.Messages.FirstOrDefaultAsync(x => x.Id == reportedMsgId);
 
-            using (var httpClient = new HttpClient())
+            if (msgEntity is null)
             {
-                foreach (var att in reportedMsg.Attachments)
-                {
-                    var bytes = await httpClient.GetByteArrayAsync(att.Url ?? att.ProxyUrl);
+                msgEntity = new MessageEntity(reportedMsg.Id, reportedMsg.Channel.Id, reportedMsg.Author.Id, reportedMsg.Content);
 
-                    attachments.Add(new(new MemoryStream(bytes), att.Filename));
-                    msgEntity.Attachments.Add(new(att.Id, att.Filename, bytes));
+                if (reportedMsg.Attachments.Count > 0)
+                {
+                    using var httpClient = new HttpClient();
+
+                    foreach (var att in reportedMsg.Attachments)
+                    {
+                        var bytes = await httpClient.GetByteArrayAsync(att.Url ?? att.ProxyUrl);
+
+                        attachments.Add(new(new MemoryStream(bytes), att.Filename));
+                        msgEntity.Attachments.Add(new(att.Id, att.Filename, bytes));
+                    }
                 }
+
+                var guildRoot = await Context.Database.Guilds.GetOrCreateRootAsync(Context.Guild.Id);
+
+                guildRoot.Messages.Add(msgEntity);
+            }
+            else
+            {
+                if (msgEntity.Attachments.Count > 0)
+                    foreach (var attachment in msgEntity.Attachments)
+                        attachments.Add(new(attachment.GetStream(), attachment.FileName));
             }
 
-            var guildRoot = await Context.Database.Guilds.GetOrCreateRootAsync(Context.Guild.Id);
-            guildRoot.Messages.Add(msgEntity);
-
+            var channel = Context.Guild.GetTextChannel(ticket.ChannelId);
             var output = new StringBuilder()
                 .AppendLine($"## Reported Message {reportedMsg.GetJumpUrl()} | ID: {reportedMsg.Id}")
                 .AppendLine($"* **Attachments Found:** {attachments.Count}")
