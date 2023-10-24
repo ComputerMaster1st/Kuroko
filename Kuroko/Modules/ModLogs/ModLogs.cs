@@ -160,7 +160,7 @@ namespace Kuroko.Modules.ModLogs
                     .WithButton("Message Deleted", $"{ModLogCommandMap.MESSAGE_DELETED}:{user.Id}", Pagination.IsButtonToggle(properties.DeletedMessages), row: toggleRow)
 
                     .WithButton("Download Attachments", $"{ModLogCommandMap.DOWNLOAD_ATTACHMENT}:{user.Id}", Pagination.IsButtonToggle(properties.SaveAttachments), row: specialRow)
-                    .WithButton("BlackBox Recorder", $"{ModLogCommandMap.BLACKBOX}:{user.Id}", Pagination.IsButtonToggle(properties.EnableBlackbox), row: specialRow);
+                    .WithButton("Blackbox Recorder", $"{ModLogCommandMap.BLACKBOX}:{user.Id}", Pagination.IsButtonToggle(properties.EnableBlackbox), row: specialRow);
             }
 
             componentBuilder.WithButton("Exit", $"{GlobalCommandMap.EXIT}:{user.Id}", ButtonStyle.Secondary, row: exitRow);

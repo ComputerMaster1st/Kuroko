@@ -8,11 +8,11 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Kuroko.Events.BlackboxEvents
 {
     [PreInitialize, KurokoEvent]
-    public class MessageDeleteEvent
+    public class BlackboxMessageDeleteEvent
     {
         private readonly IServiceProvider _services;
 
-        public MessageDeleteEvent(DiscordShardedClient client, IServiceProvider services)
+        public BlackboxMessageDeleteEvent(DiscordShardedClient client, IServiceProvider services)
         {
             _services = services;
 
