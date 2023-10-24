@@ -4,7 +4,7 @@
     {
         public const string MENU = "ml_menu";
 
-        #region "Configuration
+        #region Configuration
 
         public const string CHANNEL = "ml_channel";
         public const string CHANNEL_SAVE = "ml_channel_save";
@@ -16,13 +16,18 @@
         public const string CHANNEL_IGNORE_SAVE = "ml_channel_ignore_save";
 
         #endregion
-        #region "Toggles"
+        #region Toggles
 
         public const string MESSAGE_DELETED = "ml_message_deleted";
         public const string MESSAGE_EDITED = "ml_message_edited";
         public const string JOIN = "ml_join";
         public const string LEAVE = "ml_leave";
+
+        #endregion
+        #region Specials
+
         public const string DOWNLOAD_ATTACHMENT = "ml_download";
+        public const string BLACKBOX = "ml_blackbox";
 
         #endregion
     }

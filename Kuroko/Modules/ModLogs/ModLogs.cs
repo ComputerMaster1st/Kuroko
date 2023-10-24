@@ -108,6 +108,15 @@ namespace Kuroko.Modules.ModLogs
             await ToggleAsync(x => x.SaveAttachments = !x.SaveAttachments);
         }
 
+        [ComponentInteraction($"{ModLogCommandMap.BLACKBOX}:*")]
+        public async Task BlackboxAsync(ulong interactedUserId)
+        {
+            if (!await IsInteractedUserAsync(interactedUserId))
+                return;
+
+            await ToggleAsync(x => x.EnableBlackbox = !x.EnableBlackbox);
+        }
+
         private async Task ToggleAsync(Action<ModLogEntity> action)
         {
             var properties = await GetPropertiesAsync<ModLogEntity, GuildEntity>(Context.Guild.Id);
@@ -131,6 +140,7 @@ namespace Kuroko.Modules.ModLogs
             var mainRow = 0;
             var toggleRow = 1;
             var exitRow = 2;
+            var specialRow = 3;
             var componentBuilder = new ComponentBuilder()
                 .WithButton("Configure Log Channel", $"{ModLogCommandMap.CHANNEL}:{user.Id},0", ButtonStyle.Primary, row: mainRow)
                 .WithButton("Ignore Channels", $"{ModLogCommandMap.CHANNEL_IGNORE}:{user.Id},0", ButtonStyle.Primary, row: mainRow);
@@ -141,16 +151,16 @@ namespace Kuroko.Modules.ModLogs
                     .WithButton("Monitor All Channels", $"{ModLogCommandMap.CHANNEL_IGNORE_RESET}:{user.Id}", ButtonStyle.Success, row: mainRow);
 
             if (properties.LogChannelId != 0)
-                componentBuilder.WithButton("Unset Logging Channel", $"{ModLogCommandMap.CHANNEL_DELETE}:{user.Id}", ButtonStyle.Danger, row: mainRow);
-
-            if (properties.LogChannelId != 0)
             {
-                componentBuilder
+                componentBuilder.WithButton("Unset Logging Channel", $"{ModLogCommandMap.CHANNEL_DELETE}:{user.Id}", ButtonStyle.Danger, row: mainRow)
+
                     .WithButton("User Joined", $"{ModLogCommandMap.JOIN}:{user.Id}", Pagination.IsButtonToggle(properties.Join), row: toggleRow)
                     .WithButton("User Left", $"{ModLogCommandMap.LEAVE}:{user.Id}", Pagination.IsButtonToggle(properties.Leave), row: toggleRow)
                     .WithButton("Message Edited", $"{ModLogCommandMap.MESSAGE_EDITED}:{user.Id}", Pagination.IsButtonToggle(properties.EditedMessages), row: toggleRow)
                     .WithButton("Message Deleted", $"{ModLogCommandMap.MESSAGE_DELETED}:{user.Id}", Pagination.IsButtonToggle(properties.DeletedMessages), row: toggleRow)
-                    .WithButton("Download Attachments", $"{ModLogCommandMap.DOWNLOAD_ATTACHMENT}:{user.Id}", Pagination.IsButtonToggle(properties.SaveAttachments), row: toggleRow);
+
+                    .WithButton("Download Attachments", $"{ModLogCommandMap.DOWNLOAD_ATTACHMENT}:{user.Id}", Pagination.IsButtonToggle(properties.SaveAttachments), row: specialRow)
+                    .WithButton("BlackBox Recorder", $"{ModLogCommandMap.BLACKBOX}:{user.Id}", Pagination.IsButtonToggle(properties.EnableBlackbox), row: specialRow);
             }
 
             componentBuilder.WithButton("Exit", $"{GlobalCommandMap.EXIT}:{user.Id}", ButtonStyle.Secondary, row: exitRow);

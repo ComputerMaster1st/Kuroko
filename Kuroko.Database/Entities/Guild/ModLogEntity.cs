@@ -20,7 +20,13 @@ namespace Kuroko.Database.Entities.Guild
         public bool EditedMessages { get; set; } = false;
         public bool Join { get; set; } = false;
         public bool Leave { get; set; } = false;
+
+        #endregion
+
+        #region Specials
+
         public bool SaveAttachments { get; set; } = false;
+        public bool EnableBlackbox { get; set; } = false;
 
         #endregion
     }
