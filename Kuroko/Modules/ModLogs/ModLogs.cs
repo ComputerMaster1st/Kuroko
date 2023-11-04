@@ -139,8 +139,8 @@ namespace Kuroko.Modules.ModLogs
             var properties = propParam ?? await GetPropertiesAsync<ModLogEntity, GuildEntity>(Context.Guild.Id);
             var mainRow = 0;
             var toggleRow = 1;
-            var exitRow = 2;
-            var specialRow = 3;
+            var specialRow = 4;
+            var exitRow = 3;
             var componentBuilder = new ComponentBuilder()
                 .WithButton("Configure Log Channel", $"{ModLogCommandMap.CHANNEL}:{user.Id},0", ButtonStyle.Primary, row: mainRow)
                 .WithButton("Ignore Channels", $"{ModLogCommandMap.CHANNEL_IGNORE}:{user.Id},0", ButtonStyle.Primary, row: mainRow);
