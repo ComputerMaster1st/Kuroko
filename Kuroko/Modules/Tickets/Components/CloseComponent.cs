@@ -3,7 +3,7 @@ using Discord.Interactions;
 using Kuroko.Core;
 using Kuroko.Database;
 using Kuroko.Database.Entities.Guild;
-using Kuroko.Database.Entities.Message;
+using Kuroko.Modules.Reports;
 using Kuroko.Shared;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
@@ -40,50 +40,16 @@ namespace Kuroko.Modules.Tickets.Components
             var directory = Directory.CreateDirectory($"{DataDirectories.TEMPFILES}/ticket_{ticket.Id}");
 
             await File.WriteAllTextAsync(Path.Combine(directory.ToString(), "ticket.txt"), await PrepareTranscriptAsync(ticket, handler, directory));
-
-            var zipLocation = Kuroko.Utilities.CreateZip($"ticket_{ticket.Id}", directory, out int segments);
-            var discordAttachments = new List<FileAttachment>();
-
-            void clearAttachments()
-            {
-                foreach (var file in discordAttachments)
-                    file.Dispose();
-            }
-
-            if (segments < 10)
-            {
-                foreach (var file in zipLocation.GetFiles())
-                    discordAttachments.Add(new FileAttachment(file.FullName));
-
-                await chn.SendFilesAsync(discordAttachments);
-                clearAttachments();
-            }
-            else
-            {
-                foreach (var file in zipLocation.GetFiles())
-                {
-                    discordAttachments.Add(new FileAttachment(file.FullName));
-
-                    if (!(discordAttachments.Count < 10))
-                    {
-                        await chn.SendFilesAsync(discordAttachments);
-
-                        clearAttachments();
-                        discordAttachments.Clear();
-                    }
-                }
-
-                await chn.SendFilesAsync(discordAttachments);
-            }
+            var (ZipDir, Segments) = await UserMessageHistory.ZipAndUploadAsync(ticket, directory, chn);
 
             directory.Delete(true);
-            zipLocation.Delete(true);
+            ZipDir.Delete(true);
             root.Tickets.Remove(ticket, Context.Database);
 
             await (Context.Channel as ITextChannel).DeleteAsync();
             await msg.ModifyAsync(x =>
             {
-                x.Content = $"Ticket Transcript: {ticket.Id}. Uploaded {segments} zip file(s).";
+                x.Content = $"Ticket Transcript: {ticket.Id}. Uploaded {Segments} zip file(s).";
             });
         }
 
@@ -117,7 +83,7 @@ namespace Kuroko.Modules.Tickets.Components
                     .AppendLine();
 
                 var reportedMsg = await Context.Database.Messages.FirstOrDefaultAsync(x => x.Id == ticket.ReportedMessageId);
-                await AddMessageToTranscriptAsync(reportedMsg, output, directory);
+                output.AppendLine(UserMessageHistory.CreateMessageChain(reportedMsg, Context.Guild.GetUser(reportedMsg.UserId)));
 
                 Context.Database.Messages.Remove(reportedMsg);
 
@@ -128,76 +94,9 @@ namespace Kuroko.Modules.Tickets.Components
                 .AppendLine();
 
             foreach (var msg in ticket.Messages)
-                await AddMessageToTranscriptAsync(msg, output, directory);
+                output.AppendLine(UserMessageHistory.CreateMessageChain(msg, Context.Guild.GetUser(msg.UserId)));
 
             return output.ToString();
-        }
-
-        private async Task AddMessageToTranscriptAsync(MessageEntity msg, StringBuilder output, DirectoryInfo directory)
-        {
-            var user = Context.Guild.GetUser(msg.UserId);
-            var userName = user is null ? msg.UserId.ToString() : user.GlobalName ?? user.Username;
-
-            output
-                .AppendLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-                .AppendLine($"{userName} : {msg.CreatedAt.UtcDateTime}")
-                .AppendLine()
-                .AppendLine(msg.Content);
-
-            if (msg.Attachments.Count > 0)
-            {
-                output.AppendLine("─────────────────── [ Attachment Chain ] ───────────────────")
-                    .AppendLine();
-                var attachmentDir = directory.CreateSubdirectory("attachments");
-
-                foreach (var attachment in msg.Attachments)
-                {
-                    var filePath = Path.Combine(attachmentDir.ToString(), $"{attachment.Id}_{attachment.FileName}");
-                    var bytes = attachment.GetBytes();
-
-                    using (FileStream file = File.OpenWrite(filePath))
-                    {
-                        await file.WriteAsync(bytes);
-                    }
-
-                    var mimes = FileMimeType.GetFromBytes(bytes);
-                    var mime = mimes.OrderByDescending(x => x.Points).FirstOrDefault();
-
-                    output
-                        .AppendLine("Attachment ID : " + attachment.Id)
-                        .AppendLine("Name          : " + attachment.FileName)
-                        .AppendLine("Size (Bytes)  : " + attachment.FileSize)
-                        .AppendLine("MIME Type     : " + mime is null ? "No Mime Type Found" : mime.MimeType)
-                        .AppendLine();
-                }
-
-                output.AppendLine("────────────────────────────────────────────────────────────");
-            }
-
-            if (msg.EditedMessages.Count > 0)
-            {
-                output.AppendLine("───────────────── [ Edited Message Chain ] ─────────────────");
-
-                foreach (var edited in msg.EditedMessages)
-                {
-                    output
-                        .AppendLine("────────────────────────────────────────────────────────────")
-                        .AppendLine(edited.EditedAt.UtcDateTime.ToString())
-                        .AppendLine()
-                        .AppendLine(edited.Content)
-                        .AppendLine("────────────────────────────────────────────────────────────");
-                }
-
-                output.AppendLine("────────────────────────────────────────────────────────────");
-            }
-
-            if (msg.DeletedAt.HasValue)
-            {
-                output.AppendLine()
-                    .AppendLine($">>> [ Message Deleted At {msg.DeletedAt.Value.UtcDateTime} ] <<<");
-            }
-
-            output.AppendLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         }
     }
 }

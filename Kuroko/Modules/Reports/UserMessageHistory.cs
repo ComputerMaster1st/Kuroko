@@ -26,7 +26,11 @@ namespace Kuroko.Modules.Reports
             var ticketDir = Directory.CreateDirectory($"{DataDirectories.TEMPFILES}/ticket_{ticket.Id}");
 
             await CreateHistoryLogAsync(messages, user, ticketDir);
-            await ZipAndUploadAsync(ticket, ticketDir, guild.GetTextChannel(ticket.ChannelId));
+
+            var (ZipDir, Segments) = await ZipAndUploadAsync(ticket, ticketDir, guild.GetTextChannel(ticket.ChannelId));
+
+            ticketDir.Delete(true);
+            ZipDir.Delete(true);
         }
 
         private static async Task CreateHistoryLogAsync(IEnumerable<MessageEntity> messageHistory, IUser user, DirectoryInfo ticketDir)
@@ -95,7 +99,7 @@ namespace Kuroko.Modules.Reports
             return output.ToString();
         }
 
-        public static async Task<string> CreateAttachmentChainAsync(IEnumerable<AttachmentEntity> attachments, DirectoryInfo attachmentDir)
+        private static async Task<string> CreateAttachmentChainAsync(IEnumerable<AttachmentEntity> attachments, DirectoryInfo attachmentDir)
         {
             var output = new StringBuilder()
                 .AppendLine("─────────────────── [ Attachment Chain ] ───────────────────")
@@ -127,7 +131,7 @@ namespace Kuroko.Modules.Reports
             return output.ToString();
         }
 
-        public static async Task ZipAndUploadAsync(TicketEntity ticket, DirectoryInfo ticketDir, ITextChannel ticketChannel)
+        public static async Task<(DirectoryInfo ZipDir, int Segments)> ZipAndUploadAsync(TicketEntity ticket, DirectoryInfo ticketDir, ITextChannel ticketChannel)
         {
             var zipLocation = Kuroko.Utilities.CreateZip($"ticket_{ticket.Id}_history", ticketDir, out int segments);
             var discordAttachments = new List<FileAttachment>();
@@ -163,6 +167,8 @@ namespace Kuroko.Modules.Reports
 
                 await ticketChannel.SendFilesAsync(discordAttachments);
             }
+
+            return (zipLocation, segments);
         }
     }
 }
