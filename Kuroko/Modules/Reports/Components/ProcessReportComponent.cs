@@ -16,8 +16,14 @@ namespace Kuroko.Modules.Reports.Components
     public class ProcessReportComponent : KurokoModuleBase
     {
         [ModalInteraction($"{ReportsCommandMap.REPORT_USER}:*")]
-        public Task CreateUserReportAsync(ulong reportedUserId, ReportModal modal)
-            => CreateAsync(TicketType.ReportUser, reportedUserId, modal);
+        public async Task CreateUserReportAsync(ulong reportedUserId, ReportModal modal)
+        {
+            var ticket = await CreateAsync(TicketType.ReportUser, reportedUserId, modal);
+
+            await UserMessageHistory.GenerateUserMessageHistoryAsync(ticket, Context.ServiceProvider);
+
+            return;
+        }
 
         [ModalInteraction($"{ReportsCommandMap.REPORT_MESSAGE}:*")]
         public async Task CreateMessageReportAsync(ulong reportedMsgId, ReportModal modal)
