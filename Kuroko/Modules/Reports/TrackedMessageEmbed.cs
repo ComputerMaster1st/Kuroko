@@ -2,7 +2,7 @@
 
 namespace Kuroko.Modules.Reports
 {
-    public static class ReportedMessageBuilder
+    public static class TrackedMessageEmbed
     {
         public static Embed Build(string content, DateTimeOffset? timestamp, string title = null)
         {

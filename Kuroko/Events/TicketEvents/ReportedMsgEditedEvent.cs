@@ -32,7 +32,7 @@ namespace Kuroko.Events.TicketEvents
 
             var guild = _client.GetGuild(ticket.GuildId);
             var channel = guild.GetTextChannel(ticket.ChannelId);
-            var embed = ReportedMessageBuilder.Build(after.Content, after.EditedTimestamp, "Reported Message Edited!");
+            var embed = TrackedMessageEmbed.Build(after.Content, after.EditedTimestamp, "Reported Message Edited!");
 
             await channel.SendMessageAsync(embed: embed);
         }

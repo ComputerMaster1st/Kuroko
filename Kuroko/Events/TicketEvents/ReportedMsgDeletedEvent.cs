@@ -53,7 +53,7 @@ namespace Kuroko.Events.TicketEvents
 
             var guild = _client.GetGuild(ticket.GuildId);
             var channel = guild.GetTextChannel(ticket.ChannelId);
-            var embed = ReportedMessageBuilder.Build(msgContent, dateTimeOffset, "Reported Message Deleted!");
+            var embed = TrackedMessageEmbed.Build(msgContent, dateTimeOffset, "Reported Message Deleted!");
 
             await channel.SendMessageAsync(embed: embed);
         }

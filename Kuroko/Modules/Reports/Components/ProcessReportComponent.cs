@@ -68,7 +68,7 @@ namespace Kuroko.Modules.Reports.Components
                 .AppendLine($"* **Attachments Found:** {attachments.Count}")
                 .AppendLine("## Please provide any screenshots to provide context and support your report!");
 
-            await channel.SendFilesAsync(attachments, reportedMsg.Content, embed: ReportedMessageBuilder.Build(reportedMsg.Content, reportedMsg.Timestamp));
+            await channel.SendFilesAsync(attachments, reportedMsg.Content, embed: TrackedMessageEmbed.Build(reportedMsg.Content, reportedMsg.Timestamp));
 
             attachments.ForEach(x => x.Dispose());
         }
