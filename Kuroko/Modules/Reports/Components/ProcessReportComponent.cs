@@ -8,6 +8,7 @@ using Kuroko.Database.Entities.Message;
 using Kuroko.Modules.Reports.Modals;
 using Kuroko.Modules.Tickets;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System.Text;
 
 namespace Kuroko.Modules.Reports.Components
@@ -18,17 +19,17 @@ namespace Kuroko.Modules.Reports.Components
         [ModalInteraction($"{ReportsCommandMap.REPORT_USER}:*")]
         public async Task CreateUserReportAsync(ulong reportedUserId, ReportModal modal)
         {
-            var ticket = await CreateAsync(TicketType.ReportUser, reportedUserId, modal);
+            var (TicketId, _) = await CreateAsync(TicketType.ReportUser, reportedUserId, modal);
 
-            await UserMessageHistory.GenerateUserMessageHistoryAsync(ticket, Context.ServiceProvider);
-
-            return;
+            using IServiceScope scope = Context.ServiceProvider.CreateScope();
+            var db = scope.ServiceProvider.GetService<DatabaseContext>();
+            await UserMessageHistory.GenerateUserMessageHistoryAsync(TicketId, db, Context.Client);
         }
 
         [ModalInteraction($"{ReportsCommandMap.REPORT_MESSAGE}:*")]
         public async Task CreateMessageReportAsync(ulong reportedMsgId, ReportModal modal)
         {
-            var ticket = await CreateAsync(TicketType.ReportMessage, reportedMsgId, modal);
+            var (_, TicketChannel) = await CreateAsync(TicketType.ReportMessage, reportedMsgId, modal);
             var reportedMsg = await Context.Channel.GetMessageAsync(reportedMsgId);
             var attachments = new List<FileAttachment>();
 
@@ -62,7 +63,7 @@ namespace Kuroko.Modules.Reports.Components
                         attachments.Add(new(attachment.GetStream(), attachment.FileName));
             }
 
-            var channel = Context.Guild.GetTextChannel(ticket.ChannelId);
+            var channel = TicketChannel;
             var output = new StringBuilder()
                 .AppendLine($"## Reported Message {reportedMsg.GetJumpUrl()} | ID: {reportedMsg.Id}")
                 .AppendLine($"* **Attachments Found:** {attachments.Count}")
@@ -73,7 +74,7 @@ namespace Kuroko.Modules.Reports.Components
             attachments.ForEach(x => x.Dispose());
         }
 
-        private async Task<TicketEntity> CreateAsync(TicketType type, ulong reportedId, ReportModal modal)
+        private async Task<(int TicketId, ITextChannel TicketChannel)> CreateAsync(TicketType type, ulong reportedId, ReportModal modal)
         {
             var reportProperties = await GetPropertiesAsync<ReportsEntity, GuildEntity>(Context.Guild.Id);
             var guildRoot = await Context.Database.Guilds.GetOrCreateRootAsync(Context.Guild.Id);
@@ -102,7 +103,7 @@ namespace Kuroko.Modules.Reports.Components
             await Context.Database.SaveChangesAsync();
             await ExecuteAsync(newTicket, reportProperties);
 
-            return newTicket;
+            return (newTicket.Id, channel);
         }
 
         [RequireUserGuildPermission(GuildPermission.ManageMessages)]

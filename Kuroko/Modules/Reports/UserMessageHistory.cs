@@ -1,33 +1,33 @@
 ﻿using Discord;
-using Discord.WebSocket;
 using Kuroko.Database;
 using Kuroko.Database.Entities.Guild;
 using Kuroko.Database.Entities.Message;
 using Kuroko.Shared;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using System.Text;
 
 namespace Kuroko.Modules.Reports
 {
     public static class UserMessageHistory
     {
-        public static async Task GenerateUserMessageHistoryAsync(TicketEntity ticket, IServiceProvider services)
+        public static async Task GenerateUserMessageHistoryAsync(int ticketId, DatabaseContext db, IDiscordClient client)
         {
-            using var db = services.GetRequiredService<DatabaseContext>();
-            var messages = db.Messages.Where(x => x.UserId == ticket.ReportedUserId && x.GuildId == ticket.GuildId).OrderByDescending(x => x.CreatedAt);
+            var ticket = await db.Tickets.FirstOrDefaultAsync(x => x.Id == ticketId);
+            var root = await db.Guilds.FirstOrDefaultAsync(x => x.Id == ticket.GuildId);
+            var messages = root.Messages.Where(x => x.UserId == ticket.ReportedUserId)
+                .OrderByDescending(x => x.CreatedAt)
+                .ToList();
 
-            if (!await messages.AnyAsync())
+            if (!messages.Any())
                 return;
 
-            var client = services.GetRequiredService<DiscordShardedClient>();
-            var guild = client.GetGuild(ticket.GuildId);
-            var user = guild.GetUser(ticket.ReportedUserId);
+            var guild = await client.GetGuildAsync(ticket.GuildId);
+            var user = await guild.GetUserAsync(ticket.ReportedUserId);
             var ticketDir = Directory.CreateDirectory($"{DataDirectories.TEMPFILES}/ticket_{ticket.Id}");
 
             await CreateHistoryLogAsync(messages, user, ticketDir);
 
-            var (ZipDir, Segments) = await ZipAndUploadAsync(ticket, ticketDir, guild.GetTextChannel(ticket.ChannelId));
+            var (ZipDir, Segments) = await ZipAndUploadAsync(ticket, ticketDir, await guild.GetTextChannelAsync(ticket.ChannelId));
 
             ticketDir.Delete(true);
             ZipDir.Delete(true);
@@ -133,7 +133,7 @@ namespace Kuroko.Modules.Reports
 
         public static async Task<(DirectoryInfo ZipDir, int Segments)> ZipAndUploadAsync(TicketEntity ticket, DirectoryInfo ticketDir, ITextChannel ticketChannel)
         {
-            var zipLocation = Kuroko.Utilities.CreateZip($"ticket_{ticket.Id}_history", ticketDir, out int segments);
+            var zipLocation = Kuroko.Utilities.CreateZip($"ticket_{ticket.Id}", ticketDir, out int segments);
             var discordAttachments = new List<FileAttachment>();
 
             void clearAttachments()
