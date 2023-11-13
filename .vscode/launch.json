@@ -9,9 +9,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/bin/Debug/net7.0/Kuroko.dll",
+            "program": "${workspaceFolder}/Kuroko/bin/Debug/net7.0/Kuroko.dll",
             "args": [],
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/Kuroko",
             "stopAtEntry": false,
             "console": "integratedTerminal"
         }
