@@ -5,10 +5,32 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": ".NET Core Launch (console)",
+            "name": "Debug: Db Release",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "semiDebug",
+            "program": "${workspaceFolder}/Kuroko/bin/Debug/net7.0/Kuroko.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Kuroko",
+            "stopAtEntry": false,
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug: Full",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "fullDebug",
+            "program": "${workspaceFolder}/Kuroko/bin/Debug/net7.0/Kuroko.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Kuroko",
+            "stopAtEntry": false,
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Release",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "release",
             "program": "${workspaceFolder}/Kuroko/bin/Debug/net7.0/Kuroko.dll",
             "args": [],
             "cwd": "${workspaceFolder}/Kuroko",
