@@ -12,6 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using System.Text;
 
+DataDirectories.CreateDirectories();
+
 DiscordShardedClient _discordClient = new(new DiscordSocketConfig()
 {
     AlwaysDownloadUsers = true,
@@ -31,8 +33,6 @@ IServiceCollection _serviceCollection = new ServiceCollection();
 
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "Now Starting Kuroko. Please wait a few minutes to boot the operating system..."));
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "--------------------------------"));
-
-DataDirectories.CreateDirectories();
 
 KDiscordConfig _discordConfig = await KDiscordConfig.LoadAsync();
 KDatabaseConfig _databaseConfig = await KDatabaseConfig.LoadAsync();

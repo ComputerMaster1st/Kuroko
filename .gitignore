@@ -362,3 +362,8 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /Kuroko.Database/config
+
+# VSCode Debugging
+config/
+temp_files/
+temp_zips/
