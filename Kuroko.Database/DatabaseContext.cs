@@ -17,7 +17,7 @@ namespace Kuroko.Database
         // Root containers. Should only contain foreign keys
         public DbSet<GuildEntity> Guilds { get; internal set; } = null;
         public DbSet<UserEntity> Users { get; internal set; } = null;
-        public DbSet<MessageEntity> Messages { get; set; } = null;
+        public DbSet<MessageEntity> Messages { get; internal set; } = null;
 
         // TODO: Put Module DbSets Here
 
