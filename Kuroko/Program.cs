@@ -1,19 +1,19 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using FluentScheduler;
 using Kuroko;
 using Kuroko.Core;
 using Kuroko.Core.Attributes;
-using Kuroko.CoreModule.Events;
 using Kuroko.Database;
-using Kuroko.Events;
-using Kuroko.Events.ModLogEvents;
 using Kuroko.Shared;
 using Kuroko.Shared.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using System.Text;
+
+DataDirectories.CreateDirectories();
 
 DiscordShardedClient _discordClient = new(new DiscordSocketConfig()
 {
@@ -31,11 +31,11 @@ InteractionService _interactionService = new(_discordClient, new()
     UseCompiledLambda = true
 });
 IServiceCollection _serviceCollection = new ServiceCollection();
+Registry _registry = new();
+JobManager.UseUtcTime();
 
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "Now Starting Kuroko. Please wait a few minutes to boot the operating system..."));
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "--------------------------------"));
-
-DataDirectories.CreateDirectories();
 
 KDiscordConfig _discordConfig = await KDiscordConfig.LoadAsync();
 KDatabaseConfig _databaseConfig = await KDatabaseConfig.LoadAsync();
@@ -64,7 +64,8 @@ await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM,
 
 _serviceCollection.AddSingleton(_discordConfig)
     .AddSingleton(_discordClient)
-    .AddSingleton(_interactionService);
+    .AddSingleton(_interactionService)
+    .AddSingleton(_registry);
 
 #endregion
 
@@ -81,26 +82,19 @@ _serviceCollection.AddDbContext<DatabaseContext>(options =>
 
 #endregion
 
-#region DI: Events
+var myAssembly = Assembly.GetExecutingAssembly();
 
-// TODO: Add any events that use '[PreInitialise]' attribute here.
+#region DI: Event Loader
 
-#region Base Events
+foreach (var type in myAssembly.GetTypes())
+{
+    if (type.GetCustomAttribute<KurokoEventAttribute>(false) != null)
+        _serviceCollection.AddSingleton(type);
+    else if (type.GetCustomAttribute<ScheduledJobAttribute>(false) != null)
+        _serviceCollection.AddSingleton(type);
 
-_serviceCollection.AddSingleton<DiscordLogEvent>()
-    .AddSingleton<DiscordShardReadyEvent>()
-    .AddSingleton<DiscordSlashCommandEvent>()
-    .AddSingleton<UnobservedErrorEvent>();
-
-#endregion
-
-#region ModLog Events
-
-_serviceCollection.AddSingleton<ModLogUserJoinLeaveEvent>()
-    .AddSingleton<ModLogMessageEditedEvent>()
-    .AddSingleton<ModLogMessageDeletedEvent>();
-
-#endregion
+    continue;
+}
 
 #endregion
 
@@ -108,15 +102,13 @@ IServiceProvider _serviceProvider = _serviceCollection.BuildServiceProvider();
 
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, $"Loaded {_serviceCollection.Count - 7} dependencies from modules!"));
 
-await _interactionService.AddModulesAsync(Assembly.GetExecutingAssembly(), _serviceProvider);
+await _interactionService.AddModulesAsync(myAssembly, _serviceProvider);
 
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, $"SLASH COMMANDS     : {_interactionService.SlashCommands.Count}/100"));
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, $"MODAL COMMANDS     : {_interactionService.ModalCommands.Count}"));
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, $"COMPONENT COMMANDS : {_interactionService.ComponentCommands.Count}"));
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, $"TEXT COMMANDS      : {_interactionService.ContextCommands.Count}"));
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "Initializing services..."));
-
-// TODO: Any custom attributes that require to be preloaded into dependency injection can be done here.
 
 foreach (ServiceDescriptor service in _serviceCollection)
 {
@@ -126,8 +118,17 @@ foreach (ServiceDescriptor service in _serviceCollection)
     if (service.ImplementationType is null)
         continue;
 
-    _serviceProvider.GetService(service.ImplementationType);
+    var preInitialize = _serviceProvider.GetService(service.ImplementationType);
+
+    if (preInitialize is IJob job)
+    {
+        var scheduleJob = job as IScheduleJob;
+        scheduleJob.ScheduleJob(_registry);
+    }
 }
+
+JobManager.Initialize(_registry);
+JobManager.Start();
 
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "Startup completed!"));
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "Beginning connection to Discord..."));
@@ -143,7 +144,7 @@ bool shutdownNow = false;
 while (!shutdownNow)
 {
     var input = Console.ReadLine();
-    switch (input ?? string.Empty)
+    switch (input)
     {
         case "discord-stats":
             Console.WriteLine(new StringBuilder()
@@ -159,12 +160,31 @@ while (!shutdownNow)
 
             shutdownNow = true;
             break;
-        case "":
+        case "jobs-list":
+            var listOutput = new StringBuilder();
+
+            foreach (var job in JobManager.AllSchedules)
+                listOutput.AppendLine($"Name: {job.Name} <> Scheduled Run: {job.NextRun}");
+            
+            Console.WriteLine(listOutput.ToString());
+            break;
+        case string n when input.StartsWith("jobs-run"):
+            var jobName = n["jobs-run ".Length..];
+            var foundJob = JobManager.GetSchedule(jobName);
+
+            if (foundJob is null)
+                Console.WriteLine("Job not found.");
+            else
+                foundJob.Execute();
+            break;
+        case string when string.IsNullOrWhiteSpace(input):
         case "help":
             Console.WriteLine(new StringBuilder()
-                .AppendLine("help           - Show all available commands")
-                .AppendLine("discord-stats  - Show discord shard, guild & latency")
-                .AppendLine("shutdown       - Stop & shutdown")
+                .AppendLine("help            - Show all available commands")
+                .AppendLine("discord-stats   - Show discord shard, guild & latency")
+                .AppendLine("jobs-list       - List available jobs")
+                .AppendLine("jobs-run <name> - Run specified job")
+                .AppendLine("shutdown        - Stop & shutdown")
                 .ToString());
             break;
         default:

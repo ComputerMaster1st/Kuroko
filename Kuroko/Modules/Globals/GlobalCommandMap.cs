@@ -6,7 +6,7 @@
     {
         #region Global
 
-        public const string Exit = "exit";
+        public const string EXIT = "exit";
 
         #endregion
     }

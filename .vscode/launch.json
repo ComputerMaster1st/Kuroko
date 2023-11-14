@@ -1,0 +1,41 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug: Db Release",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "semiDebug",
+            "program": "${workspaceFolder}/Kuroko/bin/Debug/net7.0/Kuroko.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Kuroko",
+            "stopAtEntry": false,
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Debug: Full",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "fullDebug",
+            "program": "${workspaceFolder}/Kuroko/bin/Debug/net7.0/Kuroko.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Kuroko",
+            "stopAtEntry": false,
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Release",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "release",
+            "program": "${workspaceFolder}/Kuroko/bin/Debug/net7.0/Kuroko.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Kuroko",
+            "stopAtEntry": false,
+            "console": "integratedTerminal"
+        }
+    ]
+}

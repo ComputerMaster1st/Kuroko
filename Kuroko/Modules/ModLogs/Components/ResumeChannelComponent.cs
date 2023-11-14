@@ -11,7 +11,7 @@ namespace Kuroko.Modules.ModLogs.Components
 {
     public class ResumeChannelComponent : KurokoModuleBase
     {
-        [ComponentInteraction($"{ModLogCommandMap.ModLogChannelResume}:*,*")]
+        [ComponentInteraction($"{ModLogCommandMap.CHANNEL_RESUME}:*,*")]
         public async Task InitialAsync(ulong interactedUserId, int index)
         {
             if (interactedUserId != Context.User.Id)
@@ -24,7 +24,7 @@ namespace Kuroko.Modules.ModLogs.Components
             await ExecuteAsync(index);
         }
 
-        [ComponentInteraction($"{ModLogCommandMap.ModLogChannelResumeSave}:*,*")]
+        [ComponentInteraction($"{ModLogCommandMap.CHANNEL_RESUME_SAVE}:*,*")]
         public async Task ReturningAsync(ulong interactedUserId, int index, string[] channelIds)
         {
             if (interactedUserId != Context.User.Id)
@@ -57,7 +57,7 @@ namespace Kuroko.Modules.ModLogs.Components
             var user = Context.User as IGuildUser;
             var count = 0;
             var selectMenuBuilder = new SelectMenuBuilder()
-                .WithCustomId($"{ModLogCommandMap.ModLogChannelResumeSave}:{user.Id},{index}")
+                .WithCustomId($"{ModLogCommandMap.CHANNEL_RESUME_SAVE}:{user.Id},{index}")
                 .WithMinValues(1)
                 .WithPlaceholder("Select text channels to resume mod logging");
 
@@ -71,7 +71,7 @@ namespace Kuroko.Modules.ModLogs.Components
                     break;
             }
 
-            var menu = Pagination.SelectMenu(selectMenuBuilder, index, user, ModLogCommandMap.ModLogChannelResume, ModLogCommandMap.ModLogMenu);
+            var menu = Pagination.SelectMenu(selectMenuBuilder, index, user, ModLogCommandMap.CHANNEL_RESUME, ModLogCommandMap.MENU);
             var hasUnknownChannels = false;
 
             output.AppendLine("Currently Ignored Channels: ");

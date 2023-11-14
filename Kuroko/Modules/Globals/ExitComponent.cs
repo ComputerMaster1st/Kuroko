@@ -6,7 +6,7 @@ namespace Kuroko.Modules.Globals
 {
     public class ExitComponent : KurokoModuleBase
     {
-        [ComponentInteraction($"{GlobalCommandMap.Exit}:*")]
+        [ComponentInteraction($"{GlobalCommandMap.EXIT}:*")]
         public async Task ExecuteAsync(ulong interactedUserId)
         {
             if (interactedUserId != Context.User.Id)

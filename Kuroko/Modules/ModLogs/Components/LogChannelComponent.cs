@@ -12,7 +12,7 @@ namespace Kuroko.Modules.ModLogs.Components
     [RequireUserGuildPermission(GuildPermission.ManageGuild)]
     public class LogChannelComponent : KurokoModuleBase
     {
-        [ComponentInteraction($"{ModLogCommandMap.ModLogChannel}:*,*")]
+        [ComponentInteraction($"{ModLogCommandMap.CHANNEL}:*,*")]
         public async Task InitialAsync(ulong interactedUserId, int index)
         {
             if (interactedUserId != Context.User.Id)
@@ -25,7 +25,7 @@ namespace Kuroko.Modules.ModLogs.Components
             await ExecuteAsync(index);
         }
 
-        [ComponentInteraction($"{ModLogCommandMap.ModLogChannelSave}:*")]
+        [ComponentInteraction($"{ModLogCommandMap.CHANNEL_SAVE}:*")]
         public async Task ReturningAsync(ulong interactedUserId, string channelId)
         {
             if (interactedUserId != Context.User.Id)
@@ -57,7 +57,7 @@ namespace Kuroko.Modules.ModLogs.Components
             var user = Context.User as IGuildUser;
             var textChannels = await user.Guild.GetTextChannelsAsync();
             var selectMenuBuilder = new SelectMenuBuilder()
-                .WithCustomId($"{ModLogCommandMap.ModLogChannelSave}:{user.Id}")
+                .WithCustomId($"{ModLogCommandMap.CHANNEL_SAVE}:{user.Id}")
                 .WithMinValues(1)
                 .WithPlaceholder("Select a text channel to send mod logs to");
 
@@ -70,7 +70,7 @@ namespace Kuroko.Modules.ModLogs.Components
                     break;
             }
 
-            var menu = Pagination.SelectMenu(selectMenuBuilder, index, user, ModLogCommandMap.ModLogChannelIgnore, ModLogCommandMap.ModLogMenu, true);
+            var menu = Pagination.SelectMenu(selectMenuBuilder, index, user, ModLogCommandMap.CHANNEL_IGNORE, ModLogCommandMap.MENU, true);
 
             output.AppendLine($"Current Log Channel: {logChannelTag}");
 

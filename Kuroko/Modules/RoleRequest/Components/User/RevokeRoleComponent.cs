@@ -13,7 +13,7 @@ namespace Kuroko.Modules.RoleRequest.Components.User
                     .AppendLine("# Role Request")
                     .AppendLine("## Remove Role");
 
-        [ComponentInteraction($"{RoleRequestCommandMap.RoleRequestRemove}:*,*")]
+        [ComponentInteraction($"{RoleRequestCommandMap.REMOVE}:*,*")]
         public async Task EntryAsync(ulong interactedUserId, int index)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
@@ -23,7 +23,7 @@ namespace Kuroko.Modules.RoleRequest.Components.User
             await ExecuteAsync(index, OutputMsg);
         }
 
-        [ComponentInteraction($"{RoleRequestCommandMap.RoleRequestDelete}:*,*")]
+        [ComponentInteraction($"{RoleRequestCommandMap.DELETE}:*,*")]
         public async Task ReturningAsync(ulong interactedUserId, int index, string[] roleIds)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
@@ -53,7 +53,7 @@ namespace Kuroko.Modules.RoleRequest.Components.User
             var count = 0;
             var roleIds = user.RoleIds.Skip(index).ToList();
             var selectMenu = new SelectMenuBuilder()
-                .WithCustomId($"{RoleRequestCommandMap.RoleRequestDelete}:{user.Id},{index}")
+                .WithCustomId($"{RoleRequestCommandMap.DELETE}:{user.Id},{index}")
                 .WithMinValues(1)
                 .WithPlaceholder("Select role(s) to remove from yourself");
             var guildRoles = new List<IRole>();
@@ -85,7 +85,7 @@ namespace Kuroko.Modules.RoleRequest.Components.User
                     break;
             }
 
-            var menu = Pagination.SelectMenu(selectMenu, index, user, RoleRequestCommandMap.RoleRequestRemove, RoleRequestCommandMap.RoleRequestMenu);
+            var menu = Pagination.SelectMenu(selectMenu, index, user, RoleRequestCommandMap.REMOVE, RoleRequestCommandMap.RoleRequestMenu);
 
             if (!menu.HasOptions)
                 output.AppendLine()

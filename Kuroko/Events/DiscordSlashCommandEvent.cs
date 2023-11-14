@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Kuroko.Events
 {
-    [PreInitialize]
+    [PreInitialize, KurokoEvent]
     internal class DiscordSlashCommandEvent
     {
         private readonly DiscordShardedClient _client;

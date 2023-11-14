@@ -6,7 +6,7 @@ using Kuroko.Shared.Configuration;
 
 namespace Kuroko.Events
 {
-    [PreInitialize]
+    [PreInitialize, KurokoEvent]
     internal class DiscordShardReadyEvent
     {
         private readonly KDiscordConfig _config;

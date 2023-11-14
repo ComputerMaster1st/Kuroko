@@ -6,7 +6,7 @@ using Kuroko.Core.Attributes;
 
 namespace Kuroko.CoreModule.Events
 {
-    [PreInitialize]
+    [PreInitialize, KurokoEvent]
     public class DiscordLogEvent
     {
         private DiscordShardedClient _client;

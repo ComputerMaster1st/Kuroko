@@ -5,5 +5,6 @@
         public const string UNKNOWN = "UNKNOWN";
         public const string SYSTEM = "SYSTEM";
         public const string SLASHCMD = "SLASHCMD";
+        public const string JOBS = "JOBS";
     }
 }

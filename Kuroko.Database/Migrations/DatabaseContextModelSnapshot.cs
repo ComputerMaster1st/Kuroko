@@ -49,6 +49,9 @@ namespace Kuroko.Database.Migrations
                     b.Property<bool>("EditedMessages")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("EnableBlackbox")
+                        .HasColumnType("boolean");
+
                     b.Property<decimal>("GuildId")
                         .HasColumnType("numeric(20,0)");
 
@@ -61,12 +64,70 @@ namespace Kuroko.Database.Migrations
                     b.Property<decimal>("LogChannelId")
                         .HasColumnType("numeric(20,0)");
 
+                    b.Property<bool>("SaveAttachments")
+                        .HasColumnType("boolean");
+
                     b.HasKey("Id");
 
                     b.HasIndex("GuildId")
                         .IsUnique();
 
                     b.ToTable("GuildModLogs");
+                });
+
+            modelBuilder.Entity("Kuroko.Database.Entities.Guild.ReportHandler", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Level")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("ReportsEntityId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("RoleId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReportsEntityId");
+
+                    b.ToTable("ReportHandler");
+                });
+
+            modelBuilder.Entity("Kuroko.Database.Entities.Guild.ReportsEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("GuildId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<bool>("RecordMessages")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("ReportCategoryId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<decimal>("TranscriptsChannelId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuildId")
+                        .IsUnique();
+
+                    b.ToTable("GuildReports");
                 });
 
             modelBuilder.Entity("Kuroko.Database.Entities.Guild.RoleRequestEntity", b =>
@@ -86,6 +147,143 @@ namespace Kuroko.Database.Migrations
                         .IsUnique();
 
                     b.ToTable("GuildRoleRequests");
+                });
+
+            modelBuilder.Entity("Kuroko.Database.Entities.Guild.TicketEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("ChannelId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("GuildId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<int>("ReportHandlerId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal?>("ReportedMessageId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<decimal>("ReportedUserId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<string>("RulesViolated")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Severity")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Subject")
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("SubmitterId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<decimal>("SummaryMessageId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuildId");
+
+                    b.ToTable("Tickets");
+                });
+
+            modelBuilder.Entity("Kuroko.Database.Entities.Message.AttachmentEntity", b =>
+                {
+                    b.Property<decimal>("Id")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<string>("Base64Bytes")
+                        .HasColumnType("text");
+
+                    b.Property<string>("FileName")
+                        .HasColumnType("text");
+
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal?>("MessageEntityId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MessageEntityId");
+
+                    b.ToTable("AttachmentEntity");
+                });
+
+            modelBuilder.Entity("Kuroko.Database.Entities.Message.EditedMessageEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("EditedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("MessageEntityId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MessageEntityId");
+
+                    b.ToTable("EditedMessageEntity");
+                });
+
+            modelBuilder.Entity("Kuroko.Database.Entities.Message.MessageEntity", b =>
+                {
+                    b.Property<decimal>("Id")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<decimal>("ChannelId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("GuildId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<int?>("TicketEntityId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("UserId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuildId");
+
+                    b.HasIndex("TicketEntityId");
+
+                    b.ToTable("Messages");
                 });
 
             modelBuilder.Entity("Kuroko.Database.Entities.UlongEntity", b =>
@@ -135,6 +333,25 @@ namespace Kuroko.Database.Migrations
                     b.Navigation("Guild");
                 });
 
+            modelBuilder.Entity("Kuroko.Database.Entities.Guild.ReportHandler", b =>
+                {
+                    b.HasOne("Kuroko.Database.Entities.Guild.ReportsEntity", null)
+                        .WithMany("ReportHandlers")
+                        .HasForeignKey("ReportsEntityId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Kuroko.Database.Entities.Guild.ReportsEntity", b =>
+                {
+                    b.HasOne("Kuroko.Database.Entities.Guild.GuildEntity", "Guild")
+                        .WithOne("Reports")
+                        .HasForeignKey("Kuroko.Database.Entities.Guild.ReportsEntity", "GuildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Guild");
+                });
+
             modelBuilder.Entity("Kuroko.Database.Entities.Guild.RoleRequestEntity", b =>
                 {
                     b.HasOne("Kuroko.Database.Entities.Guild.GuildEntity", "Guild")
@@ -142,6 +359,49 @@ namespace Kuroko.Database.Migrations
                         .HasForeignKey("Kuroko.Database.Entities.Guild.RoleRequestEntity", "GuildId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Guild");
+                });
+
+            modelBuilder.Entity("Kuroko.Database.Entities.Guild.TicketEntity", b =>
+                {
+                    b.HasOne("Kuroko.Database.Entities.Guild.GuildEntity", "Guild")
+                        .WithMany("Tickets")
+                        .HasForeignKey("GuildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Guild");
+                });
+
+            modelBuilder.Entity("Kuroko.Database.Entities.Message.AttachmentEntity", b =>
+                {
+                    b.HasOne("Kuroko.Database.Entities.Message.MessageEntity", null)
+                        .WithMany("Attachments")
+                        .HasForeignKey("MessageEntityId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Kuroko.Database.Entities.Message.EditedMessageEntity", b =>
+                {
+                    b.HasOne("Kuroko.Database.Entities.Message.MessageEntity", null)
+                        .WithMany("EditedMessages")
+                        .HasForeignKey("MessageEntityId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Kuroko.Database.Entities.Message.MessageEntity", b =>
+                {
+                    b.HasOne("Kuroko.Database.Entities.Guild.GuildEntity", "Guild")
+                        .WithMany("Messages")
+                        .HasForeignKey("GuildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Kuroko.Database.Entities.Guild.TicketEntity", null)
+                        .WithMany("Messages")
+                        .HasForeignKey("TicketEntityId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Guild");
                 });
@@ -161,9 +421,15 @@ namespace Kuroko.Database.Migrations
 
             modelBuilder.Entity("Kuroko.Database.Entities.Guild.GuildEntity", b =>
                 {
+                    b.Navigation("Messages");
+
                     b.Navigation("ModLog");
 
+                    b.Navigation("Reports");
+
                     b.Navigation("RoleRequest");
+
+                    b.Navigation("Tickets");
                 });
 
             modelBuilder.Entity("Kuroko.Database.Entities.Guild.ModLogEntity", b =>
@@ -171,9 +437,26 @@ namespace Kuroko.Database.Migrations
                     b.Navigation("IgnoredChannelIds");
                 });
 
+            modelBuilder.Entity("Kuroko.Database.Entities.Guild.ReportsEntity", b =>
+                {
+                    b.Navigation("ReportHandlers");
+                });
+
             modelBuilder.Entity("Kuroko.Database.Entities.Guild.RoleRequestEntity", b =>
                 {
                     b.Navigation("RoleIds");
+                });
+
+            modelBuilder.Entity("Kuroko.Database.Entities.Guild.TicketEntity", b =>
+                {
+                    b.Navigation("Messages");
+                });
+
+            modelBuilder.Entity("Kuroko.Database.Entities.Message.MessageEntity", b =>
+                {
+                    b.Navigation("Attachments");
+
+                    b.Navigation("EditedMessages");
                 });
 #pragma warning restore 612, 618
         }

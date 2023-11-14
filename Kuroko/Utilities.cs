@@ -1,5 +1,8 @@
 ﻿using Discord;
+using Ionic.Zip;
+using Ionic.Zlib;
 using Kuroko.Shared;
+using System.Text;
 
 namespace Kuroko
 {
@@ -28,6 +31,26 @@ namespace Kuroko
             }
 
             Console.WriteLine(message);
+        }
+
+        public static DirectoryInfo CreateZip(string zipName, DirectoryInfo directory, out int segmentsMade)
+        {
+            var dir = Directory.CreateDirectory(Path.Combine(DataDirectories.TEMPZIPS, zipName));
+            var file = zipName + ".zip";
+            var filePath = Path.Combine(dir.ToString(), file);
+
+            if (File.Exists(filePath))
+                File.Delete(filePath);
+
+            using var zip = new ZipFile(filePath, Encoding.UTF8);
+            zip.AddDirectory(directory.FullName);
+            zip.CompressionLevel = CompressionLevel.BestCompression;
+            zip.MaxOutputSegmentSize = 20 * 1024 * 1024;
+            zip.Save();
+
+            segmentsMade = zip.NumberOfSegmentsForMostRecentSave;
+
+            return dir;
         }
     }
 }

@@ -27,7 +27,7 @@ namespace Kuroko.Modules.RoleRequest
             await ExecuteAsync(true);
         }
 
-        [ComponentInteraction($"{RoleRequestCommandMap.RoleRequestManageReset}:*")]
+        [ComponentInteraction($"{RoleRequestCommandMap.MANAGE_RESET}:*")]
         [RequireUserGuildPermission(GuildPermission.ManageRoles)]
         public async Task ResetAsync(ulong interactedUserId)
         {
@@ -73,10 +73,10 @@ namespace Kuroko.Modules.RoleRequest
                 manageRowId = 1;
 
                 if (properties.RoleIds.Count > userRoleCount)
-                    builder.WithButton("Assign", $"{RoleRequestCommandMap.RoleRequestAssign}:{user.Id},0", ButtonStyle.Success, row: 0);
+                    builder.WithButton("Assign", $"{RoleRequestCommandMap.ASSIGN}:{user.Id},0", ButtonStyle.Success, row: 0);
 
                 if (userRoleCount > 0)
-                    builder.WithButton("Remove", $"{RoleRequestCommandMap.RoleRequestRemove}:{user.Id},0", ButtonStyle.Danger, row: 0);
+                    builder.WithButton("Remove", $"{RoleRequestCommandMap.REMOVE}:{user.Id},0", ButtonStyle.Danger, row: 0);
             }
 
             if (user.GuildPermissions.ManageRoles)
@@ -84,12 +84,12 @@ namespace Kuroko.Modules.RoleRequest
                 output.AppendLine("## Manager Edition");
 
                 builder
-                    .WithButton("Add Roles", $"{RoleRequestCommandMap.RoleRequestManageAdd}:{user.Id},0", ButtonStyle.Primary, row: manageRowId)
-                    .WithButton("Remove Roles", $"{RoleRequestCommandMap.RoleRequestManageRemove}:{user.Id},0", ButtonStyle.Primary, row: manageRowId)
-                    .WithButton("Remove All", $"{RoleRequestCommandMap.RoleRequestManageReset}:{user.Id}", ButtonStyle.Danger, row: manageRowId);
+                    .WithButton("Add Roles", $"{RoleRequestCommandMap.MANAGE_ADD}:{user.Id},0", ButtonStyle.Primary, row: manageRowId)
+                    .WithButton("Remove Roles", $"{RoleRequestCommandMap.MANAGE_REMOVE}:{user.Id},0", ButtonStyle.Primary, row: manageRowId)
+                    .WithButton("Remove All", $"{RoleRequestCommandMap.MANAGE_RESET}:{user.Id}", ButtonStyle.Danger, row: manageRowId);
             }
 
-            builder.WithButton("Exit", $"{GlobalCommandMap.Exit}:{user.Id}", ButtonStyle.Secondary, row: manageRowId + 1);
+            builder.WithButton("Exit", $"{GlobalCommandMap.EXIT}:{user.Id}", ButtonStyle.Secondary, row: manageRowId + 1);
 
             var msgComponents = builder.Build();
 

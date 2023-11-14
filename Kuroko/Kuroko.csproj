@@ -1,5 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net7.0</TargetFramework>
@@ -7,16 +6,15 @@
     <Nullable>disable</Nullable>
     <Configurations>Debug;Release;Semi-Debug</Configurations>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Discord.Net" Version="3.12.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Discord.Net" Version="3.12.0-20231102.1"/>
+    <PackageReference Include="DotNetZip" Version="1.16.0"/>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0"/>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+    <PackageReference Include="FluentScheduler" Version="5.5.1"/>
   </ItemGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\Kuroko.Database\Kuroko.Database.csproj" />
-    <ProjectReference Include="..\Kuroko.Shared\Kuroko.Shared.csproj" />
+    <ProjectReference Include="..\Kuroko.Database\Kuroko.Database.csproj"/>
+    <ProjectReference Include="..\Kuroko.Shared\Kuroko.Shared.csproj"/>
   </ItemGroup>
-
 </Project>
