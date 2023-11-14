@@ -88,11 +88,12 @@ var myAssembly = Assembly.GetExecutingAssembly();
 
 foreach (var type in myAssembly.GetTypes())
 {
-    if (type.GetCustomAttribute<KurokoEventAttribute>(false) is null ||
-        type.GetCustomAttribute<ScheduledJobAttribute>(false) is null)
-        continue;
+    if (type.GetCustomAttribute<KurokoEventAttribute>(false) != null)
+        _serviceCollection.AddSingleton(type);
+    else if (type.GetCustomAttribute<ScheduledJobAttribute>(false) != null)
+        _serviceCollection.AddSingleton(type);
 
-    _serviceCollection.AddSingleton(type);
+    continue;
 }
 
 #endregion
@@ -126,6 +127,9 @@ foreach (ServiceDescriptor service in _serviceCollection)
     }
 }
 
+JobManager.Initialize(_registry);
+JobManager.Start();
+
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "Startup completed!"));
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "Beginning connection to Discord..."));
 
@@ -140,7 +144,7 @@ bool shutdownNow = false;
 while (!shutdownNow)
 {
     var input = Console.ReadLine();
-    switch (input ?? string.Empty)
+    switch (input)
     {
         case "discord-stats":
             Console.WriteLine(new StringBuilder()
@@ -156,12 +160,31 @@ while (!shutdownNow)
 
             shutdownNow = true;
             break;
-        case "":
+        case "jobs-list":
+            var listOutput = new StringBuilder();
+
+            foreach (var job in JobManager.AllSchedules)
+                listOutput.AppendLine($"Name: {job.Name} <> Scheduled Run: {job.NextRun}");
+            
+            Console.WriteLine(listOutput.ToString());
+            break;
+        case string n when input.StartsWith("jobs-run"):
+            var jobName = n["jobs-run ".Length..];
+            var foundJob = JobManager.GetSchedule(jobName);
+
+            if (foundJob is null)
+                Console.WriteLine("Job not found.");
+            else
+                foundJob.Execute();
+            break;
+        case string when string.IsNullOrWhiteSpace(input):
         case "help":
             Console.WriteLine(new StringBuilder()
-                .AppendLine("help           - Show all available commands")
-                .AppendLine("discord-stats  - Show discord shard, guild & latency")
-                .AppendLine("shutdown       - Stop & shutdown")
+                .AppendLine("help            - Show all available commands")
+                .AppendLine("discord-stats   - Show discord shard, guild & latency")
+                .AppendLine("jobs-list       - List available jobs")
+                .AppendLine("jobs-run <name> - Run specified job")
+                .AppendLine("shutdown        - Stop & shutdown")
                 .ToString());
             break;
         default:
