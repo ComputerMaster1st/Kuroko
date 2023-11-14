@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using FluentScheduler;
 using Kuroko;
 using Kuroko.Core;
 using Kuroko.Core.Attributes;
@@ -30,6 +31,8 @@ InteractionService _interactionService = new(_discordClient, new()
     UseCompiledLambda = true
 });
 IServiceCollection _serviceCollection = new ServiceCollection();
+Registry _registry = new();
+JobManager.UseUtcTime();
 
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "Now Starting Kuroko. Please wait a few minutes to boot the operating system..."));
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "--------------------------------"));
@@ -61,7 +64,8 @@ await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM,
 
 _serviceCollection.AddSingleton(_discordConfig)
     .AddSingleton(_discordClient)
-    .AddSingleton(_interactionService);
+    .AddSingleton(_interactionService)
+    .AddSingleton(_registry);
 
 #endregion
 
@@ -84,7 +88,8 @@ var myAssembly = Assembly.GetExecutingAssembly();
 
 foreach (var type in myAssembly.GetTypes())
 {
-    if (type.GetCustomAttribute<KurokoEventAttribute>(false) is null)
+    if (type.GetCustomAttribute<KurokoEventAttribute>(false) is null ||
+        type.GetCustomAttribute<ScheduledJobAttribute>(false) is null)
         continue;
 
     _serviceCollection.AddSingleton(type);
@@ -104,8 +109,6 @@ await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM,
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, $"TEXT COMMANDS      : {_interactionService.ContextCommands.Count}"));
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "Initializing services..."));
 
-// TODO: Any custom attributes that require to be preloaded into dependency injection can be done here.
-
 foreach (ServiceDescriptor service in _serviceCollection)
 {
     if (service.ServiceType.GetCustomAttributes(typeof(PreInitializeAttribute), false) is null)
@@ -114,7 +117,13 @@ foreach (ServiceDescriptor service in _serviceCollection)
     if (service.ImplementationType is null)
         continue;
 
-    _serviceProvider.GetService(service.ImplementationType);
+    var preInitialize = _serviceProvider.GetService(service.ImplementationType);
+
+    if (preInitialize is IJob job)
+    {
+        var scheduleJob = job as IScheduleJob;
+        scheduleJob.ScheduleJob(_registry);
+    }
 }
 
 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "Startup completed!"));
