@@ -40,7 +40,7 @@ namespace Kuroko.Jobs
             var entitiesToDelete = new List<MessageEntity>();
             
             await db.Messages.ForEachAsync(x => {
-                if (x.CreatedAt < DateTimeOffset.UtcNow.Subtract(TimeSpan.FromMinutes(5)))
+                if (x.CreatedAt < DateTimeOffset.UtcNow.Subtract(TimeSpan.FromDays(7)))
                     entitiesToDelete.Add(x);
             });
 
