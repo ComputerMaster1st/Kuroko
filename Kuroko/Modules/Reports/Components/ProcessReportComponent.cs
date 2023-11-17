@@ -159,7 +159,8 @@ namespace Kuroko.Modules.Reports.Components
 
                 escalateSelectMenu.AddOption(hnd.Name, hnd.Id.ToString());
 
-                lowestHandler ??= hnd;
+                if (lowestHandler is null || lowestHandler.Level > hnd.Level)
+                    lowestHandler = hnd;
             }
 
             if (ticket.ReportHandlerId == -1)
