@@ -138,67 +138,69 @@ await _discordClient.StartAsync();
 await _discordClient.SetStatusAsync(UserStatus.DoNotDisturb);
 await _discordClient.SetGameAsync("Booting...");
 
-await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "For console commands, type \"help\" or press \"return\" key!"));
+await Task.Delay(-1);
 
-bool shutdownNow = false;
-while (!shutdownNow)
-{
-    var input = Console.ReadLine();
-    switch (input)
-    {
-        case "discord-stats":
-            Console.WriteLine(new StringBuilder()
-                .AppendFormat("Shard Count  : {0}", _discordClient.Shards.Count).AppendLine()
-                .AppendFormat("Guild Count  : {0}", _discordClient.Guilds.Count).AppendLine()
-                .AppendFormat("Latency (ms) : {0}", _discordClient.Latency).AppendLine()
-                .ToString());
-            break;
-        case "shutdown":
-            Console.WriteLine(new StringBuilder()
-                .AppendLine("Shutting down now...")
-                .ToString());
+// await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM, "For console commands, type \"help\" or press \"return\" key!"));
 
-            shutdownNow = true;
-            break;
-        case "jobs-list":
-            var listOutput = new StringBuilder();
+// bool shutdownNow = false;
+// while (!shutdownNow)
+// {
+//     var input = Console.ReadLine();
+//     switch (input)
+//     {
+//         case "discord-stats":
+//             Console.WriteLine(new StringBuilder()
+//                 .AppendFormat("Shard Count  : {0}", _discordClient.Shards.Count).AppendLine()
+//                 .AppendFormat("Guild Count  : {0}", _discordClient.Guilds.Count).AppendLine()
+//                 .AppendFormat("Latency (ms) : {0}", _discordClient.Latency).AppendLine()
+//                 .ToString());
+//             break;
+//         case "shutdown":
+//             Console.WriteLine(new StringBuilder()
+//                 .AppendLine("Shutting down now...")
+//                 .ToString());
 
-            foreach (var job in JobManager.AllSchedules)
-                listOutput.AppendLine($"Name: {job.Name} <> Scheduled Run: {job.NextRun}");
+//             shutdownNow = true;
+//             break;
+//         case "jobs-list":
+//             var listOutput = new StringBuilder();
+
+//             foreach (var job in JobManager.AllSchedules)
+//                 listOutput.AppendLine($"Name: {job.Name} <> Scheduled Run: {job.NextRun}");
             
-            Console.WriteLine(listOutput.ToString());
-            break;
-        case string n when input.StartsWith("jobs-run"):
-            var jobName = n["jobs-run ".Length..];
-            var foundJob = JobManager.GetSchedule(jobName);
+//             Console.WriteLine(listOutput.ToString());
+//             break;
+//         case string n when input.StartsWith("jobs-run"):
+//             var jobName = n["jobs-run ".Length..];
+//             var foundJob = JobManager.GetSchedule(jobName);
 
-            if (foundJob is null)
-                Console.WriteLine("Job not found.");
-            else
-                foundJob.Execute();
-            break;
-        case string when string.IsNullOrWhiteSpace(input):
-        case "help":
-            Console.WriteLine(new StringBuilder()
-                .AppendLine("help            - Show all available commands")
-                .AppendLine("discord-stats   - Show discord shard, guild & latency")
-                .AppendLine("jobs-list       - List available jobs")
-                .AppendLine("jobs-run <name> - Run specified job")
-                .AppendLine("shutdown        - Stop & shutdown")
-                .ToString());
-            break;
-        default:
-            Console.WriteLine("Unknown console command!");
-            break;
-    };
-}
+//             if (foundJob is null)
+//                 Console.WriteLine("Job not found.");
+//             else
+//                 foundJob.Execute();
+//             break;
+//         case string when string.IsNullOrWhiteSpace(input):
+//         case "help":
+//             Console.WriteLine(new StringBuilder()
+//                 .AppendLine("help            - Show all available commands")
+//                 .AppendLine("discord-stats   - Show discord shard, guild & latency")
+//                 .AppendLine("jobs-list       - List available jobs")
+//                 .AppendLine("jobs-run <name> - Run specified job")
+//                 .AppendLine("shutdown        - Stop & shutdown")
+//                 .ToString());
+//             break;
+//         default:
+//             Console.WriteLine("Unknown console command!");
+//             break;
+//     };
+// }
 
-_interactionService.Dispose();
+// _interactionService.Dispose();
 
-await _discordClient.StopAsync();
-await _discordClient.LogoutAsync();
+// await _discordClient.StopAsync();
+// await _discordClient.LogoutAsync();
 
-_discordClient.Dispose();
+// _discordClient.Dispose();
 
-Console.WriteLine("Shutdown completed! Goodbye~!");
-Environment.Exit(0);
+// Console.WriteLine("Shutdown completed! Goodbye~!");
+// Environment.Exit(0);
