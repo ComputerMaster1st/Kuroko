@@ -40,6 +40,18 @@ namespace Kuroko.Events.ModLogEvents
                 return;
 
             var logChannel = await guildChannel.Guild.GetTextChannelAsync(properties.LogChannelId);
+            var originalText = "_**(INFO:** Original message not available due to restart after message creation**)**_";
+            var afterText = "_**(INFO:** Edited message is shown as \"Original\" due to not being available in cache.**)**_";
+
+            if (before.HasValue && before.Value.Content.Length <= 1024)
+                originalText = before.Value.Content;
+            else if (before.HasValue && before.Value.Content.Length > 1024)
+                originalText = "_(INFO:**Original message exceeds 1024 character length.**)_";
+
+            if (after.Content.Length <= 1024)
+                afterText = after.Content;
+            else if (after.Content.Length > 1024)
+                afterText = "_(INFO:**Edited message exceeds 1024 character length.**)_";
 
             var embedFieldBuilders = new List<EmbedFieldBuilder>()
             {
@@ -47,13 +59,13 @@ namespace Kuroko.Events.ModLogEvents
                 {
                     IsInline = false,
                     Name = "Original Message",
-                    Value = before.HasValue ? before.Value.Content : "_**(INFO:** Original message not available due to restart after message creation**)**_"
+                    Value = originalText
                 },
                 new()
                 {
                     IsInline = false,
                     Name = "Edited Message",
-                    Value = after.Content ?? "_**(INFO:** Edited msg is shown as \"Original\" due to internal cache issue. Contact Bot Dev.**)**_"
+                    Value = afterText
                 }
             };
 
