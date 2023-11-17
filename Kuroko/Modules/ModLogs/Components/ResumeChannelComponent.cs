@@ -61,7 +61,7 @@ namespace Kuroko.Modules.ModLogs.Components
                 .WithMinValues(1)
                 .WithPlaceholder("Select text channels to resume mod logging");
 
-            foreach (var textChannelId in properties.IgnoredChannelIds)
+            foreach (var textChannelId in properties.IgnoredChannelIds.Skip(index).ToList())
             {
                 var textChannel = await user.Guild.GetChannelAsync(textChannelId.Value);
                 selectMenuBuilder.AddOption(textChannel.Name, textChannel.Id.ToString());

@@ -53,6 +53,8 @@ namespace Kuroko.Modules.Reports.Components
                 transcriptChannelName = channel.Name;
 
             var selectOptions = new List<SelectMenuOptionBuilder>();
+            var count = 0;
+            var isSet = false;
 
             if (properties.TranscriptsChannelId != 0)
             {
@@ -61,15 +63,26 @@ namespace Kuroko.Modules.Reports.Components
                     Label = "(Unset Channel)",
                     Value = "0"
                 });
+
+                isSet = true;
+                count++;
             }
 
-            foreach (var chn in Context.Guild.TextChannels)
+            if (isSet && index > 0)
+                index -= 1;
+
+            foreach (var chn in Context.Guild.TextChannels.Skip(index).ToList())
             {
                 selectOptions.Add(new()
                 {
                     Label = chn.Name,
                     Value = chn.Id.ToString()
                 });
+
+                count++;
+
+                if (count >= 25)
+                    break;
             }
 
             var output = new StringBuilder()
@@ -84,7 +97,7 @@ namespace Kuroko.Modules.Reports.Components
                 Placeholder = "Select a channel to use for transcripts",
                 Options = selectOptions
             };
-            var menu = Pagination.SelectMenu(selectMenuBuilder, index, user, ReportsCommandMap.CATEGORY, ReportsCommandMap.MENU, true);
+            var menu = Pagination.SelectMenu(selectMenuBuilder, index, user, ReportsCommandMap.TRANSCRIPT, ReportsCommandMap.MENU, true);
 
             (await Context.Interaction.ModifyOriginalResponseAsync(x =>
             {

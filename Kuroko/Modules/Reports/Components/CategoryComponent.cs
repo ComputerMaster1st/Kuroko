@@ -5,6 +5,7 @@ using Kuroko.Core.Attributes;
 using Kuroko.Database.Entities.Guild;
 using Kuroko.Modules.Globals;
 using Kuroko.Services;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using System.Text;
 
 namespace Kuroko.Modules.Reports.Components
@@ -53,6 +54,8 @@ namespace Kuroko.Modules.Reports.Components
                 categoryName = category.Name;
 
             var selectOptions = new List<SelectMenuOptionBuilder>();
+            var count = 0;
+            var isSet = false;
 
             if (properties.ReportCategoryId != 0)
             {
@@ -61,15 +64,26 @@ namespace Kuroko.Modules.Reports.Components
                     Label = "(Unset Category)",
                     Value = "0"
                 });
+
+                isSet = true;
+                count++;
             }
 
-            foreach (var cat in Context.Guild.CategoryChannels)
+            if (isSet && index > 0)
+                index -= 1;
+
+            foreach (var cat in Context.Guild.CategoryChannels.Skip(index).ToList())
             {
                 selectOptions.Add(new()
                 {
                     Label = cat.Name,
                     Value = cat.Id.ToString()
                 });
+
+                count++;
+
+                if (count >= 25)
+                    break;
             }
 
             var output = new StringBuilder()

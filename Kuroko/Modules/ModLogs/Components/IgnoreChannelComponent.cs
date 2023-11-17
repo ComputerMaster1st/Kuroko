@@ -67,7 +67,7 @@ namespace Kuroko.Modules.ModLogs.Components
                 .WithMinValues(1)
                 .WithPlaceholder("Select text channels to ignore mod logging");
 
-            foreach (var textChannel in textChannels)
+            foreach (var textChannel in textChannels.Skip(index).ToList())
             {
                 if (properties.IgnoredChannelIds.Any(x => x.Value == textChannel.Id))
                     continue;

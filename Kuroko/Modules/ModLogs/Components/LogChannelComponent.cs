@@ -61,7 +61,7 @@ namespace Kuroko.Modules.ModLogs.Components
                 .WithMinValues(1)
                 .WithPlaceholder("Select a text channel to send mod logs to");
 
-            foreach (var textChannel in textChannels)
+            foreach (var textChannel in textChannels.Skip(index).ToList())
             {
                 selectMenuBuilder.AddOption(textChannel.Name, textChannel.Id.ToString());
                 count++;
@@ -70,7 +70,7 @@ namespace Kuroko.Modules.ModLogs.Components
                     break;
             }
 
-            var menu = Pagination.SelectMenu(selectMenuBuilder, index, user, ModLogCommandMap.CHANNEL_IGNORE, ModLogCommandMap.MENU, true);
+            var menu = Pagination.SelectMenu(selectMenuBuilder, index, user, ModLogCommandMap.CHANNEL, ModLogCommandMap.MENU, true);
 
             output.AppendLine($"Current Log Channel: {logChannelTag}");
 
