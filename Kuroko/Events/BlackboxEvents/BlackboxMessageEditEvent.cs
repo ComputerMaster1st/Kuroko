@@ -18,14 +18,15 @@ namespace Kuroko.Events.BlackboxEvents
             _client = client;
             _services = services;
 
-            _client.MessageUpdated += (before, after, channel) => Task.Factory.StartNew(() => MessageUpdated(after));
+            _client.MessageUpdated += (before, after, channel) => Task.Factory.StartNew(() => MessageUpdated(before, after));
         }
 
-        private async Task MessageUpdated(SocketMessage after)
+        private async Task MessageUpdated(Cacheable<IMessage, ulong> before, SocketMessage after)
         {
             var msg = after as IUserMessage;
 
-            if (msg.Author.Id == _client.CurrentUser.Id)
+            if (msg.Author.Id == _client.CurrentUser.Id  ||
+               (before.HasValue && before.Value.Content == after.Content))
                 return;
 
             using var db = _services.GetRequiredService<DatabaseContext>();

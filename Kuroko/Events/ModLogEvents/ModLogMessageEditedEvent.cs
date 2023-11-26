@@ -25,7 +25,8 @@ namespace Kuroko.Events.ModLogEvents
         {
             var channelType = channel.GetChannelType().GetValueOrDefault();
 
-            if (channelType == ChannelType.DM)
+            if (channelType == ChannelType.DM ||
+               (before.HasValue && before.Value.Content == after.Content))
                 return;
 
             using var db = _serviceProvider.GetRequiredService<DatabaseContext>();
