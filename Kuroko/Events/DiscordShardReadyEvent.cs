@@ -2,6 +2,7 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using Kuroko.Core.Attributes;
+using Kuroko.Jobs;
 using Kuroko.Shared.Configuration;
 
 namespace Kuroko.Events
@@ -12,14 +13,16 @@ namespace Kuroko.Events
         private readonly KDiscordConfig _config;
         private readonly DiscordShardedClient _client;
         private readonly InteractionService _interactionService;
+        private readonly StatusUpdate _statusUpdate;
 
         public readonly List<int> _shardIds = new();
 
-        public DiscordShardReadyEvent(KDiscordConfig config, DiscordShardedClient client, InteractionService interactionService)
+        public DiscordShardReadyEvent(KDiscordConfig config, DiscordShardedClient client, InteractionService interactionService, StatusUpdate statusUpdate)
         {
             _config = config;
             _client = client;
             _interactionService = interactionService;
+            _statusUpdate = statusUpdate;
 
             _client.ShardReady += ShardReadyEvent;
         }
@@ -38,7 +41,10 @@ namespace Kuroko.Events
             await _interactionService.RegisterCommandsGloballyAsync();
 #endif
 
-            await _client.SetGameAsync($"Prefix: \"/\" # Servers: {_client.Guilds.Count}");
+            var guildCount = _client.Guilds.Count;
+            _statusUpdate.PreviousServerCount = guildCount;
+
+            await _client.SetGameAsync($"Prefix: \"/\" # Servers: {guildCount}");
             await _client.SetStatusAsync(UserStatus.Online);
         }
     }
