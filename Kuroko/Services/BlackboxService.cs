@@ -1,17 +1,30 @@
-﻿using Discord;
+using System.Text;
+using Discord;
+using Kuroko.Core.Attributes;
 using Kuroko.Database;
 using Kuroko.Database.Entities.Guild;
 using Kuroko.Database.Entities.Message;
 using Kuroko.Shared;
 using Microsoft.EntityFrameworkCore;
-using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Kuroko.Modules.Reports
+namespace Kuroko.Services
 {
-    public static class UserMessageHistory
+    [PreInitialize]
+    public class BlackboxService
     {
-        public static async Task GenerateUserMessageHistoryAsync(int ticketId, DatabaseContext db, IDiscordClient client)
+        private readonly IDiscordClient _client;
+        private readonly IServiceProvider _services;
+
+        public BlackboxService(IDiscordClient client, IServiceProvider services)
         {
+            _client = client;
+            _services = services;
+        }
+
+        public async Task GenerateUserMessageHistoryAsync(int ticketId, IDiscordClient client)
+        {
+            var db = _services.GetRequiredService<DatabaseContext>();
             var ticket = await db.Tickets.FirstOrDefaultAsync(x => x.Id == ticketId);
             var root = await db.Guilds.FirstOrDefaultAsync(x => x.Id == ticket.GuildId);
             var messages = root.Messages.Where(x => x.UserId == ticket.ReportedUserId)
@@ -133,7 +146,7 @@ namespace Kuroko.Modules.Reports
 
         public static async Task<(DirectoryInfo ZipDir, int Segments)> ZipAndUploadAsync(TicketEntity ticket, DirectoryInfo ticketDir, ITextChannel ticketChannel)
         {
-            var zipLocation = Kuroko.Utilities.CreateZip($"ticket_{ticket.Id}", ticketDir, out int segments);
+            var zipLocation = Utilities.CreateZip($"ticket_{ticket.Id}", ticketDir, out int segments);
             var discordAttachments = new List<FileAttachment>();
 
             void clearAttachments()

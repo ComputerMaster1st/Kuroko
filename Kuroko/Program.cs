@@ -78,7 +78,7 @@ _serviceCollection.AddDbContext<DatabaseContext>(options =>
     options.UseNpgsql(_databaseConfig.ConnectionUrl())
         .EnableSensitiveDataLogging()
         .UseLazyLoadingProxies();
-}, ServiceLifetime.Transient);
+}, ServiceLifetime.Scoped);
 
 #endregion
 

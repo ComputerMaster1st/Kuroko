@@ -7,6 +7,7 @@ using Kuroko.Database.Entities.Guild;
 using Kuroko.Database.Entities.Message;
 using Kuroko.Modules.Reports.Modals;
 using Kuroko.Modules.Tickets;
+using Kuroko.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text;
@@ -16,6 +17,11 @@ namespace Kuroko.Modules.Reports.Components
     [RequireBotGuildPermission(GuildPermission.ManageChannels)]
     public class ProcessReportComponent : KurokoModuleBase
     {
+        private readonly BlackboxService _blackbox;
+
+        public ProcessReportComponent(BlackboxService blackbox)
+            => _blackbox = blackbox;
+
         [ModalInteraction($"{ReportsCommandMap.REPORT_USER}:*")]
         public async Task CreateUserReportAsync(ulong reportedUserId, ReportModal modal)
         {
@@ -23,7 +29,7 @@ namespace Kuroko.Modules.Reports.Components
 
             using IServiceScope scope = Context.ServiceProvider.CreateScope();
             var db = scope.ServiceProvider.GetService<DatabaseContext>();
-            await UserMessageHistory.GenerateUserMessageHistoryAsync(TicketId, db, Context.Client);
+            await _blackbox.GenerateUserMessageHistoryAsync(TicketId, Context.Client);
         }
 
         [ModalInteraction($"{ReportsCommandMap.REPORT_MESSAGE}:*")]
