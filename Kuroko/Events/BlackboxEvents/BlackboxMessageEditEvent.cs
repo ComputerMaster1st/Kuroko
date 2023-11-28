@@ -2,6 +2,7 @@ using Discord;
 using Discord.WebSocket;
 using Kuroko.Core.Attributes;
 using Kuroko.Database;
+using Kuroko.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,12 +12,12 @@ namespace Kuroko.Events.BlackboxEvents
     public class BlackboxMessageEditEvent
     {
         private readonly DiscordShardedClient _client;
-        private readonly IServiceProvider _services;
+        private readonly BlackboxService _blackbox;
 
-        public BlackboxMessageEditEvent(DiscordShardedClient client, IServiceProvider services)
+        public BlackboxMessageEditEvent(DiscordShardedClient client, BlackboxService blackbox)
         {
             _client = client;
-            _services = services;
+            _blackbox = blackbox;
 
             _client.MessageUpdated += (before, after, channel) => Task.Factory.StartNew(() => MessageUpdated(before, after));
         }
@@ -28,15 +29,8 @@ namespace Kuroko.Events.BlackboxEvents
             if (msg.Author.Id == _client.CurrentUser.Id  ||
                (before.HasValue && before.Value.Content == after.Content))
                 return;
-
-            using var db = _services.GetRequiredService<DatabaseContext>();
-
-            var msgEntity = await db.Messages.FirstOrDefaultAsync(x => x.Id == msg.Id);
-
-            if (msgEntity is null)
-                return;
-
-            msgEntity.EditedMessages.Add(new(msg.Content));
+            
+            await _blackbox.EditMessageAsync(msg.Id, msg.Content);
         }
     }
 }
