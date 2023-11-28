@@ -2,7 +2,6 @@ using System.Text;
 using Discord;
 using Kuroko.Core.Attributes;
 using Kuroko.Database;
-using Kuroko.Database.Entities.Guild;
 using Kuroko.Database.Entities.Message;
 using Kuroko.Shared;
 using Microsoft.EntityFrameworkCore;
@@ -78,7 +77,7 @@ namespace Kuroko.Services
 
             await CreateHistoryLogAsync(messages, user, ticketDir);
 
-            var (ZipDir, Segments) = await ZipAndUploadAsync(ticket, ticketDir, await guild.GetTextChannelAsync(ticket.ChannelId));
+            var (ZipDir, Segments) = await Utilities.ZipAndUploadAsync(ticket, ticketDir, await guild.GetTextChannelAsync(ticket.ChannelId));
 
             ticketDir.Delete(true);
             ZipDir.Delete(true);
@@ -180,46 +179,6 @@ namespace Kuroko.Services
             output.AppendLine("────────────────────────────────────────────────────────────");
 
             return output.ToString();
-        }
-
-        public static async Task<(DirectoryInfo ZipDir, int Segments)> ZipAndUploadAsync(TicketEntity ticket, DirectoryInfo ticketDir, ITextChannel ticketChannel)
-        {
-            var zipLocation = Utilities.CreateZip($"ticket_{ticket.Id}", ticketDir, out int segments);
-            var discordAttachments = new List<FileAttachment>();
-
-            void clearAttachments()
-            {
-                foreach (var file in discordAttachments)
-                    file.Dispose();
-            }
-
-            if (segments < 10)
-            {
-                foreach (var file in zipLocation.GetFiles())
-                    discordAttachments.Add(new FileAttachment(file.FullName));
-
-                await ticketChannel.SendFilesAsync(discordAttachments);
-                clearAttachments();
-            }
-            else
-            {
-                foreach (var file in zipLocation.GetFiles())
-                {
-                    discordAttachments.Add(new FileAttachment(file.FullName));
-
-                    if (!(discordAttachments.Count < 10))
-                    {
-                        await ticketChannel.SendFilesAsync(discordAttachments);
-
-                        clearAttachments();
-                        discordAttachments.Clear();
-                    }
-                }
-
-                await ticketChannel.SendFilesAsync(discordAttachments);
-            }
-
-            return (zipLocation, segments);
         }
     }
 }
