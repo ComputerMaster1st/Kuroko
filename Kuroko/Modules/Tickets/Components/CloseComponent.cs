@@ -40,7 +40,7 @@ namespace Kuroko.Modules.Tickets.Components
             var directory = Directory.CreateDirectory($"{DataDirectories.TEMPFILES}/ticket_{ticket.Id}");
 
             await File.WriteAllTextAsync(Path.Combine(directory.ToString(), "ticket.txt"), await PrepareTranscriptAsync(ticket, handler, directory));
-            var (ZipDir, Segments) = await BlackboxService.ZipAndUploadAsync(ticket, directory, chn);
+            var (ZipDir, Segments) = await Kuroko.Utilities.ZipAndUploadAsync(ticket, directory, chn);
 
             directory.Delete(true);
             ZipDir.Delete(true);

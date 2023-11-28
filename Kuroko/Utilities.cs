@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Kuroko
 {
-    public class Utilities
+    public static class Utilities
     {
         private static readonly SemaphoreSlim _logLock = new(1);
 
