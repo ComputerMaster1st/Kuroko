@@ -13,13 +13,11 @@ namespace Kuroko.Services
     [PreInitialize]
     public class BlackboxService
     {
-        private readonly IDiscordClient _client;
         private readonly IServiceProvider _services;
         private readonly HttpClient _http = new();
 
-        public BlackboxService(IDiscordClient client, IServiceProvider services)
+        public BlackboxService(IServiceProvider services)
         {
-            _client = client;
             _services = services;
         }
 

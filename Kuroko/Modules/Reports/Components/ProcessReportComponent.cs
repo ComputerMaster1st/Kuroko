@@ -4,7 +4,6 @@ using Kuroko.Core;
 using Kuroko.Core.Attributes;
 using Kuroko.Database;
 using Kuroko.Database.Entities.Guild;
-using Kuroko.Database.Entities.Message;
 using Kuroko.Modules.Reports.Modals;
 using Kuroko.Modules.Tickets;
 using Kuroko.Services;
