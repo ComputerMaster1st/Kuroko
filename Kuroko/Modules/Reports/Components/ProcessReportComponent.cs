@@ -39,43 +39,17 @@ namespace Kuroko.Modules.Reports.Components
             var reportedMsg = await Context.Channel.GetMessageAsync(reportedMsgId);
             var attachments = new List<FileAttachment>();
 
-            MessageEntity msgEntity = await Context.Database.Messages.FirstOrDefaultAsync(x => x.Id == reportedMsgId);
+            var msgEntity = await _blackbox.GetMessageAsync(reportedMsgId);
 
-            if (msgEntity is null)
-            {
-                msgEntity = new MessageEntity(reportedMsg.Id, reportedMsg.Channel.Id, reportedMsg.Author.Id, reportedMsg.Content);
+            if (msgEntity.Message is null)
+                msgEntity = await _blackbox.StoreMessageAsync(reportedMsg);
 
-                if (reportedMsg.Attachments.Count > 0)
-                {
-                    using var httpClient = new HttpClient();
-
-                    foreach (var att in reportedMsg.Attachments)
-                    {
-                        var bytes = await httpClient.GetByteArrayAsync(att.Url ?? att.ProxyUrl);
-
-                        attachments.Add(new(new MemoryStream(bytes), att.Filename));
-                        msgEntity.Attachments.Add(new(att.Id, att.Filename, bytes));
-                    }
-                }
-
-                var guildRoot = await Context.Database.Guilds.GetOrCreateRootAsync(Context.Guild.Id);
-
-                guildRoot.Messages.Add(msgEntity);
-            }
-            else
-            {
-                if (msgEntity.Attachments.Count > 0)
-                    foreach (var attachment in msgEntity.Attachments)
-                        attachments.Add(new(attachment.GetStream(), attachment.FileName));
-            }
-
-            var channel = TicketChannel;
             var output = new StringBuilder()
                 .AppendLine($"## Reported Message {reportedMsg.GetJumpUrl()} | ID: {reportedMsg.Id}")
                 .AppendLine($"* **Attachments Found:** {attachments.Count}")
                 .AppendLine("## Please provide any screenshots to provide context and support your report!");
 
-            await channel.SendFilesAsync(attachments, reportedMsg.Content, embed: TrackedMessageEmbed.Build(reportedMsg.Content, reportedMsg.Timestamp));
+            await TicketChannel.SendFilesAsync(attachments, reportedMsg.Content, embed: TrackedMessageEmbed.Build(reportedMsg.Content, reportedMsg.Timestamp));
 
             attachments.ForEach(x => x.Dispose());
         }

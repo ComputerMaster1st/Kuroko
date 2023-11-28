@@ -15,11 +15,51 @@ namespace Kuroko.Services
     {
         private readonly IDiscordClient _client;
         private readonly IServiceProvider _services;
+        private readonly HttpClient _http = new();
 
         public BlackboxService(IDiscordClient client, IServiceProvider services)
         {
             _client = client;
             _services = services;
+        }
+
+        public async Task<(MessageEntity Message, IEnumerable<FileAttachment> Attachments)> StoreMessageAsync(IMessage reportedMessage)
+        {
+            var db = _services.GetRequiredService<DatabaseContext>();
+            var attachments = new List<FileAttachment>();
+            var entity = new MessageEntity(reportedMessage.Id, reportedMessage.Channel.Id,
+                reportedMessage.Author.Id, reportedMessage.Content);
+
+            if (reportedMessage.Attachments.Count > 0)
+            {
+                foreach (var att in reportedMessage.Attachments)
+                {
+                    var bytes = await _http.GetByteArrayAsync(att.Url ?? att.ProxyUrl);
+
+                    attachments.Add(new(new MemoryStream(bytes), att.Filename));
+                    entity.Attachments.Add(new(att.Id, att.Filename, bytes));
+                }
+            }
+
+            var channel = reportedMessage.Channel as IGuildChannel;
+            var guildRoot = await db.Guilds.GetOrCreateRootAsync(channel.GuildId);
+
+            guildRoot.Messages.Add(entity);
+
+            return (entity, attachments);
+        }
+
+        public async Task<(MessageEntity Message, IEnumerable<FileAttachment> Attachments)> GetMessageAsync(ulong reportedMessageId)
+        {
+            var db = _services.GetRequiredService<DatabaseContext>();
+            var attachments = new List<FileAttachment>();
+            var entity = await db.Messages.FirstOrDefaultAsync(x => x.Id == reportedMessageId);
+
+            if (entity.Attachments.Count > 0)
+                foreach (var attachment in entity.Attachments)
+                    attachments.Add(new(attachment.GetStream(), attachment.FileName));
+            
+            return (entity, attachments);
         }
 
         public async Task GenerateUserMessageHistoryAsync(int ticketId, IDiscordClient client)
