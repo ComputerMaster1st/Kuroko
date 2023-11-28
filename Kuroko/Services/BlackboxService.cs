@@ -59,6 +59,17 @@ namespace Kuroko.Services
             return (entity, attachments);
         }
 
+        public async Task DeleteMessageAsync(ulong deletedMessageId)
+        {
+            var db = _services.GetRequiredService<DatabaseContext>();
+            var entity = await db.Messages.FirstOrDefaultAsync(x => x.Id == deletedMessageId);
+
+            if (entity is null)
+                return;
+
+            entity.DeletedAt = DateTime.UtcNow;
+        }
+
         public async Task GenerateUserMessageHistoryAsync(int ticketId, IDiscordClient client)
         {
             var db = _services.GetRequiredService<DatabaseContext>();
