@@ -20,16 +20,16 @@ namespace Kuroko.Services
             _services = services;
         }
 
-        public async Task<(MessageEntity Message, IEnumerable<FileAttachment> Attachments)> StoreMessageAsync(IMessage reportedMessage)
+        public async Task<(MessageEntity Message, IEnumerable<FileAttachment> Attachments)> StoreMessageAsync(IMessage message)
         {
             var db = _services.GetRequiredService<DatabaseContext>();
             var attachments = new List<FileAttachment>();
-            var entity = new MessageEntity(reportedMessage.Id, reportedMessage.Channel.Id,
-                reportedMessage.Author.Id, reportedMessage.Content);
+            var entity = new MessageEntity(message.Id, message.Channel.Id,
+                message.Author.Id, message.Content);
 
-            if (reportedMessage.Attachments.Count > 0)
+            if (message.Attachments.Count > 0)
             {
-                foreach (var att in reportedMessage.Attachments)
+                foreach (var att in message.Attachments)
                 {
                     var bytes = await _http.GetByteArrayAsync(att.Url ?? att.ProxyUrl);
 
@@ -38,7 +38,7 @@ namespace Kuroko.Services
                 }
             }
 
-            var channel = reportedMessage.Channel as IGuildChannel;
+            var channel = message.Channel as IGuildChannel;
             var guildRoot = await db.Guilds.GetOrCreateRootAsync(channel.GuildId);
 
             guildRoot.Messages.Add(entity);
