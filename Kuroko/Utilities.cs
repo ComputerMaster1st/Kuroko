@@ -1,18 +1,17 @@
 ﻿using Discord;
 using Ionic.Zip;
 using Ionic.Zlib;
+using Kuroko.Database.Entities.Guild;
 using Kuroko.Shared;
 using System.Text;
 
 namespace Kuroko
 {
-    public class Utilities
+    public static class Utilities
     {
         private static readonly SemaphoreSlim _logLock = new(1);
 
         public const string SeparatorCharacter = "⬤";
-
-        // TODO: Write anything out to console & output logs
 
         public static async Task WriteLogAsync(LogMessage message)
         {
@@ -33,7 +32,7 @@ namespace Kuroko
             Console.WriteLine(message);
         }
 
-        public static DirectoryInfo CreateZip(string zipName, DirectoryInfo directory, out int segmentsMade)
+        private static DirectoryInfo CreateZip(string zipName, DirectoryInfo directory, out int segmentsMade)
         {
             var dir = Directory.CreateDirectory(Path.Combine(DataDirectories.TEMPZIPS, zipName));
             var file = zipName + ".zip";
@@ -51,6 +50,46 @@ namespace Kuroko
             segmentsMade = zip.NumberOfSegmentsForMostRecentSave;
 
             return dir;
+        }
+
+        public static async Task<(DirectoryInfo ZipDir, int Segments)> ZipAndUploadAsync(TicketEntity ticket, DirectoryInfo ticketDir, ITextChannel ticketChannel)
+        {
+            var zipLocation = CreateZip($"ticket_{ticket.Id}", ticketDir, out int segments);
+            var discordAttachments = new List<FileAttachment>();
+
+            void clearAttachments()
+            {
+                foreach (var file in discordAttachments)
+                    file.Dispose();
+            }
+
+            if (segments < 10)
+            {
+                foreach (var file in zipLocation.GetFiles())
+                    discordAttachments.Add(new FileAttachment(file.FullName));
+
+                await ticketChannel.SendFilesAsync(discordAttachments);
+                clearAttachments();
+            }
+            else
+            {
+                foreach (var file in zipLocation.GetFiles())
+                {
+                    discordAttachments.Add(new FileAttachment(file.FullName));
+
+                    if (!(discordAttachments.Count < 10))
+                    {
+                        await ticketChannel.SendFilesAsync(discordAttachments);
+
+                        clearAttachments();
+                        discordAttachments.Clear();
+                    }
+                }
+
+                await ticketChannel.SendFilesAsync(discordAttachments);
+            }
+
+            return (zipLocation, segments);
         }
     }
 }

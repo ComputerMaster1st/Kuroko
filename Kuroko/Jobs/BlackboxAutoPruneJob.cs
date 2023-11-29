@@ -11,13 +11,13 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Kuroko.Jobs
 {
     [PreInitialize, ScheduledJob]
-    public class MessagePruner : IJob, IScheduleJob
+    public class BlackboxAutoPruneJob : IJob, IScheduleJob
     {
         private readonly IServiceProvider _services;
 
-        private const string NAME = "Blackbox Data Pruner";
+        private const string NAME = "Blackbox Auto-Pruner";
 
-        public MessagePruner(DiscordShardedClient client, IServiceProvider services)
+        public BlackboxAutoPruneJob(IServiceProvider services)
         {
             _services = services;
         }

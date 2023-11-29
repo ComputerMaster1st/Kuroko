@@ -3,7 +3,7 @@ using Discord.Interactions;
 using Kuroko.Core;
 using Kuroko.Database;
 using Kuroko.Database.Entities.Guild;
-using Kuroko.Modules.Reports;
+using Kuroko.Services;
 using Kuroko.Shared;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
@@ -40,7 +40,7 @@ namespace Kuroko.Modules.Tickets.Components
             var directory = Directory.CreateDirectory($"{DataDirectories.TEMPFILES}/ticket_{ticket.Id}");
 
             await File.WriteAllTextAsync(Path.Combine(directory.ToString(), "ticket.txt"), await PrepareTranscriptAsync(ticket, handler, directory));
-            var (ZipDir, Segments) = await UserMessageHistory.ZipAndUploadAsync(ticket, directory, chn);
+            var (ZipDir, Segments) = await Kuroko.Utilities.ZipAndUploadAsync(ticket, directory, chn);
 
             directory.Delete(true);
             ZipDir.Delete(true);
@@ -83,7 +83,7 @@ namespace Kuroko.Modules.Tickets.Components
                     .AppendLine();
 
                 var reportedMsg = await Context.Database.Messages.FirstOrDefaultAsync(x => x.Id == ticket.ReportedMessageId);
-                output.AppendLine(UserMessageHistory.CreateMessageChain(reportedMsg, Context.Guild.GetUser(reportedMsg.UserId)));
+                output.AppendLine(BlackboxService.CreateMessageChain(reportedMsg, Context.Guild.GetUser(reportedMsg.UserId)));
 
                 Context.Database.Messages.Remove(reportedMsg);
 
@@ -94,7 +94,7 @@ namespace Kuroko.Modules.Tickets.Components
                 .AppendLine();
 
             foreach (var msg in ticket.Messages)
-                output.AppendLine(UserMessageHistory.CreateMessageChain(msg, Context.Guild.GetUser(msg.UserId)));
+                output.AppendLine(BlackboxService.CreateMessageChain(msg, Context.Guild.GetUser(msg.UserId)));
 
             return output.ToString();
         }

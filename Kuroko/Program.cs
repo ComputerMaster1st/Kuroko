@@ -6,6 +6,7 @@ using Kuroko;
 using Kuroko.Core;
 using Kuroko.Core.Attributes;
 using Kuroko.Database;
+using Kuroko.Services;
 using Kuroko.Shared;
 using Kuroko.Shared.Configuration;
 using Microsoft.EntityFrameworkCore;
@@ -65,7 +66,8 @@ await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SYSTEM,
 _serviceCollection.AddSingleton(_discordConfig)
     .AddSingleton(_discordClient)
     .AddSingleton(_interactionService)
-    .AddSingleton(_registry);
+    .AddSingleton(_registry)
+    .AddSingleton<BlackboxService>();
 
 #endregion
 
@@ -78,7 +80,7 @@ _serviceCollection.AddDbContext<DatabaseContext>(options =>
     options.UseNpgsql(_databaseConfig.ConnectionUrl())
         .EnableSensitiveDataLogging()
         .UseLazyLoadingProxies();
-}, ServiceLifetime.Transient);
+}, ServiceLifetime.Scoped);
 
 #endregion
 
