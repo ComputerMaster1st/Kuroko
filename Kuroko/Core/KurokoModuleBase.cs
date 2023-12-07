@@ -33,5 +33,11 @@ namespace Kuroko.Core
 
             return result;
         }
+
+        public override async Task AfterExecuteAsync(ICommandInfo command)
+        {
+            await Context.Database.SaveChangesAsync();
+            await base.AfterExecuteAsync(command);
+        }
     }
 }
