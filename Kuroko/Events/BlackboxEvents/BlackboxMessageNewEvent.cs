@@ -46,7 +46,7 @@ namespace Kuroko.Events.BlackboxEvents
             {
                 if (ticket.ChannelId == channel.Id)
                 {
-                    await _tickets.StoreTicketMessageAsync(msg, ticket, modLogProperties.SaveAttachments);
+                    await _tickets.StoreTicketMessageAsync(msg, ticket.Id, modLogProperties.SaveAttachments);
                     return;
                 }
             }

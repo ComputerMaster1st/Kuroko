@@ -22,10 +22,15 @@ namespace Kuroko.Services
             _services = services;
         }
 
-        public async Task StoreTicketMessageAsync(IMessage message, TicketEntity ticket, bool downloadAttachments)
+        public async Task StoreTicketMessageAsync(IMessage message, int ticketId, bool downloadAttachments)
         {
+            var db = _services.GetRequiredService<DatabaseContext>();
             var (Message, _) = await _blackbox.CreateMessageEntityAsync(message, downloadAttachments, false);
+            var ticket = await db.Tickets.FirstOrDefaultAsync(x => x.Id == ticketId);
+
             ticket.Messages.Add(Message);
+
+            await db.SaveChangesAsync();
         }
 
         public async Task BuildAndSendTranscriptAsync(ReportsEntity properties, IGuild guild, ITextChannel reportChannel,
@@ -45,6 +50,8 @@ namespace Kuroko.Services
             directory.Delete(true);
             ZipDir.Delete(true);
             root.Tickets.Remove(ticket, db);
+
+            await db.SaveChangesAsync();
 
             var embedFieldList = new List<EmbedFieldBuilder>()
             {
