@@ -37,7 +37,7 @@ namespace Kuroko.Events.BlackboxEvents
             var db = _services.GetRequiredService<DatabaseContext>();
             var modLogProperties = await db.GuildModLogs.FirstOrDefaultAsync(x => x.GuildId == channel.GuildId);
 
-            if (modLogProperties is null || !modLogProperties.EnableBlackbox)
+            if (modLogProperties is null)
                 return;
             
             var root = await db.Guilds.GetDataAsync(channel.GuildId);
@@ -50,6 +50,9 @@ namespace Kuroko.Events.BlackboxEvents
                     return;
                 }
             }
+
+            if (!modLogProperties.EnableBlackbox)
+                return;
 
             await _blackbox.StoreMessageAsync(msg, modLogProperties.SaveAttachments, false);
         }
