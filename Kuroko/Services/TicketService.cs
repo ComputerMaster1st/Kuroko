@@ -12,10 +12,21 @@ namespace Kuroko.Services
     [PreInitialize]
     public class TicketService
     {
+        private readonly BlackboxService _blackbox;
         private readonly IServiceProvider _services;
 
         public TicketService(IServiceProvider services)
-            => _services = services;
+        {
+            _blackbox = services.GetRequiredService<BlackboxService>();
+
+            _services = services;
+        }
+
+        public async Task StoreTicketMessageAsync(IMessage message, TicketEntity ticket, bool downloadAttachments)
+        {
+            var (Message, _) = await _blackbox.CreateMessageEntityAsync(message, downloadAttachments, false);
+            ticket.Messages.Add(Message);
+        }
 
         public async Task BuildAndSendTranscriptAsync(ReportsEntity properties, IGuild guild, ITextChannel reportChannel,
             ITextChannel transcriptChannel, int ticketId)
