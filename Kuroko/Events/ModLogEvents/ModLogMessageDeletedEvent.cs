@@ -29,14 +29,16 @@ namespace Kuroko.Events.ModLogEvents
             if (channelType == ChannelType.DM)
                 return;
 
-            using var db = _serviceProvider.GetRequiredService<DatabaseContext>();
             var guildChannel = chn as IGuildChannel;
             var message = msg.HasValue ? msg.Value : null;
+
+            if (message != null && message.Author.Id == _client.CurrentUser.Id)
+                return;
+
+            var db = _serviceProvider.GetRequiredService<DatabaseContext>();
             var properties = await db.GuildModLogs.FirstOrDefaultAsync(x => x.GuildId == guildChannel.Guild.Id);
 
             if (properties is null || !(properties.LogChannelId != 0 && properties.EditedMessages))
-                return;
-            if (message != null && message.Author.Id == _client.CurrentUser.Id)
                 return;
             if (properties.IgnoredChannelIds.Any(x => x.Value == guildChannel.Id))
                 return;

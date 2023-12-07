@@ -66,7 +66,7 @@ namespace Kuroko.Services
             await reportChannel.DeleteAsync();
             await Message.ModifyAsync(async x =>
             {
-                x.Embed = await GenerateEmbedAsync(ticket, guild, handler);
+                x.Embed = await GenerateEmbedAsync(ticket, guild, handler, embedFieldList);
             });
         }
 
@@ -128,9 +128,10 @@ namespace Kuroko.Services
             var embedBuilder = new EmbedBuilder()
             {
                 Title = $"Ticket ID: {ticket.Id}",
+                Color = Color.Blue,
                 ThumbnailUrl = submitter.GetDisplayAvatarUrl(),
                 Timestamp = DateTimeOffset.UtcNow,
-                Description = ticket.Description ?? "_None Provided_",
+                Description = ticket.Description[..300] + "..." ?? "_None Provided_",
                 Fields = fieldBuilders
             };
 

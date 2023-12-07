@@ -46,11 +46,14 @@ namespace Kuroko.Services
             return (entity, attachments);
         }
 
-        public async Task<(MessageEntity Message, IEnumerable<FileAttachment> Attachments)> GetMessageAsync(ulong reportedMessageId)
+        public async Task<(MessageEntity Message, IEnumerable<FileAttachment> Attachments)> GetMessageAsync(ulong messageId)
         {
             var db = _services.GetRequiredService<DatabaseContext>();
             var attachments = new List<FileAttachment>();
-            var entity = await db.Messages.FirstOrDefaultAsync(x => x.Id == reportedMessageId);
+            var entity = await db.Messages.FirstOrDefaultAsync(x => x.Id == messageId);
+
+            if (entity is null)
+                return (null, null);
 
             if (entity.Attachments.Count > 0)
                 foreach (var attachment in entity.Attachments)

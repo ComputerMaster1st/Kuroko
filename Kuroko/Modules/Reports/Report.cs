@@ -6,7 +6,7 @@ using Kuroko.Modules.Reports.Modals;
 
 namespace Kuroko.Modules.Reports
 {
-    [RequireBotGuildPermission(GuildPermission.ManageChannels)]
+    [RequireBotGuildPermission(GuildPermission.ManageChannels), TicketPrecondition]
     public class Report : KurokoModuleBase
     {
         [UserCommand("Report User")]
