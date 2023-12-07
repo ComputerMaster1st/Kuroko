@@ -53,7 +53,6 @@ namespace Kuroko.Modules.Reports.Components
         private async Task<(int TicketId, ITextChannel TicketChannel)> CreateAsync(TicketType type, ulong reportedId, ReportModal modal)
         {
             var reportProperties = await GetPropertiesAsync<ReportsEntity, GuildEntity>(Context.Guild.Id);
-            var guildRoot = await Context.Database.Guilds.GetOrCreateRootAsync(Context.Guild.Id);
             var user = Context.User as IGuildUser;
 
             IGuildUser reportedUser;
@@ -74,7 +73,7 @@ namespace Kuroko.Modules.Reports.Components
             await channel.AddPermissionOverwriteAsync(user, new OverwritePermissions(viewChannel: PermValue.Allow));
 
             var newTicket = new TicketEntity(TicketType.ReportUser, channel.Id, modal.Subject, modal.Rules, modal.Description, user.Id, reportedUser.Id, reportedMessage?.Id);
-            guildRoot.Tickets.Add(newTicket);
+            reportProperties.Guild.Tickets.Add(newTicket);
 
             await Context.Database.SaveChangesAsync();
             await ExecuteAsync(newTicket, reportProperties);
