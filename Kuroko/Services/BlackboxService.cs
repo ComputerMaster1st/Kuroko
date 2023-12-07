@@ -16,34 +16,49 @@ namespace Kuroko.Services
         private readonly HttpClient _http = new();
 
         public BlackboxService(IServiceProvider services)
-        {
-            _services = services;
-        }
+            => _services = services;
 
-        public async Task<(MessageEntity Message, IEnumerable<FileAttachment> Attachments)> StoreMessageAsync(IMessage message)
+        public async Task<(MessageEntity Message, IEnumerable<FileAttachment> Attachments)> CreateMessageEntityAsync(IMessage message,
+            bool downloadAttachments, bool returnAttachments)
         {
-            var db = _services.GetRequiredService<DatabaseContext>();
             var attachments = new List<FileAttachment>();
             var entity = new MessageEntity(message.Id, message.Channel.Id,
                 message.Author.Id, message.Content);
 
-            if (message.Attachments.Count > 0)
+            if (downloadAttachments)
             {
-                foreach (var att in message.Attachments)
+                if (message.Attachments.Count > 0)
                 {
-                    var bytes = await _http.GetByteArrayAsync(att.Url ?? att.ProxyUrl);
+                    foreach (var att in message.Attachments)
+                    {
+                        var bytes = await _http.GetByteArrayAsync(att.Url ?? att.ProxyUrl);
 
-                    attachments.Add(new(new MemoryStream(bytes), att.Filename));
-                    entity.Attachments.Add(new(att.Id, att.Filename, bytes));
+                        attachments.Add(new(new MemoryStream(bytes), att.Filename));
+                        entity.Attachments.Add(new(att.Id, att.Filename, bytes));
+                    }
                 }
             }
 
+            if (returnAttachments)
+                return (entity, attachments);
+            
+            if (attachments.Any())
+                attachments.ForEach(x => x.Dispose());
+            
+            return (entity, null);
+        }
+
+        public async Task<(MessageEntity Message, IEnumerable<FileAttachment> Attachments)> StoreMessageAsync(IMessage message,
+            bool downloadAttachments, bool returnAttachments)
+        {
+            var db = _services.GetRequiredService<DatabaseContext>();
+            var (Message, Attachments) = await CreateMessageEntityAsync(message, downloadAttachments, returnAttachments);
             var channel = message.Channel as IGuildChannel;
             var guildRoot = await db.Guilds.GetOrCreateRootAsync(channel.GuildId);
 
-            guildRoot.Messages.Add(entity);
+            guildRoot.Messages.Add(Message);
 
-            return (entity, attachments);
+            return (Message, Attachments);
         }
 
         public async Task<(MessageEntity Message, IEnumerable<FileAttachment> Attachments)> GetMessageAsync(ulong messageId)
