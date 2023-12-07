@@ -2,13 +2,11 @@
 using Discord.Interactions;
 using Kuroko.Core;
 using Kuroko.Core.Attributes;
-using Kuroko.Database;
 using Kuroko.Database.Entities.Guild;
 using Kuroko.Modules.Reports.Modals;
 using Kuroko.Modules.Tickets;
 using Kuroko.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using System.Text;
 
 namespace Kuroko.Modules.Reports.Components
@@ -38,7 +36,7 @@ namespace Kuroko.Modules.Reports.Components
             var msgEntity = await _blackbox.GetMessageAsync(reportedMsgId);
 
             if (msgEntity.Message is null)
-                msgEntity = await _blackbox.StoreMessageAsync(reportedMsg);
+                msgEntity = await _blackbox.StoreMessageAsync(reportedMsg, true, true);
 
             var output = new StringBuilder()
                 .AppendLine($"## Reported Message {reportedMsg.GetJumpUrl()} | ID: {reportedMsg.Id}")
