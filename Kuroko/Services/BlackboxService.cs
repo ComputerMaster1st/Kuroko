@@ -57,6 +57,7 @@ namespace Kuroko.Services
             var guildRoot = await db.Guilds.GetOrCreateRootAsync(channel.GuildId);
 
             guildRoot.Messages.Add(Message);
+            await db.SaveChangesAsync();
 
             return (Message, Attachments);
         }
