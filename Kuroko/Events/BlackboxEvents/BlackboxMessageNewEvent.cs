@@ -14,11 +14,13 @@ namespace Kuroko.Events.BlackboxEvents
         private readonly IServiceProvider _services;
         private readonly DiscordShardedClient _client;
         private readonly BlackboxService _blackbox;
+        private readonly TicketService _tickets;
 
-        public BlackboxMessageNewEvent(DiscordShardedClient client, BlackboxService blackbox, IServiceProvider services)
+        public BlackboxMessageNewEvent(IServiceProvider services)
         {
-            _client = client;
-            _blackbox = blackbox;
+            _client = services.GetRequiredService<DiscordShardedClient>();
+            _blackbox = services.GetRequiredService<BlackboxService>();
+            _tickets = services.GetRequiredService<TicketService>();
             _services = services;
 
             _client.MessageReceived += (m) => Task.Factory.StartNew(() => MessageReceivedAsync(m));
@@ -41,10 +43,15 @@ namespace Kuroko.Events.BlackboxEvents
             var root = await db.Guilds.GetDataAsync(channel.GuildId);
 
             foreach (var ticket in root.Tickets)
+            {
                 if (ticket.ChannelId == channel.Id)
+                {
+                    await _tickets.StoreTicketMessageAsync(msg, ticket, modLogProperties.SaveAttachments);
                     return;
+                }
+            }
 
-            await _blackbox.StoreMessageAsync(msg);
+            await _blackbox.StoreMessageAsync(msg, modLogProperties.SaveAttachments, false);
         }
     }
 }
