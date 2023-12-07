@@ -25,9 +25,6 @@ namespace Kuroko.Modules.Reports.Components
         public async Task CreateUserReportAsync(ulong reportedUserId, ReportModal modal)
         {
             var (TicketId, _) = await CreateAsync(TicketType.ReportUser, reportedUserId, modal);
-
-            using IServiceScope scope = Context.ServiceProvider.CreateScope();
-            var db = scope.ServiceProvider.GetService<DatabaseContext>();
             await _blackbox.GenerateUserMessageHistoryAsync(TicketId, Context.Client);
         }
 
