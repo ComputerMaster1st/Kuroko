@@ -52,23 +52,24 @@ namespace Kuroko
             return dir;
         }
 
-        public static async Task<(DirectoryInfo ZipDir, int Segments)> ZipAndUploadAsync(TicketEntity ticket, DirectoryInfo ticketDir, ITextChannel ticketChannel)
+        public static async Task<(DirectoryInfo ZipDir, int Segments, IUserMessage Message)> ZipAndUploadAsync(
+            TicketEntity ticket, DirectoryInfo ticketDir, ITextChannel ticketChannel)
         {
             var zipLocation = CreateZip($"ticket_{ticket.Id}", ticketDir, out int segments);
             var discordAttachments = new List<FileAttachment>();
-
             void clearAttachments()
             {
                 foreach (var file in discordAttachments)
                     file.Dispose();
             }
 
+            IUserMessage sentMessage;
             if (segments < 10)
             {
                 foreach (var file in zipLocation.GetFiles())
                     discordAttachments.Add(new FileAttachment(file.FullName));
 
-                await ticketChannel.SendFilesAsync(discordAttachments);
+                sentMessage = await ticketChannel.SendFilesAsync(discordAttachments);
                 clearAttachments();
             }
             else
@@ -79,17 +80,17 @@ namespace Kuroko
 
                     if (!(discordAttachments.Count < 10))
                     {
-                        await ticketChannel.SendFilesAsync(discordAttachments);
+                        sentMessage = await ticketChannel.SendFilesAsync(discordAttachments);
 
                         clearAttachments();
                         discordAttachments.Clear();
                     }
                 }
 
-                await ticketChannel.SendFilesAsync(discordAttachments);
+                sentMessage = await ticketChannel.SendFilesAsync(discordAttachments);
             }
 
-            return (zipLocation, segments);
+            return (zipLocation, segments, sentMessage);
         }
     }
 }
