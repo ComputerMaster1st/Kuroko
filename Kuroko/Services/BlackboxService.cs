@@ -97,7 +97,7 @@ namespace Kuroko.Services
 
             await CreateHistoryLogAsync(messages, user, ticketDir);
 
-            var (ZipDir, Segments) = await Utilities.ZipAndUploadAsync(ticket, ticketDir, await guild.GetTextChannelAsync(ticket.ChannelId));
+            var (ZipDir, Segments, _) = await Utilities.ZipAndUploadAsync(ticket, ticketDir, await guild.GetTextChannelAsync(ticket.ChannelId));
 
             ticketDir.Delete(true);
             ZipDir.Delete(true);
