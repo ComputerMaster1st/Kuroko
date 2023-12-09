@@ -24,7 +24,7 @@ namespace Kuroko.Services
             _services = services;
         }
 
-        public async Task<(TicketEntity Ticket, ITextChannel TicketChannel)> CreateReportAsync(TicketType type, ReportModal modal, ulong reportedId, KurokoInteractionContext ctx)
+        public async Task<(TicketEntity Ticket, ITextChannel TicketChannel)> CreateTicketAsync(TicketType type, ReportModal modal, ulong reportedId, KurokoInteractionContext ctx)
         {
             ITextChannel channel;
             TicketEntity ticket;

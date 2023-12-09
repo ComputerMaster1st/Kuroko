@@ -26,14 +26,14 @@ namespace Kuroko.Modules.Reports.Components
         [ModalInteraction($"{ReportsCommandMap.REPORT_USER}:*")]
         public async Task CreateUserReportAsync(ulong reportedUserId, ReportModal modal)
         {
-            var (Ticket, _) = await _tickets.CreateReportAsync(TicketType.ReportUser, modal, reportedUserId, Context);
+            var (Ticket, _) = await _tickets.CreateTicketAsync(TicketType.ReportUser, modal, reportedUserId, Context);
             await _blackbox.GenerateUserMessageHistoryAsync(Ticket.Id, Context.Client);
         }
 
         [ModalInteraction($"{ReportsCommandMap.REPORT_MESSAGE}:*")]
         public async Task CreateMessageReportAsync(ulong reportedMsgId, ReportModal modal)
         {
-            var (Ticket, TicketChannel) = await _tickets.CreateReportAsync(TicketType.ReportUser, modal, reportedMsgId, Context);
+            var (Ticket, TicketChannel) = await _tickets.CreateTicketAsync(TicketType.ReportUser, modal, reportedMsgId, Context);
             var reportedMsg = await Context.Channel.GetMessageAsync(reportedMsgId);
             var attachments = new List<FileAttachment>();
 
