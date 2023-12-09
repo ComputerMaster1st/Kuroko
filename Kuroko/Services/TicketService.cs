@@ -61,6 +61,10 @@ namespace Kuroko.Services
                 await channel.AddPermissionOverwriteAsync(user, new OverwritePermissions(viewChannel: PermValue.Allow));
 
                 ticket = new TicketEntity(TicketType.ReportUser, channel.Id, modal.Subject, modal.Rules, modal.Description, user.Id, reportedUser.Id, reportedMessage?.Id);
+
+                var handler = properties.ReportHandlers.OrderBy(x => x.Level).First();
+                ticket.ReportHandlerId = handler.Id;
+
                 properties.Guild.Tickets.Add(ticket);
             }
 
@@ -172,7 +176,7 @@ namespace Kuroko.Services
                 {
                     IsInline = true,
                     Name = "Users In Ticket",
-                    Value = outputUsersInvolved.ToString()
+                    Value = outputUsersInvolved.Length < 1 ? "None" : outputUsersInvolved.ToString()
                 },
                 new()
                 {

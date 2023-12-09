@@ -27,7 +27,9 @@ namespace Kuroko.Modules.Reports.Components
         public async Task CreateUserReportAsync(ulong reportedUserId, ReportModal modal)
         {
             var (Ticket, _) = await _tickets.CreateTicketAsync(TicketType.ReportUser, modal, reportedUserId, Context);
+
             await _blackbox.GenerateUserMessageHistoryAsync(Ticket.Id, Context.Client);
+            await ExecuteAsync(Ticket);
         }
 
         [ModalInteraction($"{ReportsCommandMap.REPORT_MESSAGE}:*")]
@@ -50,6 +52,8 @@ namespace Kuroko.Modules.Reports.Components
             await TicketChannel.SendFilesAsync(attachments, reportedMsg.Content, embed: TrackedMessageEmbed.Build(reportedMsg.Content, reportedMsg.Timestamp));
 
             attachments.ForEach(x => x.Dispose());
+
+            await ExecuteAsync(Ticket);
         }
 
         [RequireUserGuildPermission(GuildPermission.ManageMessages)]
