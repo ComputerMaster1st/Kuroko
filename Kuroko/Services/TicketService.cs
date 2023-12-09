@@ -1,8 +1,10 @@
 using System.Text;
 using Discord;
+using Kuroko.Core;
 using Kuroko.Core.Attributes;
 using Kuroko.Database;
 using Kuroko.Database.Entities.Guild;
+using Kuroko.Modules.Reports.Modals;
 using Kuroko.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +22,39 @@ namespace Kuroko.Services
             _blackbox = services.GetRequiredService<BlackboxService>();
 
             _services = services;
+        }
+
+        public async Task<(TicketEntity Ticket, ITextChannel TicketChannel)> CreateReportAsync(TicketType type, ReportModal modal, ulong reportedId, KurokoInteractionContext ctx)
+        {
+            ITextChannel channel;
+            TicketEntity ticket;
+            using (var db = _services.GetRequiredService<DatabaseContext>())
+            {
+                var properties = await db.GuildReports.FirstOrDefaultAsync(x => x.GuildId == ctx.Guild.Id);
+                var user = ctx.User as IGuildUser;
+
+                IGuildUser reportedUser;
+                IMessage reportedMessage = null;
+                if (type == TicketType.ReportMessage)
+                {
+                    reportedMessage = await ctx.Channel.GetMessageAsync(reportedId);
+                    reportedUser = reportedMessage.Author as IGuildUser;
+                }
+                else
+                    reportedUser = ctx.Guild.GetUser(reportedId);
+
+                var category = ctx.Guild.GetCategoryChannel(properties.ReportCategoryId);
+                channel = await ctx.Guild.CreateTextChannelAsync($"report-{reportedUser.GlobalName ?? reportedUser.Username}", x =>
+                {
+                    x.CategoryId = category.Id;
+                });
+                await channel.AddPermissionOverwriteAsync(user, new OverwritePermissions(viewChannel: PermValue.Allow));
+
+                ticket = new TicketEntity(TicketType.ReportUser, channel.Id, modal.Subject, modal.Rules, modal.Description, user.Id, reportedUser.Id, reportedMessage?.Id);
+                properties.Guild.Tickets.Add(ticket);
+            }
+
+            return (ticket, channel);
         }
 
         public async Task StoreTicketMessageAsync(IMessage message, int ticketId, bool downloadAttachments)
