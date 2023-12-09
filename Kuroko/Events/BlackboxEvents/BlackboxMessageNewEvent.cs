@@ -46,14 +46,17 @@ namespace Kuroko.Events.BlackboxEvents
                     return;
                 
                 root = await db.Guilds.GetDataAsync(channel.GuildId);
-            }
 
-            foreach (var ticket in root.Tickets)
-            {
-                if (ticket.ChannelId == channel.Id)
+                if (root.Tickets.Count > 0)
                 {
-                    await _tickets.StoreTicketMessageAsync(msg, ticket.Id, properties.SaveAttachments);
-                    return;
+                    foreach (var ticket in root.Tickets)
+                    {
+                        if (ticket.ChannelId == channel.Id)
+                        {
+                            await _tickets.StoreTicketMessageAsync(msg, ticket.Id, properties.SaveAttachments);
+                            return;
+                        }
+                    }
                 }
             }
 
