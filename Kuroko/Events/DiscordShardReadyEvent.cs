@@ -44,7 +44,7 @@ namespace Kuroko.Events
             var guildCount = _client.Guilds.Count;
             _statusUpdate.PreviousServerCount = guildCount;
 
-            await _client.SetGameAsync($"Prefix: \"/\" # Servers: {guildCount}");
+            await _client.SetGameAsync($"Prefix: \"/\" {Utilities.SeparatorCharacter} Servers: {guildCount}");
             await _client.SetStatusAsync(UserStatus.Online);
         }
     }

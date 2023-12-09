@@ -35,7 +35,6 @@ namespace Kuroko.Modules.Reports.Components
             if (handler != null)
                 properties.ReportHandlers.Remove(handler, Context.Database);
 
-            await Context.Database.SaveChangesAsync();
             await ExecuteAsync(0, properties);
         }
 

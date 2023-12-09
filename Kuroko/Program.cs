@@ -67,7 +67,8 @@ _serviceCollection.AddSingleton(_discordConfig)
     .AddSingleton(_discordClient)
     .AddSingleton(_interactionService)
     .AddSingleton(_registry)
-    .AddSingleton<BlackboxService>();
+    .AddSingleton<BlackboxService>()
+    .AddSingleton<TicketService>();
 
 #endregion
 
@@ -80,7 +81,7 @@ _serviceCollection.AddDbContext<DatabaseContext>(options =>
     options.UseNpgsql(_databaseConfig.ConnectionUrl())
         .EnableSensitiveDataLogging()
         .UseLazyLoadingProxies();
-}, ServiceLifetime.Scoped);
+}, ServiceLifetime.Transient);
 
 #endregion
 

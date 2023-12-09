@@ -2,13 +2,11 @@
 using Discord.Interactions;
 using Kuroko.Core;
 using Kuroko.Core.Attributes;
-using Kuroko.Database;
 using Kuroko.Database.Entities.Guild;
 using Kuroko.Modules.Reports.Modals;
 using Kuroko.Modules.Tickets;
 using Kuroko.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using System.Text;
 
 namespace Kuroko.Modules.Reports.Components
@@ -16,32 +14,35 @@ namespace Kuroko.Modules.Reports.Components
     [RequireBotGuildPermission(GuildPermission.ManageChannels)]
     public class ProcessReportComponent : KurokoModuleBase
     {
+        private readonly TicketService _tickets;
         private readonly BlackboxService _blackbox;
 
-        public ProcessReportComponent(BlackboxService blackbox)
-            => _blackbox = blackbox;
+        public ProcessReportComponent(BlackboxService blackbox, TicketService tickets)
+        {
+            _blackbox = blackbox;
+            _tickets = tickets;
+        }
 
         [ModalInteraction($"{ReportsCommandMap.REPORT_USER}:*")]
         public async Task CreateUserReportAsync(ulong reportedUserId, ReportModal modal)
         {
-            var (TicketId, _) = await CreateAsync(TicketType.ReportUser, reportedUserId, modal);
+            var (Ticket, _) = await _tickets.CreateTicketAsync(TicketType.ReportUser, modal, reportedUserId, Context);
 
-            using IServiceScope scope = Context.ServiceProvider.CreateScope();
-            var db = scope.ServiceProvider.GetService<DatabaseContext>();
-            await _blackbox.GenerateUserMessageHistoryAsync(TicketId, Context.Client);
+            await _blackbox.GenerateUserMessageHistoryAsync(Ticket.Id, Context.Client);
+            await ExecuteAsync(Ticket);
         }
 
         [ModalInteraction($"{ReportsCommandMap.REPORT_MESSAGE}:*")]
         public async Task CreateMessageReportAsync(ulong reportedMsgId, ReportModal modal)
         {
-            var (_, TicketChannel) = await CreateAsync(TicketType.ReportMessage, reportedMsgId, modal);
+            var (Ticket, TicketChannel) = await _tickets.CreateTicketAsync(TicketType.ReportUser, modal, reportedMsgId, Context);
             var reportedMsg = await Context.Channel.GetMessageAsync(reportedMsgId);
             var attachments = new List<FileAttachment>();
 
             var msgEntity = await _blackbox.GetMessageAsync(reportedMsgId);
 
             if (msgEntity.Message is null)
-                msgEntity = await _blackbox.StoreMessageAsync(reportedMsg);
+                msgEntity = await _blackbox.StoreMessageAsync(reportedMsg, true, true);
 
             var output = new StringBuilder()
                 .AppendLine($"## Reported Message {reportedMsg.GetJumpUrl()} | ID: {reportedMsg.Id}")
@@ -51,38 +52,8 @@ namespace Kuroko.Modules.Reports.Components
             await TicketChannel.SendFilesAsync(attachments, reportedMsg.Content, embed: TrackedMessageEmbed.Build(reportedMsg.Content, reportedMsg.Timestamp));
 
             attachments.ForEach(x => x.Dispose());
-        }
 
-        private async Task<(int TicketId, ITextChannel TicketChannel)> CreateAsync(TicketType type, ulong reportedId, ReportModal modal)
-        {
-            var reportProperties = await GetPropertiesAsync<ReportsEntity, GuildEntity>(Context.Guild.Id);
-            var guildRoot = await Context.Database.Guilds.GetOrCreateRootAsync(Context.Guild.Id);
-            var user = Context.User as IGuildUser;
-
-            IGuildUser reportedUser;
-            IMessage reportedMessage = null;
-            if (type == TicketType.ReportMessage)
-            {
-                reportedMessage = await Context.Channel.GetMessageAsync(reportedId);
-                reportedUser = reportedMessage.Author as IGuildUser;
-            }
-            else
-                reportedUser = Context.Guild.GetUser(reportedId);
-
-            var category = Context.Guild.GetCategoryChannel(reportProperties.ReportCategoryId);
-            var channel = await Context.Guild.CreateTextChannelAsync($"report-{reportedUser.GlobalName ?? reportedUser.Username}", x =>
-            {
-                x.CategoryId = category.Id;
-            });
-            await channel.AddPermissionOverwriteAsync(user, new OverwritePermissions(viewChannel: PermValue.Allow));
-
-            var newTicket = new TicketEntity(TicketType.ReportUser, channel.Id, modal.Subject, modal.Rules, modal.Description, user.Id, reportedUser.Id, reportedMessage?.Id);
-            guildRoot.Tickets.Add(newTicket);
-
-            await Context.Database.SaveChangesAsync();
-            await ExecuteAsync(newTicket, reportProperties);
-
-            return (newTicket.Id, channel);
+            await ExecuteAsync(Ticket);
         }
 
         [RequireUserGuildPermission(GuildPermission.ManageMessages)]
@@ -98,8 +69,7 @@ namespace Kuroko.Modules.Reports.Components
             var role = Context.Guild.GetRole(handler is null ? 0 : handler.RoleId);
             var roleMention = role is null ? "_Role Missing! Please Fix!_" : role.Mention;
 
-            await Context.Database.SaveChangesAsync();
-            await ExecuteAsync(ticket);
+            await ExecuteAsync(ticket, properties);
             await RespondAsync($"Ticket has been diverted to **{handlerName}** [{roleMention}] by {Context.User.Mention}.");
         }
 
@@ -112,7 +82,6 @@ namespace Kuroko.Modules.Reports.Components
 
             ticket.Severity = severity;
 
-            await Context.Database.SaveChangesAsync();
             await ExecuteAsync(ticket);
             await RespondAsync($"Ticket severity has been updated to **{severity}** by {Context.User.Mention}.");
         }

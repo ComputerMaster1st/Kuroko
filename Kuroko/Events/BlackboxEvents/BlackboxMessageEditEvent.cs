@@ -1,10 +1,7 @@
 using Discord;
 using Discord.WebSocket;
 using Kuroko.Core.Attributes;
-using Kuroko.Database;
 using Kuroko.Services;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Kuroko.Events.BlackboxEvents
 {

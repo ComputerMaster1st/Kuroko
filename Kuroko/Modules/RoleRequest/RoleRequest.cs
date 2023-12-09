@@ -39,14 +39,13 @@ namespace Kuroko.Modules.RoleRequest
             var properties = await GetPropertiesAsync<RoleRequestEntity, GuildEntity>(Context.Guild.Id);
             properties.RoleIds.Clear(Context.Database);
 
-            await Context.Database.SaveChangesAsync();
             await ExecuteAsync(true);
         }
 
-        private async Task ExecuteAsync(bool isReturning = false)
+        private async Task ExecuteAsync(bool isReturning = false, RoleRequestEntity propParams = null)
         {
             var user = Context.User as IGuildUser;
-            var properties = await Context.Database.GuildRoleRequests.FirstOrDefaultAsync(x => x.Guild.Id == Context.Guild.Id);
+            var properties = propParams ?? await GetPropertiesAsync<RoleRequestEntity, GuildEntity>(Context.Guild.Id);
             var output = new StringBuilder()
                 .AppendLine("# Role Request");
             var hasRoles = false;

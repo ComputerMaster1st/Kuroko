@@ -44,7 +44,6 @@ namespace Kuroko.Modules.ModLogs.Components
                 properties.IgnoredChannelIds.Remove(temp, Context.Database);
             }
 
-            await Context.Database.SaveChangesAsync();
             await ExecuteAsync(index, properties);
         }
 

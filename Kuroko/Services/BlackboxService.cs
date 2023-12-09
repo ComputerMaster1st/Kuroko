@@ -16,41 +16,61 @@ namespace Kuroko.Services
         private readonly HttpClient _http = new();
 
         public BlackboxService(IServiceProvider services)
-        {
-            _services = services;
-        }
+            => _services = services;
 
-        public async Task<(MessageEntity Message, IEnumerable<FileAttachment> Attachments)> StoreMessageAsync(IMessage message)
+        public async Task<(MessageEntity Message, IEnumerable<FileAttachment> Attachments)> CreateMessageEntityAsync(IMessage message,
+            bool downloadAttachments, bool returnAttachments)
         {
-            var db = _services.GetRequiredService<DatabaseContext>();
             var attachments = new List<FileAttachment>();
             var entity = new MessageEntity(message.Id, message.Channel.Id,
                 message.Author.Id, message.Content);
 
-            if (message.Attachments.Count > 0)
+            if (downloadAttachments)
             {
-                foreach (var att in message.Attachments)
+                if (message.Attachments.Count > 0)
                 {
-                    var bytes = await _http.GetByteArrayAsync(att.Url ?? att.ProxyUrl);
+                    foreach (var att in message.Attachments)
+                    {
+                        var bytes = await _http.GetByteArrayAsync(att.Url ?? att.ProxyUrl);
 
-                    attachments.Add(new(new MemoryStream(bytes), att.Filename));
-                    entity.Attachments.Add(new(att.Id, att.Filename, bytes));
+                        attachments.Add(new(new MemoryStream(bytes), att.Filename));
+                        entity.Attachments.Add(new(att.Id, att.Filename, bytes));
+                    }
                 }
             }
 
-            var channel = message.Channel as IGuildChannel;
-            var guildRoot = await db.Guilds.GetOrCreateRootAsync(channel.GuildId);
-
-            guildRoot.Messages.Add(entity);
-
-            return (entity, attachments);
+            if (returnAttachments)
+                return (entity, attachments);
+            
+            if (attachments.Any())
+                attachments.ForEach(x => x.Dispose());
+            
+            return (entity, null);
         }
 
-        public async Task<(MessageEntity Message, IEnumerable<FileAttachment> Attachments)> GetMessageAsync(ulong reportedMessageId)
+        public async Task<(MessageEntity Message, IEnumerable<FileAttachment> Attachments)> StoreMessageAsync(IMessage message,
+            bool downloadAttachments, bool returnAttachments)
         {
-            var db = _services.GetRequiredService<DatabaseContext>();
+            var (Message, Attachments) = await CreateMessageEntityAsync(message, downloadAttachments, returnAttachments);
+            var channel = message.Channel as IGuildChannel;
+
+            using (var db = _services.GetRequiredService<DatabaseContext>())
+            {
+                var guildRoot = await db.Guilds.GetOrCreateRootAsync(channel.GuildId);
+                guildRoot.Messages.Add(Message);
+            }
+
+            return (Message, Attachments);
+        }
+
+        public async Task<(MessageEntity Message, IEnumerable<FileAttachment> Attachments)> GetMessageAsync(ulong messageId)
+        {
+            using var db = _services.GetRequiredService<DatabaseContext>();
             var attachments = new List<FileAttachment>();
-            var entity = await db.Messages.FirstOrDefaultAsync(x => x.Id == reportedMessageId);
+            var entity = await db.Messages.FirstOrDefaultAsync(x => x.Id == messageId);
+
+            if (entity is null)
+                return (null, null);
 
             if (entity.Attachments.Count > 0)
                 foreach (var attachment in entity.Attachments)
@@ -61,27 +81,29 @@ namespace Kuroko.Services
 
         public async Task EditMessageAsync(ulong editedMessageId, string newContent)
         {
-            var (Message, _) = await GetMessageAsync(editedMessageId);
+            using var db = _services.GetRequiredService<DatabaseContext>();
+            var entity = await db.Messages.FirstOrDefaultAsync(x => x.Id == editedMessageId);
 
-            if (Message is null)
+            if (entity is null)
                 return;
 
-            Message.EditedMessages.Add(new(newContent));
+            entity.EditedMessages.Add(new(newContent));
         }
 
-        public async Task DeleteMessageAsync(ulong deletedMessageId)
+        public async Task DeletedMessageAsync(ulong deletedMessageId)
         {
-            var (Message, _) = await GetMessageAsync(deletedMessageId);
+            using var db = _services.GetRequiredService<DatabaseContext>();
+            var entity = await db.Messages.FirstOrDefaultAsync(x => x.Id == deletedMessageId);
 
-            if (Message is null)
+            if (entity is null)
                 return;
 
-            Message.DeletedAt = DateTime.UtcNow;
+            entity.DeletedAt = DateTime.UtcNow;
         }
 
         public async Task GenerateUserMessageHistoryAsync(int ticketId, IDiscordClient client)
         {
-            var db = _services.GetRequiredService<DatabaseContext>();
+            using var db = _services.GetRequiredService<DatabaseContext>();
             var ticket = await db.Tickets.FirstOrDefaultAsync(x => x.Id == ticketId);
             var root = await db.Guilds.FirstOrDefaultAsync(x => x.Id == ticket.GuildId);
             var messages = root.Messages.Where(x => x.UserId == ticket.ReportedUserId)
@@ -97,7 +119,7 @@ namespace Kuroko.Services
 
             await CreateHistoryLogAsync(messages, user, ticketDir);
 
-            var (ZipDir, Segments) = await Utilities.ZipAndUploadAsync(ticket, ticketDir, await guild.GetTextChannelAsync(ticket.ChannelId));
+            var (ZipDir, Segments, _) = await Utilities.ZipAndUploadAsync(ticket, ticketDir, await guild.GetTextChannelAsync(ticket.ChannelId));
 
             ticketDir.Delete(true);
             ZipDir.Delete(true);

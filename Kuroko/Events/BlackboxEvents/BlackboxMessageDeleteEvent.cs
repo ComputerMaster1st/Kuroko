@@ -8,6 +8,6 @@ namespace Kuroko.Events.BlackboxEvents
     public class BlackboxMessageDeleteEvent
     {
         public BlackboxMessageDeleteEvent(DiscordShardedClient client, BlackboxService blackbox)
-            => client.MessageDeleted += (msg, channel) => Task.Factory.StartNew(() => blackbox.DeleteMessageAsync(msg.Id));
+            => client.MessageDeleted += (msg, channel) => Task.Factory.StartNew(() => blackbox.DeletedMessageAsync(msg.Id));
     }
 }

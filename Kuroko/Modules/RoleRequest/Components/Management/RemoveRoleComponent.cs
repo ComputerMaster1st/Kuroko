@@ -32,7 +32,7 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
                 return;
 
             await DeferAsync();
-            await ExecuteAsync(await GetPropertiesAsync<RoleRequestEntity, GuildEntity>(Context.Guild.Id), index, OutputMsg);
+            await ExecuteAsync(index, OutputMsg);
         }
 
         [ComponentInteraction($"{RoleRequestCommandMap.MANAGE_DELETE}:*,*")]
@@ -57,14 +57,14 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
                 OutputMsg.AppendLine("* " + role.Name);
             }
 
-            await Context.Database.SaveChangesAsync();
-            await ExecuteAsync(properties, index, OutputMsg);
+            await ExecuteAsync(index, OutputMsg, properties);
         }
 
-        private async Task ExecuteAsync(RoleRequestEntity properties, int index, StringBuilder output)
+        private async Task ExecuteAsync(int index, StringBuilder output, RoleRequestEntity propParams = null)
         {
             var count = 0;
             var user = Context.User as IGuildUser;
+            var properties = propParams ?? await GetPropertiesAsync<RoleRequestEntity, GuildEntity>(Context.Guild.Id);
             var roleIds = properties.RoleIds.Skip(index).ToList();
             var selectMenu = new SelectMenuBuilder()
                 .WithCustomId($"{RoleRequestCommandMap.MANAGE_DELETE}:{user.Id},{index}")

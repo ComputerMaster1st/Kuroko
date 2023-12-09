@@ -17,13 +17,13 @@ namespace Kuroko.Core
             return true;
         }
 
-        protected async Task<TPropertyEntity> GetPropertiesAsync<TPropertyEntity, TDiscordEntity>(ulong id)
+        protected async Task<TPropertyEntity> GetPropertiesAsync<TPropertyEntity, TDiscordEntity>(ulong rootId)
             where TPropertyEntity : class, IPropertyEntity
             where TDiscordEntity : class, IDiscordEntity
         {
             var set = Context.Database.Set<TPropertyEntity>();
             var rootSet = Context.Database.Set<TDiscordEntity>();
-            var result = await set.CreateOrGetPropertiesAsync(rootSet, id, (x, y) =>
+            var result = await set.CreateOrGetPropertiesAsync(rootSet, rootId, (x, y) =>
             {
                 var properties = x.GetType().GetProperties();
                 var property = properties.FirstOrDefault(x => x.PropertyType == typeof(TPropertyEntity));
@@ -32,6 +32,12 @@ namespace Kuroko.Core
             });
 
             return result;
+        }
+
+        public override async Task AfterExecuteAsync(ICommandInfo command)
+        {
+            await Context.Database.SaveChangesAsync();
+            await base.AfterExecuteAsync(command);
         }
     }
 }

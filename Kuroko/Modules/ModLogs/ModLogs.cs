@@ -47,7 +47,8 @@ namespace Kuroko.Modules.ModLogs
 
             properties.LogChannelId = 0;
 
-            await SaveAndExecuteAsync(properties);
+            await DeferAsync();
+            await ExecuteAsync(true, properties);
         }
 
         [ComponentInteraction($"{ModLogCommandMap.CHANNEL_IGNORE_RESET}:*")]
@@ -60,7 +61,8 @@ namespace Kuroko.Modules.ModLogs
 
             properties.IgnoredChannelIds.Clear(Context.Database);
 
-            await SaveAndExecuteAsync(properties);
+            await DeferAsync();
+            await ExecuteAsync(true, properties);
         }
 
         [ComponentInteraction($"{ModLogCommandMap.JOIN}:*")]
@@ -123,13 +125,7 @@ namespace Kuroko.Modules.ModLogs
 
             action(properties);
 
-            await SaveAndExecuteAsync(properties);
-        }
-
-        private async Task SaveAndExecuteAsync(ModLogEntity properties)
-        {
             await DeferAsync();
-            await Context.Database.SaveChangesAsync();
             await ExecuteAsync(true, properties);
         }
 

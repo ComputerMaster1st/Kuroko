@@ -2,6 +2,8 @@
 using Discord.WebSocket;
 using Kuroko.Core.Attributes;
 using Kuroko.Database;
+using Kuroko.Database.Entities.Guild;
+using Kuroko.Database.Entities.Message;
 using Kuroko.Modules.Reports;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,14 +26,17 @@ namespace Kuroko.Events.TicketEvents
 
         private async Task MessageDeletedAsync(Cacheable<IMessage, ulong> oldMsg)
         {
-            using var db = _services.GetRequiredService<DatabaseContext>();
+            TicketEntity ticket;
+            MessageEntity msgEntity;
+            using (var db = _services.GetRequiredService<DatabaseContext>())
+            {
+                ticket = await db.Tickets.FirstOrDefaultAsync(x => x.ReportedMessageId == oldMsg.Id);
+                msgEntity = await db.Messages.FirstOrDefaultAsync(x => x.Id == oldMsg.Id);
 
-            var ticket = await db.Tickets.FirstOrDefaultAsync(x => x.ReportedMessageId == oldMsg.Id);
+                if (ticket is null)
+                    return;
+            }
 
-            if (ticket is null)
-                return;
-
-            var msgEntity = await db.Messages.FirstOrDefaultAsync(x => x.Id == oldMsg.Id);
             string msgContent = "_(! No content found !)_";
             DateTimeOffset? dateTimeOffset = DateTimeOffset.UtcNow;
 

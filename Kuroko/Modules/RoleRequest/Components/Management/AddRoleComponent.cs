@@ -31,7 +31,7 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
                 return;
 
             await DeferAsync();
-            await ExecuteAsync(await GetPropertiesAsync<RoleRequestEntity, GuildEntity>(Context.Guild.Id), index, OutputMsg);
+            await ExecuteAsync(index, OutputMsg);
         }
 
         [ComponentInteraction($"{RoleRequestCommandMap.MANAGE_SAVE}:*,*")]
@@ -59,11 +59,10 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
                 }
             }
 
-            await Context.Database.SaveChangesAsync();
-            await ExecuteAsync(properties, index, output);
+            await ExecuteAsync(index, output, properties);
         }
 
-        private async Task ExecuteAsync(RoleRequestEntity properties, int index, StringBuilder output)
+        private async Task ExecuteAsync(int index, StringBuilder output, RoleRequestEntity propParams = null)
         {
             var self = Context.Guild.GetUser(Context.Client.CurrentUser.Id) as IGuildUser;
             var user = Context.User as IGuildUser;
@@ -81,6 +80,7 @@ namespace Kuroko.Modules.RoleRequest.Components.Management
                     selfHighestRole = role;
             }
 
+            var properties = propParams ?? await GetPropertiesAsync<RoleRequestEntity, GuildEntity>(Context.Guild.Id);
             var selectMenu = new SelectMenuBuilder()
                 .WithCustomId($"{RoleRequestCommandMap.MANAGE_SAVE}:{user.Id},{index}")
                 .WithMinValues(1)

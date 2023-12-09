@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using Kuroko.Core.Attributes;
 using Kuroko.Database;
+using Kuroko.Database.Entities.Guild;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -28,30 +29,34 @@ namespace Kuroko.Events.ModLogEvents
 
         private async Task UserJoinedAsync(SocketGuildUser arg)
         {
-            using var db = _serviceProvider.GetRequiredService<DatabaseContext>();
-
             var user = arg as IGuildUser;
-            var properties = await db.GuildModLogs.FirstOrDefaultAsync(x => x.GuildId == user.Guild.Id);
 
-            if (properties is null || !(properties.LogChannelId != 0 && properties.Join))
-                return;
+            ModLogEntity properties;
+            using (var db = _serviceProvider.GetRequiredService<DatabaseContext>())
+            {
+                properties = await db.GuildModLogs.FirstOrDefaultAsync(x => x.GuildId == user.Guild.Id);
+
+                if (properties is null || !(properties.LogChannelId != 0 && properties.Join))
+                    return;
+            }
 
             var textChannel = await user.Guild.GetTextChannelAsync(properties.LogChannelId);
-
             await ExecuteAsync(textChannel, user, JoinType.Joined);
         }
 
         private async Task UserLeftAsync(SocketGuild arg1, SocketUser arg2)
         {
-            using var db = _serviceProvider.GetRequiredService<DatabaseContext>();
+            ModLogEntity properties;
+            using (var db = _serviceProvider.GetRequiredService<DatabaseContext>())
+            {
+                properties = await db.GuildModLogs.FirstOrDefaultAsync(x => x.GuildId == arg1.Id);
+
+                if (properties is null || !(properties.LogChannelId != 0 && properties.Leave))
+                    return;
+            }
 
             var guild = arg1 as IGuild;
             var user = arg2 as IUser;
-            var properties = await db.GuildModLogs.FirstOrDefaultAsync(x => x.GuildId == arg1.Id);
-
-            if (properties is null || !(properties.LogChannelId != 0 && properties.Leave))
-                return;
-
             var textChannel = await guild.GetTextChannelAsync(properties.LogChannelId);
 
             await ExecuteAsync(textChannel, user, JoinType.Left);

@@ -30,17 +30,13 @@ namespace Kuroko.Events.TicketEvents
             if (msg.Author.Id == _client.CurrentUser.Id)
                 return;
 
+            var channel = msg.Channel as ITextChannel;
             using var db = _services.GetRequiredService<DatabaseContext>();
 
             var ticket = await db.Tickets.FirstOrDefaultAsync(x => x.ChannelId == msg.Channel.Id);
-
-            if (ticket is null)
-                return;
-
-            var channel = msg.Channel as ITextChannel;
             var root = await db.Guilds.FirstOrDefaultAsync(x => x.Id == channel.Guild.Id);
 
-            if (root is null)
+            if (ticket is null || root is null)
                 return;
 
             var msgEntity = new MessageEntity(msg.Id, msg.Channel.Id, msg.Author.Id, msg.Content);
@@ -53,6 +49,7 @@ namespace Kuroko.Events.TicketEvents
                     var bytes = await _httpClient.GetByteArrayAsync(attachment.Url ?? attachment.ProxyUrl);
                     msgEntity.Attachments.Add(new(attachment.Id, attachment.Filename, bytes));
                 }
+
             }
         }
     }
