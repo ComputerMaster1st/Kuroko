@@ -33,18 +33,28 @@ namespace Kuroko.Services
                 var properties = await db.GuildReports.FirstOrDefaultAsync(x => x.GuildId == ctx.Guild.Id);
                 var user = ctx.User as IGuildUser;
 
-                IGuildUser reportedUser;
+                IGuildUser reportedUser = null;
                 IMessage reportedMessage = null;
-                if (type == TicketType.ReportMessage)
+                string ticketChannelName;
+
+                switch (type)
                 {
-                    reportedMessage = await ctx.Channel.GetMessageAsync(reportedId);
-                    reportedUser = reportedMessage.Author as IGuildUser;
-                }
-                else
-                    reportedUser = ctx.Guild.GetUser(reportedId);
+                    case TicketType.ReportMessage:
+                        reportedMessage = await ctx.Channel.GetMessageAsync(reportedId);
+                        reportedUser = reportedMessage.Author as IGuildUser;
+                        ticketChannelName = $"report_msg-{reportedUser.DisplayName}";
+                        break;
+                    case TicketType.ReportUser:
+                        reportedUser = ctx.Guild.GetUser(reportedId);
+                        ticketChannelName = $"report_user-{reportedUser.DisplayName}";
+                        break;
+                    default:
+                        ticketChannelName = $"ticket-{user.GlobalName}";
+                        break;
+                };
 
                 var category = ctx.Guild.GetCategoryChannel(properties.ReportCategoryId);
-                channel = await ctx.Guild.CreateTextChannelAsync($"report-{reportedUser.GlobalName ?? reportedUser.Username}", x =>
+                channel = await ctx.Guild.CreateTextChannelAsync(ticketChannelName, x =>
                 {
                     x.CategoryId = category.Id;
                 });
