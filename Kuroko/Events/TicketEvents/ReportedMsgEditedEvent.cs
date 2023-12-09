@@ -1,6 +1,7 @@
 ﻿using Discord.WebSocket;
 using Kuroko.Core.Attributes;
 using Kuroko.Database;
+using Kuroko.Database.Entities.Guild;
 using Kuroko.Modules.Reports;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,12 +24,14 @@ namespace Kuroko.Events.TicketEvents
 
         private async Task MessageUpdatedAsync(SocketMessage after)
         {
-            using var db = _services.GetRequiredService<DatabaseContext>();
+            TicketEntity ticket;
+            using (var db = _services.GetRequiredService<DatabaseContext>())
+            {
+                ticket = await db.Tickets.FirstOrDefaultAsync(x => x.ReportedMessageId == after.Id);
 
-            var ticket = await db.Tickets.FirstOrDefaultAsync(x => x.ReportedMessageId == after.Id);
-
-            if (ticket is null)
-                return;
+                if (ticket is null)
+                    return;
+            }
 
             var guild = _client.GetGuild(ticket.GuildId);
             var channel = guild.GetTextChannel(ticket.ChannelId);

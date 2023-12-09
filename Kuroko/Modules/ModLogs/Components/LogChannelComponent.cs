@@ -41,16 +41,15 @@ namespace Kuroko.Modules.ModLogs.Components
 
             properties.LogChannelId = selectedChannelId;
 
-            await Context.Database.SaveChangesAsync();
-            await ExecuteAsync(0);
+            await ExecuteAsync(0, properties);
         }
 
-        private async Task ExecuteAsync(int index)
+        private async Task ExecuteAsync(int index, ModLogEntity propParam = null)
         {
             var output = new StringBuilder()
                 .AppendLine("# Moderation Logging")
                 .AppendLine("## Configure Log Channel");
-            var properties = await GetPropertiesAsync<ModLogEntity, GuildEntity>(Context.Guild.Id);
+            var properties = propParam ?? await GetPropertiesAsync<ModLogEntity, GuildEntity>(Context.Guild.Id);
             var logChannel = Context.Guild.GetChannel(properties.LogChannelId);
             var logChannelTag = logChannel is null ? "**Not Set**" : $"<#{logChannel.Id}>";
             var count = 0;

@@ -51,20 +51,21 @@ namespace Kuroko.Services
         public async Task<(MessageEntity Message, IEnumerable<FileAttachment> Attachments)> StoreMessageAsync(IMessage message,
             bool downloadAttachments, bool returnAttachments)
         {
-            var db = _services.GetRequiredService<DatabaseContext>();
             var (Message, Attachments) = await CreateMessageEntityAsync(message, downloadAttachments, returnAttachments);
             var channel = message.Channel as IGuildChannel;
-            var guildRoot = await db.Guilds.GetOrCreateRootAsync(channel.GuildId);
 
-            guildRoot.Messages.Add(Message);
-            await db.SaveChangesAsync();
+            using (var db = _services.GetRequiredService<DatabaseContext>())
+            {
+                var guildRoot = await db.Guilds.GetOrCreateRootAsync(channel.GuildId);
+                guildRoot.Messages.Add(Message);
+            }
 
             return (Message, Attachments);
         }
 
         public async Task<(MessageEntity Message, IEnumerable<FileAttachment> Attachments)> GetMessageAsync(ulong messageId)
         {
-            var db = _services.GetRequiredService<DatabaseContext>();
+            using var db = _services.GetRequiredService<DatabaseContext>();
             var attachments = new List<FileAttachment>();
             var entity = await db.Messages.FirstOrDefaultAsync(x => x.Id == messageId);
 
@@ -80,27 +81,29 @@ namespace Kuroko.Services
 
         public async Task EditMessageAsync(ulong editedMessageId, string newContent)
         {
-            var (Message, _) = await GetMessageAsync(editedMessageId);
+            using var db = _services.GetRequiredService<DatabaseContext>();
+            var entity = await db.Messages.FirstOrDefaultAsync(x => x.Id == editedMessageId);
 
-            if (Message is null)
+            if (entity is null)
                 return;
 
-            Message.EditedMessages.Add(new(newContent));
+            entity.EditedMessages.Add(new(newContent));
         }
 
-        public async Task DeleteMessageAsync(ulong deletedMessageId)
+        public async Task DeletedMessageAsync(ulong deletedMessageId)
         {
-            var (Message, _) = await GetMessageAsync(deletedMessageId);
+            using var db = _services.GetRequiredService<DatabaseContext>();
+            var entity = await db.Messages.FirstOrDefaultAsync(x => x.Id == deletedMessageId);
 
-            if (Message is null)
+            if (entity is null)
                 return;
 
-            Message.DeletedAt = DateTime.UtcNow;
+            entity.DeletedAt = DateTime.UtcNow;
         }
 
         public async Task GenerateUserMessageHistoryAsync(int ticketId, IDiscordClient client)
         {
-            var db = _services.GetRequiredService<DatabaseContext>();
+            using var db = _services.GetRequiredService<DatabaseContext>();
             var ticket = await db.Tickets.FirstOrDefaultAsync(x => x.Id == ticketId);
             var root = await db.Guilds.FirstOrDefaultAsync(x => x.Id == ticket.GuildId);
             var messages = root.Messages.Where(x => x.UserId == ticket.ReportedUserId)

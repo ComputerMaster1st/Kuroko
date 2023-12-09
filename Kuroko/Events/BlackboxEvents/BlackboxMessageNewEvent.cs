@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using Kuroko.Core.Attributes;
 using Kuroko.Database;
+using Kuroko.Database.Entities.Guild;
 using Kuroko.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,27 +35,32 @@ namespace Kuroko.Events.BlackboxEvents
                 return;
             
             var channel = msg.Channel as IGuildChannel;
-            var db = _services.GetRequiredService<DatabaseContext>();
-            var modLogProperties = await db.GuildModLogs.FirstOrDefaultAsync(x => x.GuildId == channel.GuildId);
 
-            if (modLogProperties is null)
-                return;
-            
-            var root = await db.Guilds.GetDataAsync(channel.GuildId);
+            GuildEntity root;
+            ModLogEntity properties;
+            using (var db = _services.GetRequiredService<DatabaseContext>())
+            {
+                properties = await db.GuildModLogs.FirstOrDefaultAsync(x => x.GuildId == channel.GuildId);
+
+                if (properties is null)
+                    return;
+                
+                root = await db.Guilds.GetDataAsync(channel.GuildId);
+            }
 
             foreach (var ticket in root.Tickets)
             {
                 if (ticket.ChannelId == channel.Id)
                 {
-                    await _tickets.StoreTicketMessageAsync(msg, ticket.Id, modLogProperties.SaveAttachments);
+                    await _tickets.StoreTicketMessageAsync(msg, ticket.Id, properties.SaveAttachments);
                     return;
                 }
             }
 
-            if (!modLogProperties.EnableBlackbox)
+            if (!properties.EnableBlackbox)
                 return;
 
-            await _blackbox.StoreMessageAsync(msg, modLogProperties.SaveAttachments, false);
+            await _blackbox.StoreMessageAsync(msg, properties.SaveAttachments, false);
         }
     }
 }

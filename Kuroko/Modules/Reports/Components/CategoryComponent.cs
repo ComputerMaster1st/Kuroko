@@ -5,7 +5,6 @@ using Kuroko.Core.Attributes;
 using Kuroko.Database.Entities.Guild;
 using Kuroko.Modules.Globals;
 using Kuroko.Services;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using System.Text;
 
 namespace Kuroko.Modules.Reports.Components
@@ -34,7 +33,6 @@ namespace Kuroko.Modules.Reports.Components
 
             properties.ReportCategoryId = categoryId;
 
-            await Context.Database.SaveChangesAsync();
             await ExecuteAsync(index, properties);
         }
 

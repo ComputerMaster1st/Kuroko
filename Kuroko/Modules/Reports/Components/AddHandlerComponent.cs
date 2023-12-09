@@ -55,7 +55,6 @@ namespace Kuroko.Modules.Reports.Components
                 Level = role.Position
             });
 
-            await Context.Database.SaveChangesAsync();
             await ExecuteAsync(0, properties);
         }
 

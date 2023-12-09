@@ -24,19 +24,18 @@ namespace Kuroko.Services
 
         public async Task StoreTicketMessageAsync(IMessage message, int ticketId, bool downloadAttachments)
         {
-            var db = _services.GetRequiredService<DatabaseContext>();
             var (Message, _) = await _blackbox.CreateMessageEntityAsync(message, downloadAttachments, false);
+
+            using var db = _services.GetRequiredService<DatabaseContext>();
             var ticket = await db.Tickets.FirstOrDefaultAsync(x => x.Id == ticketId);
 
             ticket.Messages.Add(Message);
-
-            await db.SaveChangesAsync();
         }
 
         public async Task BuildAndSendTranscriptAsync(ReportsEntity properties, IGuild guild, ITextChannel reportChannel,
             ITextChannel transcriptChannel, int ticketId)
         {
-            var db = _services.GetRequiredService<DatabaseContext>();
+            using var db = _services.GetRequiredService<DatabaseContext>();
             var root = await db.Guilds.FirstOrDefaultAsync(x => x.Id == guild.Id);
             var ticket = await db.Tickets.FirstOrDefaultAsync(x => x.Id == ticketId);
             var handler = properties.ReportHandlers.FirstOrDefault(x => x.Id == ticket.ReportHandlerId);
@@ -50,8 +49,6 @@ namespace Kuroko.Services
             directory.Delete(true);
             ZipDir.Delete(true);
             root.Tickets.Remove(ticket, db);
-
-            await db.SaveChangesAsync();
 
             var embedFieldList = new List<EmbedFieldBuilder>()
             {
@@ -158,7 +155,7 @@ namespace Kuroko.Services
 
         private async Task<string> GenerateReportTranscriptAsync(TicketEntity ticket, ReportHandler handler, IGuild guild)
         {
-            var db = _services.GetRequiredService<DatabaseContext>();
+            using var db = _services.GetRequiredService<DatabaseContext>();
             var reportedUser = await guild.GetUserAsync(ticket.ReportedUserId);
             var output = new StringBuilder()
                 .AppendLine("############################################")

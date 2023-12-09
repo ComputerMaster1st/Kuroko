@@ -92,7 +92,6 @@ namespace Kuroko.Modules.Reports.Components
             var role = Context.Guild.GetRole(handler is null ? 0 : handler.RoleId);
             var roleMention = role is null ? "_Role Missing! Please Fix!_" : role.Mention;
 
-            await Context.Database.SaveChangesAsync();
             await ExecuteAsync(ticket);
             await RespondAsync($"Ticket has been diverted to **{handlerName}** [{roleMention}] by {Context.User.Mention}.");
         }
@@ -106,7 +105,6 @@ namespace Kuroko.Modules.Reports.Components
 
             ticket.Severity = severity;
 
-            await Context.Database.SaveChangesAsync();
             await ExecuteAsync(ticket);
             await RespondAsync($"Ticket severity has been updated to **{severity}** by {Context.User.Mention}.");
         }

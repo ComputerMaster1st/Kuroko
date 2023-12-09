@@ -33,7 +33,6 @@ namespace Kuroko.Modules.Reports.Components
 
             properties.TranscriptsChannelId = channelId;
 
-            await Context.Database.SaveChangesAsync();
             await ExecuteAsync(index, properties);
         }
 

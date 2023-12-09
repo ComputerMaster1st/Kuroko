@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using Kuroko.Core.Attributes;
 using Kuroko.Database;
+using Kuroko.Database.Entities.Guild;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -31,14 +32,18 @@ namespace Kuroko.Events.ModLogEvents
             if (after.Author.Id == _client.CurrentUser.Id)
                 return;
 
-            var db = _serviceProvider.GetRequiredService<DatabaseContext>();
             var guildChannel = channel as IGuildChannel;
-            var properties = await db.GuildModLogs.FirstOrDefaultAsync(x => x.GuildId == guildChannel.Guild.Id);
 
-            if (properties is null || !(properties.LogChannelId != 0 && properties.EditedMessages))
-                return;
-            if (properties.IgnoredChannelIds.Any(x => x.Value == guildChannel.Id))
-                return;
+            ModLogEntity properties;
+            using (var db = _serviceProvider.GetRequiredService<DatabaseContext>())
+            {
+                properties = await db.GuildModLogs.FirstOrDefaultAsync(x => x.GuildId == guildChannel.Guild.Id);
+
+                if (properties is null || !(properties.LogChannelId != 0 && properties.EditedMessages))
+                    return;
+                if (properties.IgnoredChannelIds.Any(x => x.Value == guildChannel.Id))
+                    return;
+            }
 
             var logChannel = await guildChannel.Guild.GetTextChannelAsync(properties.LogChannelId);
             var originalText = "_**(INFO:** Original message not available due to restart after message creation**)**_";

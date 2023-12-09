@@ -36,18 +36,17 @@ namespace Kuroko.Jobs
         {
             await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.JOBS, $"{NAME}: Job started at {DateTimeOffset.UtcNow}"));
 
-            var db = _services.GetRequiredService<DatabaseContext>();
             var entitiesToDelete = new List<MessageEntity>();
-            
-            await db.Messages.ForEachAsync(x => {
-                if (x.CreatedAt < DateTimeOffset.UtcNow.Subtract(TimeSpan.FromDays(7)))
-                    entitiesToDelete.Add(x);
-            });
 
-            if (entitiesToDelete.Any())
+            using (var db = _services.GetRequiredService<DatabaseContext>())
             {
-                db.Messages.RemoveRange(entitiesToDelete);
-                await db.SaveChangesAsync();
+                await db.Messages.ForEachAsync(x => {
+                    if (x.CreatedAt < DateTimeOffset.UtcNow.Subtract(TimeSpan.FromDays(7)))
+                        entitiesToDelete.Add(x);
+                });
+
+                if (entitiesToDelete.Any())
+                    db.Messages.RemoveRange(entitiesToDelete);
             }
 
             await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.JOBS,

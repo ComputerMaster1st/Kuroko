@@ -40,7 +40,6 @@ namespace Kuroko.Modules.Reports
             properties.RecordMessages = !properties.RecordMessages;
 
             await DeferAsync();
-            await Context.Database.SaveChangesAsync();
             await ExecuteAsync(true, properties);
         }
 
