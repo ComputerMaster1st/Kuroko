@@ -6,7 +6,6 @@ using Kuroko.Core.Attributes;
 using Kuroko.Database.Entities.Guild;
 using Kuroko.Modules.Globals;
 using Kuroko.Services;
-using Microsoft.EntityFrameworkCore;
 
 namespace Kuroko.Modules.Blackbox
 {
