@@ -35,32 +35,21 @@ namespace Kuroko.Events.BlackboxEvents
                 return;
             
             var channel = msg.Channel as IGuildChannel;
+            using var db = _services.GetRequiredService<DatabaseContext>();
+            var root = await db.Guilds.GetDataAsync(channel.GuildId);
+            var properties = await db.Blackboxes.FirstOrDefaultAsync(x => x.GuildId == channel.GuildId);
 
-            GuildEntity root;
-            ModLogEntity properties;
-            using (var db = _services.GetRequiredService<DatabaseContext>())
-            {
-                properties = await db.GuildModLogs.FirstOrDefaultAsync(x => x.GuildId == channel.GuildId);
-
-                if (properties is null)
-                    return;
-                
-                root = await db.Guilds.GetDataAsync(channel.GuildId);
-
-                if (root.Tickets.Count > 0)
-                {
-                    foreach (var ticket in root.Tickets)
+            if (properties is null)
+                return;
+            if (root.Tickets.Count > 0)
+                foreach (var ticket in root.Tickets)
+                    if (ticket.ChannelId == channel.Id)
                     {
-                        if (ticket.ChannelId == channel.Id)
-                        {
-                            await _tickets.StoreTicketMessageAsync(msg, ticket.Id, properties.SaveAttachments);
-                            return;
-                        }
+                        await _tickets.StoreTicketMessageAsync(msg, ticket.Id, properties.SaveAttachments);
+                        return;
                     }
-                }
-            }
 
-            if (!properties.EnableBlackbox)
+            if (!properties.IsEnabled)
                 return;
 
             await _blackbox.StoreMessageAsync(msg, properties.SaveAttachments, false);
