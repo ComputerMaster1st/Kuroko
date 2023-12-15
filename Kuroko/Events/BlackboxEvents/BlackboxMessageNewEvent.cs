@@ -2,7 +2,6 @@
 using Discord.WebSocket;
 using Kuroko.Core.Attributes;
 using Kuroko.Database;
-using Kuroko.Database.Entities.Guild;
 using Kuroko.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
