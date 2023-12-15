@@ -11,7 +11,7 @@ namespace Kuroko.Database.Entities.Guild
         public ulong GuildId { get; private set; } = 0;
         public GuildEntity Guild { get; private set; } = null;
         
+        public bool IsEnabled { get; set; } = false;
         public bool SaveAttachments { get; set; } = false;
-        public bool EnableBlackbox { get; set; } = false;
     }
 }
