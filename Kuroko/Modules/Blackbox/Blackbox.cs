@@ -64,12 +64,16 @@ namespace Kuroko.Modules.Blackbox
             var properties = propParams ?? await GetPropertiesAsync<BlackboxEntity, GuildEntity>(Context.Guild.Id);
             var componentBuilder = new ComponentBuilder()
                 .WithButton("Blackbox Recorder", $"{BlackboxCommandMap.ENABLE}:{Context.User.Id}",
-                    Pagination.IsButtonToggle(properties.IsEnabled), row: 0);
+                    Pagination.IsButtonToggle(properties.IsEnabled), row: 0)
+                .WithButton("Exit",
+                    $"{GlobalCommandMap.EXIT}:{Context.User.Id}",
+                    ButtonStyle.Secondary,
+                    row: 0);
 
             if (properties.IsEnabled)
             {
                 componentBuilder.WithButton("Download Attachments", $"{BlackboxCommandMap.ATTACHMENTS}:{Context.User.Id}",
-                    Pagination.IsButtonToggle(properties.SaveAttachments), row: 0);
+                    Pagination.IsButtonToggle(properties.SaveAttachments), row: 1);
             }
 
             if (!isReturning)
