@@ -50,6 +50,14 @@ namespace Kuroko.Events.BlackboxEvents
 
             if (!properties.IsEnabled)
                 return;
+            
+            if (properties.SyncModLog)
+            {
+                var modlogProp = properties.Guild.ModLog;
+
+                if (modlogProp.IgnoredChannelIds.Any(x => x.Value == channel.Id))
+                    return;
+            }
 
             await _blackbox.StoreMessageAsync(msg, properties.SaveAttachments, false);
         }
