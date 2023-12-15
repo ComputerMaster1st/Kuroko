@@ -135,7 +135,6 @@ namespace Kuroko.Modules.ModLogs
             var properties = propParam ?? await GetPropertiesAsync<ModLogEntity, GuildEntity>(Context.Guild.Id);
             var mainRow = 0;
             var toggleRow = 1;
-            var specialRow = 4;
             var exitRow = 3;
             var componentBuilder = new ComponentBuilder()
                 .WithButton("Configure Log Channel", $"{ModLogCommandMap.CHANNEL}:{user.Id},0", ButtonStyle.Primary, row: mainRow)
@@ -153,10 +152,7 @@ namespace Kuroko.Modules.ModLogs
                     .WithButton("User Joined", $"{ModLogCommandMap.JOIN}:{user.Id}", Pagination.IsButtonToggle(properties.Join), row: toggleRow)
                     .WithButton("User Left", $"{ModLogCommandMap.LEAVE}:{user.Id}", Pagination.IsButtonToggle(properties.Leave), row: toggleRow)
                     .WithButton("Message Edited", $"{ModLogCommandMap.MESSAGE_EDITED}:{user.Id}", Pagination.IsButtonToggle(properties.EditedMessages), row: toggleRow)
-                    .WithButton("Message Deleted", $"{ModLogCommandMap.MESSAGE_DELETED}:{user.Id}", Pagination.IsButtonToggle(properties.DeletedMessages), row: toggleRow)
-
-                    .WithButton("Download Attachments", $"{ModLogCommandMap.DOWNLOAD_ATTACHMENT}:{user.Id}", Pagination.IsButtonToggle(properties.SaveAttachments), row: specialRow)
-                    .WithButton("Blackbox Recorder", $"{ModLogCommandMap.BLACKBOX}:{user.Id}", Pagination.IsButtonToggle(properties.EnableBlackbox), row: specialRow);
+                    .WithButton("Message Deleted", $"{ModLogCommandMap.MESSAGE_DELETED}:{user.Id}", Pagination.IsButtonToggle(properties.DeletedMessages), row: toggleRow);
             }
 
             componentBuilder.WithButton("Exit", $"{GlobalCommandMap.EXIT}:{user.Id}", ButtonStyle.Secondary, row: exitRow);

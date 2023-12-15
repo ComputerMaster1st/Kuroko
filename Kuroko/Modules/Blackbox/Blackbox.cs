@@ -3,7 +3,10 @@ using Discord;
 using Discord.Interactions;
 using Kuroko.Core;
 using Kuroko.Core.Attributes;
+using Kuroko.Database.Entities.Guild;
+using Kuroko.Modules.Globals;
 using Kuroko.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace Kuroko.Modules.Blackbox
 {
@@ -21,16 +24,26 @@ namespace Kuroko.Modules.Blackbox
                 return;
 
             await DeferAsync();
-            await ExecuteAsync(true);
+            await ExecuteAsync(isReturning: true);
         }
 
-        private async Task ExecuteAsync(bool isReturning = false)
+        private async Task ExecuteAsync(BlackboxEntity propParams = null, bool isReturning = false)
         {
             var output = new StringBuilder()
                 .AppendLine("# Blackbox Recorder")
                 .AppendLine("## NOTICE!")
                 .AppendLine("Enabling \"Blackbox Recorder\" will record all messages from all channels that are not ignored by ModLogs. We recommend you to make your server aware that all messages are being recorded for moderation purposes.");
-            var componentBuilder = new ComponentBuilder();
+
+            var properties = propParams ?? await GetPropertiesAsync<BlackboxEntity, GuildEntity>(Context.Guild.Id);
+            var componentBuilder = new ComponentBuilder()
+                .WithButton("Blackbox Recorder", $"{BlackboxCommandMap.ENABLE}:{Context.User.Id}",
+                    Pagination.IsButtonToggle(properties.IsEnabled), row: 0);
+
+            if (properties.IsEnabled)
+            {
+                componentBuilder.WithButton("Download Attachments", $"{BlackboxCommandMap.ATTACHMENTS}:{Context.User.Id}",
+                    Pagination.IsButtonToggle(properties.SaveAttachments), row: 0);
+            }
 
             if (!isReturning)
             {
