@@ -1,7 +1,17 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Kuroko.Database.Entities.Guild
 {
-    public class BlackboxEntity(ulong id) : GuildEntity(id)
+    public class BlackboxEntity : IPropertyEntity
     {
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; private set; } = 0;
+
+        public ulong GuildId { get; private set; } = 0;
+        public GuildEntity Guild { get; private set; } = null;
         
+        public bool SaveAttachments { get; set; } = false;
+        public bool EnableBlackbox { get; set; } = false;
     }
 }
