@@ -36,12 +36,21 @@ namespace Kuroko.Modules.Blackbox
         }
 
         [ComponentInteraction($"{BlackboxCommandMap.ATTACHMENTS}:*")]
-        public async Task DownloadAsync(ulong interactedUserId)
+        public async Task SaveAttachmentsAsync(ulong interactedUserId)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
                 return;
 
             await ToggleAsync(x => x.SaveAttachments = !x.SaveAttachments);
+        }
+
+        [ComponentInteraction($"{BlackboxCommandMap.SYNCMODLOG}:*")]
+        public async Task SyncModLogAsync(ulong interactedUserId)
+        {
+            if (!await IsInteractedUserAsync(interactedUserId))
+                return;
+
+            await ToggleAsync(x => x.SyncModLog = !x.SyncModLog);
         }
 
         private async Task ToggleAsync(Action<BlackboxEntity> action)
