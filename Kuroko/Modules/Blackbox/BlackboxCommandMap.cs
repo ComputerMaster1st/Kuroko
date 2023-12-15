@@ -8,5 +8,6 @@ namespace Kuroko.Modules.Blackbox
 
         public const string ENABLE = PREFIX + "enable";
         public const string ATTACHMENTS = PREFIX + "attachments";
+        public const string SYNCMODLOG = PREFIX + "syncmodlog";
     }
 }

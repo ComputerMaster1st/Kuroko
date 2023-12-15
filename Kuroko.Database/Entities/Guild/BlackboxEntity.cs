@@ -13,5 +13,6 @@ namespace Kuroko.Database.Entities.Guild
         
         public bool IsEnabled { get; set; } = false;
         public bool SaveAttachments { get; set; } = false;
+        public bool SyncModLog { get; set; } = true;
     }
 }
