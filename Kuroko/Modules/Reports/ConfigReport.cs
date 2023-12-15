@@ -85,9 +85,6 @@ namespace Kuroko.Modules.Reports
             else
                 output.AppendLine("* **No handlers configured. Please set them up.**");
 
-            output.AppendLine("## NOTICE!")
-                .AppendLine("Enabling \"Automated Message Log Generation\" will record all messages from all channels that are not ignored by ModLogs. We recommend you to make your server aware that all messages are being recorded for moderation purposes. Disabling the feature will result in all recorded messages deleted as per Discord's developer policy.");
-
             var menusRow = 0;
             var togglesRow = 1;
             var exitRow = 2;
