@@ -24,11 +24,5 @@
         public const string LEAVE = "ml_leave";
 
         #endregion
-        #region Specials
-
-        public const string DOWNLOAD_ATTACHMENT = "ml_download";
-        public const string BLACKBOX = "ml_blackbox";
-
-        #endregion
     }
 }

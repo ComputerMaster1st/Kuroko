@@ -25,6 +25,7 @@ namespace Kuroko.Database
         public DbSet<ModLogEntity> GuildModLogs { get; internal set; } = null;
         public DbSet<ReportsEntity> GuildReports { get; internal set; } = null;
         public DbSet<TicketEntity> Tickets { get; internal set; } = null;
+        public DbSet<BlackboxEntity> Blackboxes { get; internal set; } = null;
 
 #if DEBUG
         public DatabaseContext() { }
@@ -128,6 +129,17 @@ namespace Kuroko.Database
                 .WithOne(x => x.Guild)
                 .HasForeignKey(x => x.GuildId)
                 .HasPrincipalKey(x => x.Id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            #endregion
+
+            #region Blackboxes
+
+            modelBuilder.Entity<GuildEntity>()
+                .HasOne(x => x.Blackbox)
+                .WithOne(x => x.Guild)
+                .HasForeignKey<BlackboxEntity>(x => x.GuildId)
+                .HasPrincipalKey<GuildEntity>(x => x.Id)
                 .OnDelete(DeleteBehavior.Cascade);
 
             #endregion

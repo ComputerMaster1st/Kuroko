@@ -2,7 +2,6 @@
 using Discord.WebSocket;
 using Kuroko.Core.Attributes;
 using Kuroko.Database;
-using Kuroko.Database.Entities.Guild;
 using Kuroko.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,33 +34,30 @@ namespace Kuroko.Events.BlackboxEvents
                 return;
             
             var channel = msg.Channel as IGuildChannel;
+            using var db = _services.GetRequiredService<DatabaseContext>();
+            var root = await db.Guilds.GetDataAsync(channel.GuildId);
+            var properties = await db.Blackboxes.FirstOrDefaultAsync(x => x.GuildId == channel.GuildId);
 
-            GuildEntity root;
-            ModLogEntity properties;
-            using (var db = _services.GetRequiredService<DatabaseContext>())
-            {
-                properties = await db.GuildModLogs.FirstOrDefaultAsync(x => x.GuildId == channel.GuildId);
-
-                if (properties is null)
-                    return;
-                
-                root = await db.Guilds.GetDataAsync(channel.GuildId);
-
-                if (root.Tickets.Count > 0)
-                {
-                    foreach (var ticket in root.Tickets)
-                    {
-                        if (ticket.ChannelId == channel.Id)
-                        {
-                            await _tickets.StoreTicketMessageAsync(msg, ticket.Id, properties.SaveAttachments);
-                            return;
-                        }
-                    }
-                }
-            }
-
-            if (!properties.EnableBlackbox)
+            if (properties is null)
                 return;
+            if (root.Tickets.Count > 0)
+                foreach (var ticket in root.Tickets)
+                    if (ticket.ChannelId == channel.Id)
+                    {
+                        await _tickets.StoreTicketMessageAsync(msg, ticket.Id, properties.SaveAttachments);
+                        return;
+                    }
+
+            if (!properties.IsEnabled)
+                return;
+            
+            if (properties.SyncModLog)
+            {
+                var modlogProp = properties.Guild.ModLog;
+
+                if (modlogProp.IgnoredChannelIds.Any(x => x.Value == channel.Id))
+                    return;
+            }
 
             await _blackbox.StoreMessageAsync(msg, properties.SaveAttachments, false);
         }
