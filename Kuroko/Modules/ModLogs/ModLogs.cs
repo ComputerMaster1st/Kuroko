@@ -101,24 +101,6 @@ namespace Kuroko.Modules.ModLogs
             await ToggleAsync(x => x.EditedMessages = !x.EditedMessages);
         }
 
-        [ComponentInteraction($"{ModLogCommandMap.DOWNLOAD_ATTACHMENT}:*")]
-        public async Task DownloadAsync(ulong interactedUserId)
-        {
-            if (!await IsInteractedUserAsync(interactedUserId))
-                return;
-
-            await ToggleAsync(x => x.SaveAttachments = !x.SaveAttachments);
-        }
-
-        [ComponentInteraction($"{ModLogCommandMap.BLACKBOX}:*")]
-        public async Task BlackboxAsync(ulong interactedUserId)
-        {
-            if (!await IsInteractedUserAsync(interactedUserId))
-                return;
-
-            await ToggleAsync(x => x.EnableBlackbox = !x.EnableBlackbox);
-        }
-
         private async Task ToggleAsync(Action<ModLogEntity> action)
         {
             var properties = await GetPropertiesAsync<ModLogEntity, GuildEntity>(Context.Guild.Id);

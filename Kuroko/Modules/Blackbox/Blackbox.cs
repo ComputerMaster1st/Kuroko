@@ -27,6 +27,34 @@ namespace Kuroko.Modules.Blackbox
             await ExecuteAsync(isReturning: true);
         }
 
+        [ComponentInteraction($"{BlackboxCommandMap.ENABLE}:*")]
+        public async Task BlackboxAsync(ulong interactedUserId)
+        {
+            if (!await IsInteractedUserAsync(interactedUserId))
+                return;
+
+            await ToggleAsync(x => x.IsEnabled = !x.IsEnabled);
+        }
+
+        [ComponentInteraction($"{BlackboxCommandMap.ATTACHMENTS}:*")]
+        public async Task DownloadAsync(ulong interactedUserId)
+        {
+            if (!await IsInteractedUserAsync(interactedUserId))
+                return;
+
+            await ToggleAsync(x => x.SaveAttachments = !x.SaveAttachments);
+        }
+
+        private async Task ToggleAsync(Action<BlackboxEntity> action)
+        {
+            var properties = await GetPropertiesAsync<BlackboxEntity, GuildEntity>(Context.Guild.Id);
+
+            action(properties);
+
+            await DeferAsync();
+            await ExecuteAsync(properties, true);
+        }
+
         private async Task ExecuteAsync(BlackboxEntity propParams = null, bool isReturning = false)
         {
             var output = new StringBuilder()
