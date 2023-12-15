@@ -68,8 +68,8 @@ namespace Kuroko.Modules.Blackbox
             var output = new StringBuilder()
                 .AppendLine("# Blackbox Recorder")
                 .AppendLine("## NOTICE!")
-                .AppendLine("Enabling \"Blackbox Recorder\" will record all messages from all channels that are not ignored by ModLogs. We recommend you to make your server aware that all messages are being recorded for moderation purposes.")
-                .AppendLine("_NOTE: Blackbox can only record channels it can see. To check, look at members list to verify you can see the bot there in the channel._")
+                .AppendLine("Enabling \"Blackbox Recorder\" will record all messages from the point of activation. We recommend you to make your server aware that all messages are being recorded for moderation purposes.")
+                .AppendLine("_NOTE: Blackbox can only record channels the bot can see. To check, look at members list to verify you can see the bot there in the channel._")
                 .AppendLine();
 
             var properties = propParams ?? await GetPropertiesAsync<BlackboxEntity, GuildEntity>(Context.Guild.Id);
@@ -83,7 +83,7 @@ namespace Kuroko.Modules.Blackbox
 
             if (properties.IsEnabled)
             {
-                output.AppendLine("\"Synchronize ModLogs\" will configure the blackbox to use the same ignored channel configuration within \"ModLogs\". By default, this will be active. Disable to force the blackbox to record all visible channels.");
+                output.AppendLine("\"Synchronize ModLogs\" will configure the blackbox to use the same ignored channel configuration within \"ModLogs\". By default, this will be active. Disabling will force the blackbox to record all visible channels.");
 
                 componentBuilder
                     .WithButton("Download Attachments", $"{BlackboxCommandMap.ATTACHMENTS}:{Context.User.Id}",
