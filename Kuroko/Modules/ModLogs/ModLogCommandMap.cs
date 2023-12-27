@@ -26,6 +26,10 @@
         public const string MESSAGE_EDITED = "ml_message_edited";
         public const string JOIN = "ml_join";
         public const string LEAVE = "ml_leave";
+        public const string TIMEOUT = "ml_timeout";
+        public const string SERVERMUTE = "ml_servermute";
+        public const string KICK = "ml_kick";
+        public const string BAN = "ml_ban";
 
         #endregion
     }

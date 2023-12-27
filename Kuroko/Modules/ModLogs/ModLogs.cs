@@ -89,6 +89,18 @@ namespace Kuroko.Modules.ModLogs
                     case ModLogCommandMap.MESSAGE_DELETED:
                         properties.DeletedMessages = !properties.DeletedMessages;
                         break;
+                    case ModLogCommandMap.KICK:
+                        properties.Kick = !properties.Kick;
+                        break;
+                    case ModLogCommandMap.BAN:
+                        properties.Ban = !properties.Ban;
+                        break;
+                    case ModLogCommandMap.SERVERMUTE:
+                        properties.ServerMute = !properties.ServerMute;
+                        break;
+                    case ModLogCommandMap.TIMEOUT:
+                        properties.Timeout = !properties.Timeout;
+                        break;
                     default:
                         await RespondAsync($"Unable to process flag: **{entry}**", ephemeral: true);
                         return;
@@ -147,6 +159,30 @@ namespace Kuroko.Modules.ModLogs
                             Description = "Monitors message deletion",
                             Label = properties.DeletedMessages ? "(Unset) Message Deletion" : "Message Deletion",
                             Value = ModLogCommandMap.MESSAGE_DELETED
+                        },
+                        new()
+                        {
+                            Description = "Monitors server muting",
+                            Label = properties.ServerMute ? "(Unset) Server Mute" : "Server Mute",
+                            Value = ModLogCommandMap.SERVERMUTE
+                        },
+                        new()
+                        {
+                            Description = "Monitors user timeouts",
+                            Label = properties.Timeout ? "(unset) User Timeout" : "User Timeout",
+                            Value = ModLogCommandMap.TIMEOUT
+                        },
+                        new()
+                        {
+                            Description = "Monitors server kicks",
+                            Label = properties.Kick ? "(Unset) Server Kick" : "Server Kick",
+                            Value = ModLogCommandMap.KICK
+                        },
+                        new()
+                        {
+                            Description = "Monitors server ban",
+                            Label = properties.Ban ? "(Unset) Server Ban" : "Server Ban",
+                            Value = ModLogCommandMap.BAN
                         }
                     ]
                 };

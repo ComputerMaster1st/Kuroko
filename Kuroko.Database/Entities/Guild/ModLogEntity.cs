@@ -20,6 +20,10 @@ namespace Kuroko.Database.Entities.Guild
         public bool EditedMessages { get; set; } = false;
         public bool Join { get; set; } = false;
         public bool Leave { get; set; } = false;
+        public bool Timeout { get; set; } = false;
+        public bool ServerMute { get; set; } = false;
+        public bool Kick { get; set; } = false;
+        public bool Ban { get; set; } = false;
 
         #endregion
     }
