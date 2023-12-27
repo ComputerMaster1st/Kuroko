@@ -18,6 +18,8 @@
         #endregion
         #region Toggles
 
+        public const string ENTRIES = "ml_entries";
+
         public const string MESSAGE_DELETED = "ml_message_deleted";
         public const string MESSAGE_EDITED = "ml_message_edited";
         public const string JOIN = "ml_join";

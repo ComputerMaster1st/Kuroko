@@ -6,6 +6,7 @@ using Kuroko.Database;
 using Kuroko.Database.Entities.Guild;
 using Kuroko.Modules.Globals;
 using Kuroko.Services;
+using System.Reflection.Emit;
 using System.Text;
 
 namespace Kuroko.Modules.ModLogs
@@ -129,12 +130,43 @@ namespace Kuroko.Modules.ModLogs
 
             if (properties.LogChannelId != 0)
             {
-                componentBuilder.WithButton("Unset Logging Channel", $"{ModLogCommandMap.CHANNEL_DELETE}:{user.Id}", ButtonStyle.Danger, row: mainRow)
+                var selectMenuBuilder = new SelectMenuBuilder()
+                {
+                    CustomId = $"{ModLogCommandMap.ENTRIES}:{user.Id}",
+                    MaxValues = 25,
+                    MinValues = 1,
+                    Placeholder = "Select options to (un)set for monitoring...",
+                    Options =
+                    [
+                        new()
+                        {
+                            Description = "Monitors when user joins the server",
+                            Label = properties.Join ? "(Unset) User Join" : "User Join",
+                            Value = ModLogCommandMap.JOIN
+                        },
+                        new()
+                        {
+                            Description = "Monitors when user leaves the server",
+                            Label = properties.Leave ? "(Unset) User Left" : "User Left",
+                            Value = ModLogCommandMap.LEAVE
+                        },
+                        new()
+                        {
+                            Description = "Monitors message editing",
+                            Label = properties.EditedMessages ? "(Unset) Message Editing" : "Message Editing",
+                            Value = ModLogCommandMap.MESSAGE_EDITED
+                        },
+                        new()
+                        {
+                            Description = "Monitors message deletion",
+                            Label = properties.DeletedMessages ? "(Unset) Message Deletion" : "Message Deletion",
+                            Value = ModLogCommandMap.MESSAGE_DELETED
+                        }
+                    ]
+                };
 
-                    .WithButton("User Joined", $"{ModLogCommandMap.JOIN}:{user.Id}", Pagination.IsButtonToggle(properties.Join), row: toggleRow)
-                    .WithButton("User Left", $"{ModLogCommandMap.LEAVE}:{user.Id}", Pagination.IsButtonToggle(properties.Leave), row: toggleRow)
-                    .WithButton("Message Edited", $"{ModLogCommandMap.MESSAGE_EDITED}:{user.Id}", Pagination.IsButtonToggle(properties.EditedMessages), row: toggleRow)
-                    .WithButton("Message Deleted", $"{ModLogCommandMap.MESSAGE_DELETED}:{user.Id}", Pagination.IsButtonToggle(properties.DeletedMessages), row: toggleRow);
+                componentBuilder.WithButton("Unset Logging Channel", $"{ModLogCommandMap.CHANNEL_DELETE}:{user.Id}", ButtonStyle.Danger, row: mainRow)
+                    .WithSelectMenu(selectMenuBuilder, toggleRow);
             }
 
             componentBuilder.WithButton("Exit", $"{GlobalCommandMap.EXIT}:{user.Id}", ButtonStyle.Secondary, row: exitRow);
