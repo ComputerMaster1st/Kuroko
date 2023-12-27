@@ -66,48 +66,34 @@ namespace Kuroko.Modules.ModLogs
             await ExecuteAsync(true, properties);
         }
 
-        [ComponentInteraction($"{ModLogCommandMap.JOIN}:*")]
-        public async Task JoinAsync(ulong interactedUserId)
+        [ComponentInteraction($"{ModLogCommandMap.ENTRIES}:*")]
+        public async Task ConfigureOptionsAsync(ulong interactedUserId, string[] rawEntries)
         {
             if (!await IsInteractedUserAsync(interactedUserId))
                 return;
 
-            await ToggleAsync(x => x.Join = !x.Join);
-        }
-
-        [ComponentInteraction($"{ModLogCommandMap.LEAVE}:*")]
-        public async Task LeaveAsync(ulong interactedUserId)
-        {
-            if (!await IsInteractedUserAsync(interactedUserId))
-                return;
-
-            await ToggleAsync(x => x.Leave = !x.Leave);
-        }
-
-        [ComponentInteraction($"{ModLogCommandMap.MESSAGE_DELETED}:*")]
-        public async Task MessageDeleteAsync(ulong interactedUserId)
-        {
-            if (!await IsInteractedUserAsync(interactedUserId))
-                return;
-
-            await ToggleAsync(x => x.DeletedMessages = !x.DeletedMessages);
-        }
-
-        [ComponentInteraction($"{ModLogCommandMap.MESSAGE_EDITED}:*")]
-        public async Task MessageEditAsync(ulong interactedUserId)
-        {
-            if (!await IsInteractedUserAsync(interactedUserId))
-                return;
-
-            await ToggleAsync(x => x.EditedMessages = !x.EditedMessages);
-        }
-
-        private async Task ToggleAsync(Action<ModLogEntity> action)
-        {
             var properties = await GetPropertiesAsync<ModLogEntity, GuildEntity>(Context.Guild.Id);
 
-            action(properties);
-
+            foreach (var entry in rawEntries)
+                switch (entry)
+                {
+                    case ModLogCommandMap.JOIN:
+                        properties.Join = !properties.Join;
+                        break;
+                    case ModLogCommandMap.LEAVE:
+                        properties.Leave = !properties.Leave;
+                        break;
+                    case ModLogCommandMap.MESSAGE_EDITED:
+                        properties.EditedMessages = !properties.EditedMessages;
+                        break;
+                    case ModLogCommandMap.MESSAGE_DELETED:
+                        properties.DeletedMessages = !properties.DeletedMessages;
+                        break;
+                    default:
+                        await RespondAsync($"Unable to process flag: **{entry}**", ephemeral: true);
+                        return;
+                }
+            
             await DeferAsync();
             await ExecuteAsync(true, properties);
         }
