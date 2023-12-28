@@ -138,6 +138,12 @@ namespace Kuroko.Modules.ModLogs
                     [
                         new()
                         {
+                            Description = "Monitors audit log and post all entries",
+                            Label = properties.AuditLog ? "(Unset) Audit Log" : "Audit Log",
+                            Value = ModLogCommandMap.AUDITLOG
+                        },
+                        new()
+                        {
                             Description = "Monitors when user joins the server",
                             Label = properties.Join ? "(Unset) User Join" : "User Join",
                             Value = ModLogCommandMap.JOIN
@@ -163,19 +169,19 @@ namespace Kuroko.Modules.ModLogs
                         new()
                         {
                             Description = "Monitors server muting",
-                            Label = properties.ServerMute ? "(Unset) Server Mute" : "Server Mute",
+                            Label = properties.ServerMute ? "(Unset) Server Mute" : "Server Mute (Audit Log)",
                             Value = ModLogCommandMap.SERVERMUTE
                         },
                         new()
                         {
                             Description = "Monitors user timeouts",
-                            Label = properties.Timeout ? "(unset) User Timeout" : "User Timeout",
+                            Label = properties.Timeout ? "(unset) User Timeout" : "User Timeout (Audit Log)",
                             Value = ModLogCommandMap.TIMEOUT
                         },
                         new()
                         {
                             Description = "Monitors server kicks",
-                            Label = properties.Kick ? "(Unset) Server Kick" : "Server Kick",
+                            Label = properties.Kick ? "(Unset) Server Kick" : "Server Kick (Audit Log)",
                             Value = ModLogCommandMap.KICK
                         },
                         new()

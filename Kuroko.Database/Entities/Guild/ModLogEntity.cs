@@ -24,6 +24,7 @@ namespace Kuroko.Database.Entities.Guild
         public bool ServerMute { get; set; } = false;
         public bool Kick { get; set; } = false;
         public bool Ban { get; set; } = false;
+        public bool AuditLog { get; set; } = false;
 
         #endregion
     }

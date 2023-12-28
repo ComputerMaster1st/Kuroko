@@ -20,6 +20,7 @@
 
         // Select menu for setting up toggles
         public const string ENTRIES = "ml_entries";
+        public const string AUDITLOG = "ml_auditlog";
 
         // Toggles
         public const string MESSAGE_DELETED = "ml_message_deleted";
