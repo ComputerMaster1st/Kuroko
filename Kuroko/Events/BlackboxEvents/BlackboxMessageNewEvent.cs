@@ -51,7 +51,7 @@ namespace Kuroko.Events.BlackboxEvents
             if (!properties.IsEnabled)
                 return;
             
-            if (properties.SyncModLog)
+            if (properties.SyncModLog && properties.Guild.ModLog != null)
             {
                 var modlogProp = properties.Guild.ModLog;
 
