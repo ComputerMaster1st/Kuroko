@@ -38,7 +38,7 @@ namespace Kuroko.Events.ModLogEvents
             using var db = _services.GetRequiredService<DatabaseContext>();
             var properties = await db.GuildModLogs.FirstOrDefaultAsync(x => x.GuildId == guildParam.Id);
 
-            if (properties.LogChannelId == 0)
+            if (properties is null || properties.LogChannelId == 0)
                 return;
 
             var guild = guildParam as IGuild;
