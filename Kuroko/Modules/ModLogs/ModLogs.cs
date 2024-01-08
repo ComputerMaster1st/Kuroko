@@ -6,12 +6,12 @@ using Kuroko.Database;
 using Kuroko.Database.Entities.Guild;
 using Kuroko.Modules.Globals;
 using Kuroko.Services;
-using System.Reflection.Emit;
 using System.Text;
 
 namespace Kuroko.Modules.ModLogs
 {
     [RequireUserGuildPermission(GuildPermission.ManageGuild)]
+    [RequireBotGuildPermission(GuildPermission.ViewAuditLog)]
     public class ModLogs : KurokoModuleBase
     {
         private static StringBuilder OutputMsg
@@ -95,12 +95,12 @@ namespace Kuroko.Modules.ModLogs
                     case ModLogCommandMap.BAN:
                         properties.Ban = !properties.Ban;
                         break;
-                    case ModLogCommandMap.SERVERMUTE:
-                        properties.ServerMute = !properties.ServerMute;
-                        break;
-                    case ModLogCommandMap.TIMEOUT:
-                        properties.Timeout = !properties.Timeout;
-                        break;
+                    // case ModLogCommandMap.SERVERMUTE:
+                    //     properties.ServerMute = !properties.ServerMute;
+                    //     break;
+                    // case ModLogCommandMap.TIMEOUT:
+                    //     properties.Timeout = !properties.Timeout;
+                    //     break;
                     default:
                         await RespondAsync($"Unable to process flag: **{entry}**", ephemeral: true);
                         return;
@@ -166,18 +166,18 @@ namespace Kuroko.Modules.ModLogs
                             Label = properties.DeletedMessages ? "(Unset) Message Deletion" : "Message Deletion",
                             Value = ModLogCommandMap.MESSAGE_DELETED
                         },
-                        new()
-                        {
-                            Description = "Monitors server muting",
-                            Label = properties.ServerMute ? "(Unset) Server Mute" : "Server Mute (Audit Log)",
-                            Value = ModLogCommandMap.SERVERMUTE
-                        },
-                        new()
-                        {
-                            Description = "Monitors user timeouts",
-                            Label = properties.Timeout ? "(unset) User Timeout" : "User Timeout (Audit Log)",
-                            Value = ModLogCommandMap.TIMEOUT
-                        },
+                        // new()
+                        // {
+                        //     Description = "Monitors server muting",
+                        //     Label = properties.ServerMute ? "(Unset) Server Mute" : "Server Mute (Audit Log)",
+                        //     Value = ModLogCommandMap.SERVERMUTE
+                        // },
+                        // new()
+                        // {
+                        //     Description = "Monitors user timeouts",
+                        //     Label = properties.Timeout ? "(unset) User Timeout" : "User Timeout (Audit Log)",
+                        //     Value = ModLogCommandMap.TIMEOUT
+                        // },
                         new()
                         {
                             Description = "Monitors server kicks",
