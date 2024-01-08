@@ -95,6 +95,9 @@ namespace Kuroko.Modules.ModLogs
                     case ModLogCommandMap.BAN:
                         properties.Ban = !properties.Ban;
                         break;
+                    case ModLogCommandMap.AUDITLOG:
+                        properties.AuditLog = !properties.AuditLog;
+                        break;
                     // case ModLogCommandMap.SERVERMUTE:
                     //     properties.ServerMute = !properties.ServerMute;
                     //     break;
