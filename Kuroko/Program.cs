@@ -23,7 +23,11 @@ DiscordShardedClient _discordClient = new(new DiscordSocketConfig()
     LogLevel = LogSeverity.Info,
     MaxWaitBetweenGuildAvailablesBeforeReady = 1000,
     MessageCacheSize = 1000,
-    GatewayIntents = GatewayIntents.Guilds | GatewayIntents.GuildMembers | GatewayIntents.GuildMessages | GatewayIntents.MessageContent
+    GatewayIntents = GatewayIntents.Guilds |
+                     GatewayIntents.GuildMembers | 
+                     GatewayIntents.GuildMessages | 
+                     GatewayIntents.MessageContent |
+                     GatewayIntents.GuildBans
 });
 InteractionService _interactionService = new(_discordClient, new()
 {
