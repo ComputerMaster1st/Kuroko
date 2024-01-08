@@ -131,69 +131,70 @@ namespace Kuroko.Modules.ModLogs
 
             if (properties.LogChannelId != 0)
             {
+                var optionsBuilder = new List<SelectMenuOptionBuilder>()
+                {
+                    new()
+                    {
+                        Description = "Monitors audit log and post all entries",
+                        Label = properties.AuditLog ? "(Unset) Audit Log" : "Audit Log",
+                        Value = ModLogCommandMap.AUDITLOG
+                    },
+                    new()
+                    {
+                        Description = "Monitors when user joins the server",
+                        Label = properties.Join ? "(Unset) User Join" : "User Join",
+                        Value = ModLogCommandMap.JOIN
+                    },
+                    new()
+                    {
+                        Description = "Monitors when user leaves the server",
+                        Label = properties.Leave ? "(Unset) User Left" : "User Left",
+                        Value = ModLogCommandMap.LEAVE
+                    },
+                    new()
+                    {
+                        Description = "Monitors message editing",
+                        Label = properties.EditedMessages ? "(Unset) Message Editing" : "Message Editing",
+                        Value = ModLogCommandMap.MESSAGE_EDITED
+                    },
+                    new()
+                    {
+                        Description = "Monitors message deletion",
+                        Label = properties.DeletedMessages ? "(Unset) Message Deletion" : "Message Deletion",
+                        Value = ModLogCommandMap.MESSAGE_DELETED
+                    },
+                    // new()
+                    // {
+                    //     Description = "Monitors server muting",
+                    //     Label = properties.ServerMute ? "(Unset) Server Mute" : "Server Mute (Audit Log)",
+                    //     Value = ModLogCommandMap.SERVERMUTE
+                    // },
+                    // new()
+                    // {
+                    //     Description = "Monitors user timeouts",
+                    //     Label = properties.Timeout ? "(unset) User Timeout" : "User Timeout (Audit Log)",
+                    //     Value = ModLogCommandMap.TIMEOUT
+                    // },
+                    new()
+                    {
+                        Description = "Monitors server kicks",
+                        Label = properties.Kick ? "(Unset) Server Kick" : "Server Kick (Audit Log)",
+                        Value = ModLogCommandMap.KICK
+                    },
+                    new()
+                    {
+                        Description = "Monitors server ban",
+                        Label = properties.Ban ? "(Unset) Server Ban" : "Server Ban",
+                        Value = ModLogCommandMap.BAN
+                    }
+                };
                 var selectMenuBuilder = new SelectMenuBuilder()
                 {
                     CustomId = $"{ModLogCommandMap.ENTRIES}:{user.Id}",
-                    MaxValues = 25,
+                    MaxValues = optionsBuilder.Count,
                     MinValues = 1,
                     Placeholder = "Select options to (un)set for monitoring...",
-                    Options =
-                    [
-                        new()
-                        {
-                            Description = "Monitors audit log and post all entries",
-                            Label = properties.AuditLog ? "(Unset) Audit Log" : "Audit Log",
-                            Value = ModLogCommandMap.AUDITLOG
-                        },
-                        new()
-                        {
-                            Description = "Monitors when user joins the server",
-                            Label = properties.Join ? "(Unset) User Join" : "User Join",
-                            Value = ModLogCommandMap.JOIN
-                        },
-                        new()
-                        {
-                            Description = "Monitors when user leaves the server",
-                            Label = properties.Leave ? "(Unset) User Left" : "User Left",
-                            Value = ModLogCommandMap.LEAVE
-                        },
-                        new()
-                        {
-                            Description = "Monitors message editing",
-                            Label = properties.EditedMessages ? "(Unset) Message Editing" : "Message Editing",
-                            Value = ModLogCommandMap.MESSAGE_EDITED
-                        },
-                        new()
-                        {
-                            Description = "Monitors message deletion",
-                            Label = properties.DeletedMessages ? "(Unset) Message Deletion" : "Message Deletion",
-                            Value = ModLogCommandMap.MESSAGE_DELETED
-                        },
-                        // new()
-                        // {
-                        //     Description = "Monitors server muting",
-                        //     Label = properties.ServerMute ? "(Unset) Server Mute" : "Server Mute (Audit Log)",
-                        //     Value = ModLogCommandMap.SERVERMUTE
-                        // },
-                        // new()
-                        // {
-                        //     Description = "Monitors user timeouts",
-                        //     Label = properties.Timeout ? "(unset) User Timeout" : "User Timeout (Audit Log)",
-                        //     Value = ModLogCommandMap.TIMEOUT
-                        // },
-                        new()
-                        {
-                            Description = "Monitors server kicks",
-                            Label = properties.Kick ? "(Unset) Server Kick" : "Server Kick (Audit Log)",
-                            Value = ModLogCommandMap.KICK
-                        },
-                        new()
-                        {
-                            Description = "Monitors server ban",
-                            Label = properties.Ban ? "(Unset) Server Ban" : "Server Ban",
-                            Value = ModLogCommandMap.BAN
-                        }
-                    ]
+                    Options = optionsBuilder
                 };
 
                 componentBuilder.WithButton("Unset Logging Channel", $"{ModLogCommandMap.CHANNEL_DELETE}:{user.Id}", ButtonStyle.Danger, row: mainRow)
