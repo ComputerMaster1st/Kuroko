@@ -20,6 +20,8 @@
 
         // Select menu for setting up toggles
         public const string ENTRIES = "ml_entries";
+        public const string ENTRIES_MENU = "ml_entries_menu";
+        public const string ENTRIES_RESET = "ml_entries_reset";
         public const string AUDITLOG = "ml_auditlog";
 
         // Toggles
