@@ -196,9 +196,8 @@ namespace Kuroko.Modules.ModLogs
                     Placeholder = "Select options to (un)set for monitoring...",
                     Options = optionsBuilder
                 };
-
-                componentBuilder.WithButton("Unset Logging Channel", $"{ModLogCommandMap.CHANNEL_DELETE}:{user.Id}", ButtonStyle.Danger, row: mainRow)
-                    .WithSelectMenu(selectMenuBuilder, toggleRow);
+                
+                componentBuilder.WithSelectMenu(selectMenuBuilder, toggleRow);
             }
 
             componentBuilder.WithButton("Exit", $"{GlobalCommandMap.EXIT}:{user.Id}", ButtonStyle.Secondary, row: exitRow);

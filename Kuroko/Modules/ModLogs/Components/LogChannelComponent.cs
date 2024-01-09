@@ -39,7 +39,10 @@ namespace Kuroko.Modules.ModLogs.Components
             var selectedChannelId = ulong.Parse(channelId);
             var properties = await GetPropertiesAsync<ModLogEntity, GuildEntity>(Context.Guild.Id);
 
-            properties.LogChannelId = selectedChannelId;
+            if (properties.LogChannelId == selectedChannelId)
+                properties.LogChannelId = 0;
+            else
+                properties.LogChannelId = selectedChannelId;
 
             await ExecuteAsync(0, properties);
         }
@@ -62,7 +65,10 @@ namespace Kuroko.Modules.ModLogs.Components
 
             foreach (var textChannel in textChannels.Skip(index).ToList())
             {
-                selectMenuBuilder.AddOption(textChannel.Name, textChannel.Id.ToString());
+                if (logChannel != null && logChannel.Id == textChannel.Id)
+                    selectMenuBuilder.AddOption($"(Unset) {textChannel.Name}", textChannel.Id.ToString(), "Turns off ModLogs if unset!");
+                else
+                    selectMenuBuilder.AddOption(textChannel.Name, textChannel.Id.ToString());
                 count++;
 
                 if (count >= 25)
