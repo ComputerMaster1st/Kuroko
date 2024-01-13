@@ -1,4 +1,5 @@
 ﻿using Kuroko.Database.Entities;
+using Kuroko.Database.Entities.Audio;
 using Kuroko.Database.Entities.Guild;
 using Kuroko.Database.Entities.Message;
 using Kuroko.Database.Entities.User;
@@ -26,6 +27,10 @@ namespace Kuroko.Database
         public DbSet<ReportsEntity> GuildReports { get; internal set; } = null;
         public DbSet<TicketEntity> Tickets { get; internal set; } = null;
         public DbSet<BlackboxEntity> Blackboxes { get; internal set; } = null;
+
+        public DbSet<TrackDataEntity> TrackData { get; internal set; } = null;
+        public DbSet<SubFingerprintEntity> SubFingerprints { get; internal set; } = null;
+        public DbSet<HashEntity> Hashs { get; internal set; } = null;
 
 #if DEBUG
         public DatabaseContext() { }
@@ -140,6 +145,24 @@ namespace Kuroko.Database
                 .WithOne(x => x.Guild)
                 .HasForeignKey<BlackboxEntity>(x => x.GuildId)
                 .HasPrincipalKey<GuildEntity>(x => x.Id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            #endregion
+
+            #region Audio
+
+            modelBuilder.Entity<TrackDataEntity>()
+                .HasMany(x => x.SubFingerprints)
+                .WithOne(x => x.TrackData)
+                .HasForeignKey(x => x.TrackDataId)
+                .HasPrincipalKey(x => x.Id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<SubFingerprintEntity>()
+                .HasMany(x => x.Hashes)
+                .WithOne(x => x.SubFingerprint)
+                .HasForeignKey(x => x.SubFingerprintId)
+                .HasPrincipalKey(x => x.Id)
                 .OnDelete(DeleteBehavior.Cascade);
 
             #endregion

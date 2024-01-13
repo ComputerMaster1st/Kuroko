@@ -8,6 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="SoundFingerprinting" Version="9.1.0" />
+    <PackageReference Include="SoundFingerprinting.Emy" Version="9.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Kuroko.Database\Kuroko.Database.csproj" />
     <ProjectReference Include="..\Kuroko.Shared\Kuroko.Shared.csproj" />
   </ItemGroup>
