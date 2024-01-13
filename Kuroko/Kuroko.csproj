@@ -14,6 +14,7 @@
     <PackageReference Include="FluentScheduler" Version="5.5.1" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Kuroko.Audio\Kuroko.Audio.csproj" />
     <ProjectReference Include="..\Kuroko.Database\Kuroko.Database.csproj" />
     <ProjectReference Include="..\Kuroko.Shared\Kuroko.Shared.csproj" />
   </ItemGroup>

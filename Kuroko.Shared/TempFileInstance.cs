@@ -1,16 +1,14 @@
-﻿using System;
-using Kuroko.Shared;
-
-namespace Kuroko.Modules.Audio
+﻿
+namespace Kuroko.Shared
 {
-    internal class TempFileInstance : IDisposable
+    public class TempFileInstance : IDisposable
     {
         private bool disposedValue;
         public string FilePath { get; private set; }
 
         public TempFileInstance()
         {
-            FilePath = Path.Combine(DataDirectories.TEMPFILES, $"probe_{Path.GetRandomFileName()}.tmp");
+            FilePath = Path.Combine(DataDirectories.TEMPFILES, $"{Path.GetRandomFileName()}.tmp");
             File.Create(FilePath).Close();
         }
 

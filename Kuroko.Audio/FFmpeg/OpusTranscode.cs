@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace Kuroko.Modules.Audio.FFmpeg
+namespace Kuroko.Audio.FFmpeg
 {
-    internal class OpusTranscode
+    public class OpusTranscode
     {
         public static async Task<Stream> TranscodeAudio(Stream data, CancellationToken cancellationToken)
         {

@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Kuroko.Modules.Audio
+namespace Kuroko.Audio
 {
-    internal class SongMetadata
+    public class SongMetadata
     {
         /// <summary>
         /// Title of this song

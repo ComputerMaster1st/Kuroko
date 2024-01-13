@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Text.Json;
+using Kuroko.Shared;
 
-namespace Kuroko.Modules.Audio.FFmpeg
+namespace Kuroko.Audio.FFmpeg
 {
-    internal class Probe
+    public class Probe
     {
         public static async Task<SongMetadata> GetMetadataAsync(Stream data)
         {
@@ -54,7 +55,7 @@ namespace Kuroko.Modules.Audio.FFmpeg
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = "ffprobe",
-                    Arguments = $"-i {path} -hide_banner -show_format -print_format json -v quiet",
+                    Arguments = $"-i \"{path}\" -hide_banner -show_format -print_format json -v quiet",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                 },

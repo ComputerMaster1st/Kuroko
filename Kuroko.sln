@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kuroko.Database", "Kuroko.D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kuroko.Shared", "Kuroko.Shared\Kuroko.Shared.csproj", "{7EE93CBD-BDBB-47A0-A3A7-600DF83ADA7E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kuroko.Audio", "Kuroko.Audio\Kuroko.Audio.csproj", "{9E5518EE-97AA-4CE1-8290-9358F27E9BCE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,6 +36,12 @@ Global
 		{7EE93CBD-BDBB-47A0-A3A7-600DF83ADA7E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7EE93CBD-BDBB-47A0-A3A7-600DF83ADA7E}.Semi-Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7EE93CBD-BDBB-47A0-A3A7-600DF83ADA7E}.Semi-Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E5518EE-97AA-4CE1-8290-9358F27E9BCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E5518EE-97AA-4CE1-8290-9358F27E9BCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E5518EE-97AA-4CE1-8290-9358F27E9BCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E5518EE-97AA-4CE1-8290-9358F27E9BCE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E5518EE-97AA-4CE1-8290-9358F27E9BCE}.Semi-Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E5518EE-97AA-4CE1-8290-9358F27E9BCE}.Semi-Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
