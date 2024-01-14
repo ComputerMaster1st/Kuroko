@@ -49,6 +49,7 @@ namespace Kuroko.Audio.FFmpeg
         {
             TaskCompletionSource<int> awaitExitSource = new TaskCompletionSource<int>();
             string json;
+            string stats;
 
             using (Process process = new Process
             {
@@ -62,7 +63,7 @@ namespace Kuroko.Audio.FFmpeg
                 EnableRaisingEvents = true
             })
             {
-                process.Exited += (obj, args) => { awaitExitSource.SetResult(process.ExitCode); };
+                process.Exited += (obj, args) => awaitExitSource.SetResult(process.ExitCode);
                 process.Start();
 
                 json = await process.StandardOutput.ReadToEndAsync();
@@ -72,7 +73,49 @@ namespace Kuroko.Audio.FFmpeg
             if (await awaitExitSource.Task != 0)
                 throw new Exception("FFprobe closed with a non-0 exit code");
 
-            return JsonSerializer.Deserialize<Metadata>(json);
+            Metadata metadata = JsonSerializer.Deserialize<Metadata>(json);
+
+            // FFprobe can give incorrect duration on some files
+            // FFmpeg is able to get accurate duration when decoding
+            awaitExitSource = new TaskCompletionSource<int>();
+            using (Process process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "ffmpeg",
+                    Arguments = $"-i \"{path}\" -hide_banner -v quiet -vn -progress pipe:2 -f null -",
+                    UseShellExecute = false,
+                    RedirectStandardError = true,
+                },
+                EnableRaisingEvents = true
+            })
+            {
+                process.Exited += (obj, args) => awaitExitSource.SetResult(process.ExitCode);
+                process.Start();
+
+                var task = new Task<string>(() =>
+                {
+                    List<string> output = new List<string>();
+                    string line;
+                    while ((line = process.StandardError.ReadLine()) != null)
+                        output.Add(line);
+                    return output.FindLast(x => x.StartsWith("out_time_us=")).Substring("out_time_us=".Length);
+                });
+                task.Start();
+
+                stats = await task;
+                await awaitExitSource.Task;
+            }
+
+            if (double.TryParse(stats, out double time_us))
+                metadata.format.duration = (time_us / 1000000d).ToString();
+            else
+                throw new ArgumentException("FFmpeg (probe) gave back unreadable information.");
+
+            if (await awaitExitSource.Task != 0)
+                throw new Exception("FFmpeg (probe) closed with a non-0 exit code");
+
+            return metadata;
         }
     }
 }
