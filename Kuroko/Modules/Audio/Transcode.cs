@@ -52,6 +52,26 @@ namespace Kuroko.Audio
                 return;
             }
 
+            // Check if in database
+            await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SLASHCMD, $"Checking if already transcoded"));
+            sw.Start();
+            bool match = await Fingerprinting.Fingerprinting.Match(sourceAudio, metadata.Duration.TotalSeconds);
+            sw.Stop();
+            await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SLASHCMD, $"{(match ? "File already transcoded" : "File needs transcoding")} (Elapsed = {sw.ElapsedMilliseconds / 1000d})"));
+            sourceAudio.Position = 0;
+            sw.Reset();
+
+            if (!match)
+            {
+                await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SLASHCMD, $"Adding file to fingerprint database"));
+                sw.Start();
+                await Fingerprinting.Fingerprinting.AddTrack(sourceAudio, metadata);
+                sw.Stop();
+                await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SLASHCMD, $"Added (Elapsed = {sw.ElapsedMilliseconds / 1000d})"));
+                sourceAudio.Position = 0;
+                sw.Reset();
+            }
+
             // TODO: Ask to fill in missing info
             await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SLASHCMD, $"Transcoding file"));
             sw.Start();
