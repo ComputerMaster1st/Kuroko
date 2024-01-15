@@ -1,8 +1,4 @@
-﻿using Kuroko.Database.Entities.Guild;
-using Kuroko.Database.Entities.Message;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Kuroko.Database.Entities.Audio
