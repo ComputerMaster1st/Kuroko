@@ -66,7 +66,10 @@ namespace Kuroko.Audio.FFmpeg
                 process.Exited += (obj, args) => awaitExitSource.SetResult(process.ExitCode);
                 process.Start();
 
-                json = await process.StandardOutput.ReadToEndAsync();
+                // FFprobe outputs in UTF8
+                using StreamReader streamReader = new StreamReader(process.StandardOutput.BaseStream, System.Text.Encoding.UTF8);
+
+                json = await streamReader.ReadToEndAsync();
                 await awaitExitSource.Task;
             }
 
