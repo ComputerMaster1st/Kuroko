@@ -7,12 +7,12 @@ namespace Kuroko.Audio
         /// <summary>
         /// Title of this song
         /// </summary>
-        public string Title { get; set; } = "Unknown title";
+        public string Title { get; set; } = "Unknown";
 
         /// <summary>
         /// Artist of this song
         /// </summary>
-        public string Artist { get; set; } = "Unknown artist";
+        public string Artist { get; set; } = "Unknown";
 
         /// <summary>
         /// Album
