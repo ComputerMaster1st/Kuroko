@@ -69,20 +69,14 @@ namespace Kuroko.Audio.Fingerprinting
             var resultTracks = result.GroupBy(x => x.Track.Id).ToList();
 
             if (resultTracks.Count == 0)
-                Console.WriteLine($"{file} matched no tracks");
+                Console.WriteLine($"Matched no tracks");
 
             if (resultTracks.Count > 1)
             {
-                Console.WriteLine($"{file} matched multiple tracks");
+                Console.WriteLine($"Matched multiple tracks");
                 foreach (var tr in resultTracks)
-                    Console.WriteLine($"{tr.Key} With {tr.Count()} Matches Coverage[0]: {tr.First().TrackCoverageWithPermittedGapsLength:0.00} seconds. Confidence[0]: {tr.First().Coverage.Confidence}");
+                    Console.WriteLine($"{tr.Key} With {tr.Count()} matches. Coverage[0]: {tr.First().TrackCoverageWithPermittedGapsLength:0.00} seconds. Confidence[0]: {tr.First().Coverage.Confidence}");
                 Console.WriteLine($"Best match was {result[0].Track.Id}");
-            }
-
-            if (resultTracks.Count >= 1 &&
-                result[0].Track.Id != file)
-            {
-                Console.WriteLine($"Track {file} had incorrect match");
             }
 
             return resultTracks.Count >= 1;
