@@ -5,7 +5,6 @@ using Kuroko.Audio.FFmpeg;
 using Kuroko.Core;
 using Kuroko.Modules.Audio;
 using Kuroko.Modules.Audio.Modal;
-using Kuroko.Services;
 using Kuroko.Shared;
 using System.Diagnostics;
 using System.Text;
@@ -99,7 +98,7 @@ namespace Kuroko.Audio
                     {
                         x.Content = "Command timed out";
                         x.Components = null;
-                    }).Result.ResetTimeout();
+                    }).Wait();
                 }
                 finally
                 {
@@ -111,11 +110,11 @@ namespace Kuroko.Audio
 
             try
             {
-                (await ModifyOriginalResponseAsync(x =>
+                await ModifyOriginalResponseAsync(x =>
                 {
                     x.Content = output.ToString();
                     x.Components = componentBuilder.Build();
-                })).ResetTimeout();
+                });
             }
             catch
             {
@@ -191,11 +190,11 @@ namespace Kuroko.Audio
                 .AppendLine()
                 .AppendLine("Transcoding...");
 
-            (await ModifyOriginalResponseAsync(x =>
+            await ModifyOriginalResponseAsync(x =>
             {
                 x.Content = output.ToString();
                 x.Components = null;
-            })).ResetTimeout();
+            });
 
             Stopwatch sw = new Stopwatch();
             await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SLASHCMD, $"Transcoding file"));
@@ -228,12 +227,12 @@ namespace Kuroko.Audio
                 .AppendLine($"Size: {transcodedAudio.Length / 1024} KiB");
 
             // Return File
-            (await ModifyOriginalResponseAsync(x =>
+            await ModifyOriginalResponseAsync(x =>
             {
                 x.Content = output.ToString();
                 x.Components = null;
                 x.Attachments = new Optional<IEnumerable<FileAttachment>>(new FileAttachment[] { new FileAttachment(transcodedAudio, $"{state.FileName}.ogg") });
-            })).ResetTimeout();
+            });
         }
     }
 }
