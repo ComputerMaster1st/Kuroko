@@ -10,16 +10,15 @@ namespace Kuroko.Audio.Fingerprinting
 {
     public class Fingerprinting
     {
-        private static IModelService modelService;
-        private static readonly IAudioService audioService = new FFmpegAudioService();
+        private IModelService modelService;
+        private readonly IAudioService audioService = new FFmpegAudioService();
 
-        public static void InitService(IServiceProvider serviceProvider)
+        public Fingerprinting(IServiceProvider serviceProvider)
         {
-            if (modelService == null)
-                modelService = new Database.EFCoreService(serviceProvider);
+            modelService = new Database.EFCoreService(serviceProvider);
         }
 
-        public static async Task<bool> Match(Stream audioStream, double fullLength)
+        public async Task<bool> Match(Stream audioStream, double fullLength)
         {
             using (var tempFile = new TempFileInstance())
             {
@@ -30,7 +29,7 @@ namespace Kuroko.Audio.Fingerprinting
             }
         }
 
-        public static async Task<bool> Match(string file, double fullLength)
+        public async Task<bool> Match(string file, double fullLength)
         {
             int secondsToAnalyze = 15; // Number of seconds to analyze
             int startAtSecond = 20; // Start 20 seconds in
@@ -83,7 +82,7 @@ namespace Kuroko.Audio.Fingerprinting
         }
 
         //TODO, Passthough ID
-        public static async Task<string> AddTrack(Stream audioStream, SongMetadata metadata)
+        public async Task<string> AddTrack(Stream audioStream, SongMetadata metadata)
         {
             using (var tempFile = new TempFileInstance())
             {
@@ -94,9 +93,9 @@ namespace Kuroko.Audio.Fingerprinting
             }
         }
 
-        public static async Task<string> AddTrack(string file, SongMetadata metadata)
+        public async Task<string> AddTrack(string file, SongMetadata metadata)
         {
-            var track = new TrackInfo(Guid.NewGuid().ToString(), metadata.Title, metadata.Artist);
+            var track = new TrackInfo(file, metadata.Title, metadata.Artist);
             var fingerprints = await FingerprintCommandBuilder.Instance
                 .BuildFingerprintCommand()
                 .From(file)
