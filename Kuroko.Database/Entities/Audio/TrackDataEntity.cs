@@ -9,21 +9,15 @@ namespace Kuroko.Database.Entities.Audio
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; private set; } = 0;
 
-        public string TrackInfoId { get; set; } = "";
+        public string SongId { get; set; }
 
-        public string Artist { get; set; } = "";
-        public string Title { get; set; } = "";
         public double Length { get; set; } = 0;
-
-        //public IDictionary<string, string> MetaFields { get; set; }
 
         public virtual List<SubFingerprintEntity> SubFingerprints { get; private set; } = new();
 
-        public TrackDataEntity(string trackInfoId, string artist, string title, double length)
+        public TrackDataEntity(string songId, double length)
         {
-            TrackInfoId = trackInfoId;
-            Artist = artist;
-            Title = title;
+            SongId = songId;
             Length = length;
         }
     }

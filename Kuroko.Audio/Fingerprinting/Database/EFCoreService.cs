@@ -48,7 +48,7 @@ namespace Kuroko.Audio.Fingerprinting.Database
                 return;
 
             // We don't store media type
-            var trackEntity = new TrackDataEntity(trackInfo.Id, trackInfo.Artist, trackInfo.Title, audioHashes.DurationInSeconds);
+            var trackEntity = new TrackDataEntity(trackInfo.Id, audioHashes.DurationInSeconds);
             SubFingerprintDao.InsertHashDataForTrack(audioHashes, trackEntity);
 
             var db = scope.ServiceProvider.GetService<DatabaseContext>();
@@ -69,9 +69,7 @@ namespace Kuroko.Audio.Fingerprinting.Database
                 throw new ArgumentException($"Could not find track {trackInfo.Id} to update", nameof(trackInfo.Id));
 
             // We don't store media type
-            track.TrackInfoId = trackInfo.Id;
-            track.Artist = trackInfo.Artist;
-            track.Title = trackInfo.Title;
+            track.SongId = trackInfo.Id;
 
             db.SaveChanges();
         }
@@ -143,17 +141,17 @@ namespace Kuroko.Audio.Fingerprinting.Database
 
             var metaFields = CopyMetaFields(/*trackData.MetaFields*/ null);
             metaFields.Add("TrackLength", $"{trackData.Length: 0.000}");
-            return new TrackInfo(trackData.TrackInfoId, trackData.Title, trackData.Artist, metaFields, MediaType.Audio);
+            return new TrackInfo(trackData.SongId, "", "", metaFields, MediaType.Audio);
         }
 
         public IEnumerable<string> GetTrackIds()
         {
             using var scope = _services.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-            return db.SFPTrackData.Select(x => x.TrackInfoId);
+            return db.SFPTrackData.Select(x => x.SongId);
         }
 
-        public TrackDataEntity ReadTrackEntityById(DatabaseContext ctx, string id) => ctx.SFPTrackData.FirstOrDefault(x => x.TrackInfoId == id);
+        public TrackDataEntity ReadTrackEntityById(DatabaseContext ctx, string id) => ctx.SFPTrackData.FirstOrDefault(x => x.SongId == id);
 
         private static IDictionary<string, string> CopyMetaFields(IDictionary<string, string> metaFields)
         {
@@ -162,7 +160,7 @@ namespace Kuroko.Audio.Fingerprinting.Database
 
         private static TrackData RepackTrackData(TrackDataEntity entity)
         {
-            return new TrackData(entity.TrackInfoId, entity.Artist, entity.Title, entity.Length, new ModelReference<int>(entity.Id), /*entity.MetaFields*/ new Dictionary<string, string>(), MediaType.Audio);
+            return new TrackData(entity.SongId, "", "", entity.Length, new ModelReference<int>(entity.Id), /*entity.MetaFields*/ new Dictionary<string, string>(), MediaType.Audio);
         }
 
         private static SubFingerprintData RepackSubFingerprint(SubFingerprintEntity entity)
