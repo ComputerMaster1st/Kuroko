@@ -28,9 +28,9 @@ namespace Kuroko.Database
         public DbSet<TicketEntity> Tickets { get; internal set; } = null;
         public DbSet<BlackboxEntity> Blackboxes { get; internal set; } = null;
 
-        public DbSet<TrackDataEntity> TrackData { get; internal set; } = null;
-        public DbSet<SubFingerprintEntity> SubFingerprints { get; internal set; } = null;
-        public DbSet<HashEntity> Hashs { get; internal set; } = null;
+        public DbSet<TrackDataEntity> SFPTrackData { get; internal set; } = null;
+        public DbSet<SubFingerprintEntity> SFPSubFingerprints { get; internal set; } = null;
+        public DbSet<HashEntity> SFPHashes { get; internal set; } = null;
 
 #if DEBUG
         public DatabaseContext() { }

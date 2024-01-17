@@ -31,7 +31,7 @@ namespace Kuroko.Audio.Fingerprinting.Database
             }
         }
 
-        public IEnumerable<SubFingerprintEntity> ReadHashedFingerprintsByTrackReference(DatabaseContext databaseContext, int trackReference) => databaseContext.SubFingerprints.Where(x => x.TrackDataId == trackReference);
+        public IEnumerable<SubFingerprintEntity> ReadHashedFingerprintsByTrackReference(DatabaseContext databaseContext, int trackReference) => databaseContext.SFPSubFingerprints.Where(x => x.TrackDataId == trackReference);
 
         public IEnumerable<SubFingerprintEntity> ReadSubFingerprints(IServiceScope scope, IEnumerable<int[]> hashes, QueryConfiguration queryConfiguration)
         {
@@ -74,7 +74,7 @@ namespace Kuroko.Audio.Fingerprinting.Database
             IDictionary<string, string> noMetaFieldsFilters)
         {
             var subFingeprintIds = GetSubFingerprintMatches(ctx, hashes, thresholdVotes);
-            var subFingerprints = subFingeprintIds.Select(x => ctx.SubFingerprints.AsNoTracking().FirstOrDefault(y => y.Id == x));
+            var subFingerprints = subFingeprintIds.Select(x => ctx.SFPSubFingerprints.AsNoTracking().FirstOrDefault(y => y.Id == x));
 
             if (yesMetaFieldsFilters.Count > 0 || noMetaFieldsFilters.Count > 0)
             {
@@ -82,7 +82,7 @@ namespace Kuroko.Audio.Fingerprinting.Database
                     .GroupBy(subFingerprint => subFingerprint.TrackDataId)
                     .Where(group =>
                     {
-                        var trackData = ctx.TrackData.AsNoTracking().FirstOrDefault(x => x.Id == group.Key);
+                        var trackData = ctx.SFPTrackData.AsNoTracking().FirstOrDefault(x => x.Id == group.Key);
                         var result = metaFieldsFilter.PassesFilters(/*trackData.MetaFields*/
                             new Dictionary<string, string>(), yesMetaFieldsFilters, noMetaFieldsFilters);
                         return result;
@@ -97,7 +97,7 @@ namespace Kuroko.Audio.Fingerprinting.Database
         {
             var compositHashes = hashes.Select((hash, table) => (long)table << 32 | (uint)hash);
 
-            return ctx.Hashs.AsNoTracking()
+            return ctx.SFPHashes.AsNoTracking()
                 .Where(x => compositHashes.Contains(x.IndexedHash))
                 .Select(x => x.SubFingerprintId)
                 .GroupBy(x => x)
@@ -105,20 +105,20 @@ namespace Kuroko.Audio.Fingerprinting.Database
                 .Select(x => x.Key).ToList();
         }
 
-        public int GetSubFingerprintCounts(DatabaseContext databaseContext) => databaseContext.SubFingerprints.Count();
+        public int GetSubFingerprintCounts(DatabaseContext databaseContext) => databaseContext.SFPSubFingerprints.Count();
 
         public IEnumerable<int> GetHashCountsPerTable(DatabaseContext databaseContext)
         {
-            if (databaseContext.Hashs.Count() == 0)
+            if (databaseContext.SFPHashes.Count() == 0)
                 yield break;
 
-            int tables = (int)(databaseContext.Hashs.Max(x => x.IndexedHash) >> 32) + 1;
+            int tables = (int)(databaseContext.SFPHashes.Max(x => x.IndexedHash) >> 32) + 1;
 
             for (int i = 0; i < tables; i++)
             {
                 long lower = (long)i << 32;
                 long upper = (long)i << 32 | uint.MaxValue; ;
-                yield return databaseContext.Hashs.Where(x => x.IndexedHash >= lower & x.IndexedHash <= upper).Count();
+                yield return databaseContext.SFPHashes.Where(x => x.IndexedHash >= lower & x.IndexedHash <= upper).Count();
             }
         }
     }

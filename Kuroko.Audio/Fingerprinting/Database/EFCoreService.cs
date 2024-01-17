@@ -31,7 +31,7 @@ namespace Kuroko.Audio.Fingerprinting.Database
             {
                 using var scope = _services.CreateScope();
                 var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-                return new[] { new ModelServiceInfo(Id, db.TrackData.Count(), SubFingerprintDao.GetSubFingerprintCounts(db), SubFingerprintDao.GetHashCountsPerTable(db).ToArray()) };
+                return new[] { new ModelServiceInfo(Id, db.SFPTrackData.Count(), SubFingerprintDao.GetSubFingerprintCounts(db), SubFingerprintDao.GetHashCountsPerTable(db).ToArray()) };
             }
         }
 
@@ -52,7 +52,7 @@ namespace Kuroko.Audio.Fingerprinting.Database
             SubFingerprintDao.InsertHashDataForTrack(audioHashes, trackEntity);
 
             var db = scope.ServiceProvider.GetService<DatabaseContext>();
-            db.TrackData.Add(trackEntity);
+            db.SFPTrackData.Add(trackEntity);
             db.SaveChanges();
         }
 
@@ -128,7 +128,7 @@ namespace Kuroko.Audio.Fingerprinting.Database
             foreach (var trackReference in references)
             {
                 int reference = trackReference.Get<int>();
-                yield return RepackTrackData(db.TrackData.FirstOrDefault(x => x.Id == reference));
+                yield return RepackTrackData(db.SFPTrackData.FirstOrDefault(x => x.Id == reference));
             }
         }
 
@@ -150,10 +150,10 @@ namespace Kuroko.Audio.Fingerprinting.Database
         {
             using var scope = _services.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-            return db.TrackData.Select(x => x.TrackInfoId);
+            return db.SFPTrackData.Select(x => x.TrackInfoId);
         }
 
-        public TrackDataEntity ReadTrackEntityById(DatabaseContext ctx, string id) => ctx.TrackData.FirstOrDefault(x => x.TrackInfoId == id);
+        public TrackDataEntity ReadTrackEntityById(DatabaseContext ctx, string id) => ctx.SFPTrackData.FirstOrDefault(x => x.TrackInfoId == id);
 
         private static IDictionary<string, string> CopyMetaFields(IDictionary<string, string> metaFields)
         {
