@@ -76,7 +76,8 @@ namespace Kuroko.Audio.FFmpeg
             if (await awaitExitSource.Task != 0)
                 throw new Exception("FFprobe closed with a non-0 exit code");
 
-            Metadata metadata = JsonSerializer.Deserialize<Metadata>(json);
+            JsonSerializerOptions options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            Metadata metadata = JsonSerializer.Deserialize<Metadata>(json, options);
 
             // FFprobe can give incorrect duration on some files
             // FFmpeg is able to get accurate duration when decoding
