@@ -1,4 +1,7 @@
-﻿using Kuroko.Shared;
+﻿using Kuroko.Database;
+using Kuroko.Database.Entities.Audio;
+using Kuroko.Shared;
+using Microsoft.Extensions.DependencyInjection;
 using SoundFingerprinting;
 using SoundFingerprinting.Audio;
 using SoundFingerprinting.Builder;
@@ -8,17 +11,19 @@ using SoundFingerprinting.Query;
 
 namespace Kuroko.Audio.Fingerprinting
 {
-    public class Fingerprinting
+    public class FingerprintingCache
     {
-        private IModelService modelService;
+        private readonly IServiceProvider _services;
+        private readonly IModelService modelService;
         private readonly IAudioService audioService = new FFmpegAudioService();
 
-        public Fingerprinting(IServiceProvider serviceProvider)
+        public FingerprintingCache(IServiceProvider serviceProvider)
         {
+            _services = serviceProvider;
             modelService = new Database.EFCoreService(serviceProvider);
         }
 
-        public async Task<bool> Match(Stream audioStream, double fullLength)
+        public async Task<SongInfo> Match(Stream audioStream, double fullLength)
         {
             using (var tempFile = new TempFileInstance())
             {
@@ -29,7 +34,12 @@ namespace Kuroko.Audio.Fingerprinting
             }
         }
 
-        public async Task<bool> Match(string file, double fullLength)
+        public string GetFilePath(SongInfo songInfo)
+        {
+            return Path.Combine(DataDirectories.TRANSCODE, $"{songInfo.Id}.ogg");
+        }
+
+        public async Task<SongInfo> Match(string file, double fullLength)
         {
             int secondsToAnalyze = 15; // Number of seconds to analyze
             int startAtSecond = 20; // Start 20 seconds in
@@ -68,7 +78,10 @@ namespace Kuroko.Audio.Fingerprinting
             var resultTracks = result.GroupBy(x => x.Track.Id).ToList();
 
             if (resultTracks.Count == 0)
+            {
                 Console.WriteLine($"Matched no tracks");
+                return null;
+            }
 
             if (resultTracks.Count > 1)
             {
@@ -78,36 +91,67 @@ namespace Kuroko.Audio.Fingerprinting
                 Console.WriteLine($"Best match was {result[0].Track.Id}");
             }
 
-            return resultTracks.Count >= 1;
+            using var scope = _services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+            return db.SongInfo.Where(x => x.Id == int.Parse(result[0].Track.Id)).First();
         }
 
-        //TODO, Passthough ID
-        public async Task<string> AddTrack(Stream audioStream, SongMetadata metadata)
+        public async Task AddTrack(Stream originalStream, Stream transcodedStream, SongMetadata metadata)
         {
+            using var scope = _services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+            // We assume that the stream is at position 0
+
+            // Store metadata into database
+            SongInfo songInfo = new(metadata.Title, metadata.Artist, metadata.Album, metadata.Duration, transcodedStream.Length);
+            db.SongInfo.Add(songInfo);
+            await db.SaveChangesAsync();
+
             using (var tempFile = new TempFileInstance())
             {
                 using (var fileStream = new FileStream(tempFile.FilePath, FileMode.Truncate))
-                    await audioStream.CopyToAsync(fileStream);
+                    await originalStream.CopyToAsync(fileStream);
 
-                return await AddTrack(tempFile.FilePath, metadata);
+                // Store fingerprint into database
+                await FingerprintTrack(tempFile.FilePath, songInfo.Id);
             }
+
+            // Store file
+            using (var outFile = new FileStream(Path.Combine(DataDirectories.TRANSCODE, $"{songInfo.Id}.ogg"), FileMode.CreateNew))
+                await transcodedStream.CopyToAsync(outFile);
         }
 
-        public async Task<string> AddTrack(string file, SongMetadata metadata)
+        //public async Task AddTrack(string originalFile, string transcodedFile, SongMetadata metadata)
+        //{
+        //    using var scope = _services.CreateScope();
+        //    var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+        //    // We assume that the stream is at position 0
+
+        //    // Store metadata into database
+        //    SongInfo songInfo = new(metadata.Title, metadata.Artist, metadata.Album, metadata.Duration, new FileInfo(transcodedFile).Length);
+        //    db.SongInfo.Add(songInfo);
+        // await db.SaveChangesAsync();
+
+        //    // fingerprint into database
+        //    await FingerprintTrack(originalFile, songInfo.Id);
+
+        //    File.Copy(originalFile, Path.Combine(DataDirectories.TRANSCODE, $"{songInfo.Id}.ogg"));  
+        //}
+
+        private async Task FingerprintTrack(string file, int id)
         {
-            var track = new TrackInfo(file, metadata.Title, metadata.Artist);
+            // Metadata stored seperatly
+            var track = new TrackInfo(id.ToString(), "", "");
+
+            // Fingerprint audio
             var fingerprints = await FingerprintCommandBuilder.Instance
                 .BuildFingerprintCommand()
                 .From(file)
                 .UsingServices(audioService)
                 .Hash();
 
-            // Store hashes in the database for later retrieval
-            modelService.Insert(track, fingerprints);
-
-            // Save file somewhere
-            // Add to database
-            return track.Id;
+            // Store in database
+            await Task.Run(() => modelService.Insert(track, fingerprints));
         }
     }
 }

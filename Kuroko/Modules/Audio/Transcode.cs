@@ -2,7 +2,9 @@
 using Discord.Interactions;
 using FluentScheduler;
 using Kuroko.Audio.FFmpeg;
+using Kuroko.Audio.Fingerprinting;
 using Kuroko.Core;
+using Kuroko.Database.Entities.Audio;
 using Kuroko.Modules.Audio;
 using Kuroko.Modules.Audio.Modal;
 using Kuroko.Shared;
@@ -68,12 +70,31 @@ namespace Kuroko.Audio
             // Check if in database
             await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SLASHCMD, $"Checking if already transcoded"));
             sw.Start();
-            var fingerprinter = new Fingerprinting.Fingerprinting(Context.ServiceProvider);
-            bool match = await fingerprinter.Match(sourceAudio, metadata.Duration.TotalSeconds);
+            var cache = new FingerprintingCache(Context.ServiceProvider);
+            var match = await cache.Match(sourceAudio, metadata.Duration.TotalSeconds);
             sw.Stop();
-            await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SLASHCMD, $"{(match ? "File already transcoded" : "File needs transcoding")} (Elapsed = {sw.ElapsedMilliseconds / 1000d})"));
+            await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SLASHCMD, $"{(match != null ? "File already transcoded" : "File needs transcoding")} (Elapsed = {sw.ElapsedMilliseconds / 1000d})"));
             sourceAudio.Position = 0;
             sw.Reset();
+
+            if (match != null)
+            {
+                var outputMatch = new StringBuilder()
+                    .AppendLine("Loaded from cache")
+                    .AppendLine($"Title: {match.Title}")
+                    .AppendLine($"Artist: {match.Artist}")
+                    .AppendLine($"Album: {match.Album}")
+                    .AppendLine($"Length: {match.Length:m\\:ss}")
+                    .AppendLine($"Size: {match.FileSize / 1024} KiB");
+
+                await ModifyOriginalResponseAsync(x =>
+                {
+                    x.Content = outputMatch.ToString();
+                    x.Components = null;
+                    x.Attachments = new Optional<IEnumerable<FileAttachment>>(new FileAttachment[] { new FileAttachment(cache.GetFilePath(match), $"{match.Title}.ogg") });
+                });
+                return;
+            }
 
             var output = new StringBuilder()
                 .AppendLine(filename)
@@ -206,17 +227,15 @@ namespace Kuroko.Audio
             await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SLASHCMD, $"Transcoded (Elapsed = {sw.ElapsedMilliseconds / 1000d})"));
             sw.Reset();
 
-            if (false)
-            {
-                await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SLASHCMD, $"Adding file to fingerprint database"));
-                sw.Start();
-                var fingerprinter = new Fingerprinting.Fingerprinting(Context.ServiceProvider);
-                await fingerprinter.AddTrack(state.Stream, metadata);
-                sw.Stop();
-                await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SLASHCMD, $"Added (Elapsed = {sw.ElapsedMilliseconds / 1000d})"));
-                state.Stream.Position = 0;
-                sw.Reset();
-            }
+            await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SLASHCMD, $"Adding file to fingerprint cache"));
+            sw.Start();
+            var cache = new FingerprintingCache(Context.ServiceProvider);
+            await cache.AddTrack(state.Stream, transcodedAudio, metadata);
+            sw.Stop();
+            await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SLASHCMD, $"Added (Elapsed = {sw.ElapsedMilliseconds / 1000d})"));
+            state.Stream.Position = 0;
+            transcodedAudio.Position = 0;
+            sw.Reset();
 
             output = new StringBuilder()
                 .AppendLine(state.FileName)
