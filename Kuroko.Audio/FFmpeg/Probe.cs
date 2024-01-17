@@ -97,7 +97,7 @@ namespace Kuroko.Audio.FFmpeg
                 process.Exited += (obj, args) => awaitExitSource.SetResult(process.ExitCode);
                 process.Start();
 
-                var task = new Task<string>(() =>
+                stats = await Task.Run<string>(() =>
                 {
                     List<string> output = new List<string>();
                     string line;
@@ -105,9 +105,7 @@ namespace Kuroko.Audio.FFmpeg
                         output.Add(line);
                     return output.FindLast(x => x.StartsWith("out_time_us=")).Substring("out_time_us=".Length);
                 });
-                task.Start();
 
-                stats = await task;
                 await awaitExitSource.Task;
             }
 
