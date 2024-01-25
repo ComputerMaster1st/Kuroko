@@ -72,7 +72,7 @@ namespace Kuroko.Audio
             // Check if in database
             await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SLASHCMD, $"Checking if already transcoded"));
             sw.Start();
-            var cache = new FingerprintingCache(Context.ServiceProvider);
+            using var cache = new FingerprintingCache(Context.ServiceProvider);
             var match = await cache.Match(sourceAudio, metadata.Duration.TotalSeconds);
             sw.Stop();
             await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SLASHCMD, $"{(match != null ? "File already transcoded" : "File needs transcoding")} (Elapsed = {sw.ElapsedMilliseconds / 1000d})"));
@@ -231,7 +231,7 @@ namespace Kuroko.Audio
 
             await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SLASHCMD, $"Adding file to fingerprint cache"));
             sw.Start();
-            var cache = new FingerprintingCache(Context.ServiceProvider);
+            using var cache = new FingerprintingCache(Context.ServiceProvider);
             await cache.AddTrack(state.Stream, transcodedAudio, metadata);
             sw.Stop();
             await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SLASHCMD, $"Added (Elapsed = {sw.ElapsedMilliseconds / 1000d})"));

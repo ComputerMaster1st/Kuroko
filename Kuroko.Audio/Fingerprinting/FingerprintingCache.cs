@@ -1,4 +1,5 @@
-﻿using Kuroko.Database;
+﻿using Kuroko.Audio.FFmpeg;
+using Kuroko.Database;
 using Kuroko.Database.Entities.Audio;
 using Kuroko.Shared;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,20 +8,23 @@ using SoundFingerprinting.Audio;
 using SoundFingerprinting.Builder;
 using SoundFingerprinting.Data;
 using SoundFingerprinting.Emy;
+using SoundFingerprinting.Extensions.LMDB;
+using SoundFingerprinting.Media;
 using SoundFingerprinting.Query;
 
 namespace Kuroko.Audio.Fingerprinting
 {
-    public class FingerprintingCache
+    public class FingerprintingCache : IDisposable
     {
         private readonly IServiceProvider _services;
-        private readonly IModelService modelService;
+        private readonly LMDBModelService modelService;
         private readonly IAudioService audioService = new FFmpegAudioService();
+        private bool disposedValue;
 
         public FingerprintingCache(IServiceProvider serviceProvider)
         {
             _services = serviceProvider;
-            modelService = new Database.EFCoreService(serviceProvider);
+            modelService = new LMDBModelService(Path.Combine(DataDirectories.AUDIO, "Fingerprints"));
         }
 
         public async Task<SongInfo> Match(Stream audioStream, double fullLength)
@@ -138,6 +142,18 @@ namespace Kuroko.Audio.Fingerprinting
         //    File.Copy(originalFile, Path.Combine(DataDirectories.TRANSCODE, $"{songInfo.Id}.ogg"));  
         //}
 
+        public async Task RemoveTrack(int id)
+        {
+            using var scope = _services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+            db.SongInfo.Remove(db.SongInfo.Where(x => x.Id == id).FirstOrDefault());
+
+            await Task.Run(() => modelService.DeleteTrack(id.ToString()));
+            File.Delete(Path.Combine(DataDirectories.TRANSCODE, $"{id}.ogg"));
+
+            await db.SaveChangesAsync();
+        }
+
         private async Task FingerprintTrack(string file, int id)
         {
             // Metadata stored seperatly
@@ -152,6 +168,23 @@ namespace Kuroko.Audio.Fingerprinting
 
             // Store in database
             await Task.Run(() => modelService.Insert(track, fingerprints));
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                    modelService.Dispose();
+
+                disposedValue=true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

@@ -10,6 +10,7 @@
   <ItemGroup>
     <PackageReference Include="SoundFingerprinting" Version="9.1.0" />
     <PackageReference Include="SoundFingerprinting.Emy" Version="9.1.0" />
+    <PackageReference Include="SoundFingerprinting.Extensions.LMDB" Version="8.7.0" />
   </ItemGroup>
 
   <ItemGroup>

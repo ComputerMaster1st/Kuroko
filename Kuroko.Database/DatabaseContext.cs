@@ -29,9 +29,6 @@ namespace Kuroko.Database
         public DbSet<BlackboxEntity> Blackboxes { get; internal set; } = null;
 
         public DbSet<SongInfo> SongInfo { get; internal set; } = null;
-        public DbSet<TrackDataEntity> SFPTrackData { get; internal set; } = null;
-        public DbSet<SubFingerprintEntity> SFPSubFingerprints { get; internal set; } = null;
-        public DbSet<HashEntity> SFPHashes { get; internal set; } = null;
 
 #if DEBUG
         public DatabaseContext() { }
@@ -146,24 +143,6 @@ namespace Kuroko.Database
                 .WithOne(x => x.Guild)
                 .HasForeignKey<BlackboxEntity>(x => x.GuildId)
                 .HasPrincipalKey<GuildEntity>(x => x.Id)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            #endregion
-
-            #region Audio
-
-            modelBuilder.Entity<TrackDataEntity>()
-                .HasMany(x => x.SubFingerprints)
-                .WithOne(x => x.TrackData)
-                .HasForeignKey(x => x.TrackDataId)
-                .HasPrincipalKey(x => x.Id)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<SubFingerprintEntity>()
-                .HasMany(x => x.Hashes)
-                .WithOne(x => x.SubFingerprint)
-                .HasForeignKey(x => x.SubFingerprintId)
-                .HasPrincipalKey(x => x.Id)
                 .OnDelete(DeleteBehavior.Cascade);
 
             #endregion
