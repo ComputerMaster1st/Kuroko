@@ -35,7 +35,7 @@ namespace Kuroko.Audio
             Stopwatch sw = new Stopwatch();
 
             await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SLASHCMD, $"Downloading file (Id: {attachment.Id})"));
-            string filename = Path.GetFileNameWithoutExtension(attachment.Filename);
+            string fileName = Path.GetFileNameWithoutExtension(attachment.Filename);
             string fileExt = Path.GetExtension(attachment.Filename).ToLower();
             sw.Start();
             byte[] bytes = await _httpClient.GetByteArrayAsync(attachment.Url ?? attachment.ProxyUrl);
@@ -99,7 +99,7 @@ namespace Kuroko.Audio
             }
 
             var output = new StringBuilder()
-                .AppendLine(filename)
+                .AppendLine(fileName)
                 .AppendLine($"Title: {metadata.Title}")
                 .AppendLine($"Artist: {metadata.Artist}")
                 .AppendLine($"Album: {metadata.Album}")
@@ -129,7 +129,7 @@ namespace Kuroko.Audio
                 }
             }, (s) => s.WithName($"{TranscodeCommandMap.JOB_TIMEOUT}:{attachment.Id}").ToRunOnceIn(10).Minutes());
 
-            activeCommands.Add(attachment.Id, new TranscodeState() { Stream = sourceAudio, FileName = filename, Meta = metadata });
+            activeCommands.Add(attachment.Id, new TranscodeState() { Stream = sourceAudio, FileName = fileName, Meta = metadata });
 
             try
             {
