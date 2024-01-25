@@ -36,13 +36,15 @@ namespace Kuroko.Audio
 
             await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SLASHCMD, $"Downloading file (Id: {attachment.Id})"));
             string filename = Path.GetFileNameWithoutExtension(attachment.Filename);
+            string fileExt = Path.GetExtension(attachment.Filename).ToLower();
             sw.Start();
             byte[] bytes = await _httpClient.GetByteArrayAsync(attachment.Url ?? attachment.ProxyUrl);
             sw.Stop();
             await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SLASHCMD, $"Downloading file (Elapsed = {sw.ElapsedMilliseconds / 1000d})"));
             sw.Reset();
 
-            bool isAudio = FileMimeType.GetFromBytes(bytes).Any(x => x.MimeType.StartsWith("audio/"));
+            // video/MP4 is allowed as m4a files get identified as such
+            bool isAudio = FileMimeType.GetFromBytes(bytes).Any(x => x.MimeType.StartsWith("audio/") | (x.MimeType == "video/mp4" & fileExt == ".m4a"));
             if (!isAudio)
             {
                 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SLASHCMD, "File MIME type is not audio"));
