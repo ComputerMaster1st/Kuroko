@@ -46,7 +46,7 @@ namespace Kuroko.Audio
             if (!isAudio)
             {
                 await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SLASHCMD, "File MIME type is not audio"));
-                await FollowupWithFileAsync("Not an audio file", ephemeral: true);
+                await FollowupAsync("Not an audio file", ephemeral: true);
                 return;
             }
 
