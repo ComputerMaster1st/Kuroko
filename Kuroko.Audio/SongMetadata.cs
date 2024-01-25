@@ -23,5 +23,7 @@ namespace Kuroko.Audio
         /// Total duration of this song
         /// </summary>
         public TimeSpan Duration { get; set; } = TimeSpan.Zero;
+
+        internal bool TranscodeNeedsFile { get; set; } = false;
     }
 }

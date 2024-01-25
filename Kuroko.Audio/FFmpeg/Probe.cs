@@ -21,7 +21,7 @@ namespace Kuroko.Audio.FFmpeg
 
         public static async Task<SongMetadata> GetMetadataAsync(string url)
         {
-            Metadata root = await ProbeFileAsync(url);
+            (Metadata root, bool needsFile) = await ProbeFileAsync(url);
             SongMetadata metadata = new SongMetadata();
 
             if (root == null || root.format == null)
@@ -42,10 +42,12 @@ namespace Kuroko.Audio.FFmpeg
                     metadata.Album = tags.album;
             }
 
+            metadata.TranscodeNeedsFile = needsFile;
+
             return metadata;
         }
 
-        private static async Task<Metadata> ProbeFileAsync(string path)
+        private static async Task<(Metadata Metadata, bool NeedsFileTranscode)> ProbeFileAsync(string path)
         {
             TaskCompletionSource<int> awaitExitSource = new TaskCompletionSource<int>();
             string json;
@@ -79,6 +81,11 @@ namespace Kuroko.Audio.FFmpeg
             JsonSerializerOptions options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             Metadata metadata = JsonSerializer.Deserialize<Metadata>(json, options);
 
+            // m4a audio files can only be piped into ffmpeg if the file
+            // is encoded with faststart. we can infer this from trace logs
+            bool isMOV = metadata?.format?.format_long_name == "QuickTime / MOV";
+            bool fastStart = true;
+
             // FFprobe can give incorrect duration on some files
             // FFmpeg is able to get accurate duration when decoding
             awaitExitSource = new TaskCompletionSource<int>();
@@ -87,9 +94,10 @@ namespace Kuroko.Audio.FFmpeg
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = "ffmpeg",
-                    Arguments = $"-i \"{path}\" -hide_banner -v quiet -vn -progress pipe:2 -f null -",
+                    Arguments = $"-i \"{path}\" -hide_banner -v {(isMOV ? "trace" : "quiet")} -vn -progress pipe:1 -f null -",
                     UseShellExecute = false,
-                    RedirectStandardError = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = isMOV,
                 },
                 EnableRaisingEvents = true
             })
@@ -97,14 +105,46 @@ namespace Kuroko.Audio.FFmpeg
                 process.Exited += (obj, args) => awaitExitSource.SetResult(process.ExitCode);
                 process.Start();
 
+                var fastStartTask = new Task<bool>(() =>
+                {
+                    bool faststart = false;
+                    string line;
+                    while ((line = process.StandardError.ReadLine()) != null)
+                    {
+                        // If moov appeares first, the file is encoded for faststart
+                        // we can pipe into ffmpeg
+                        if (line.Contains("type:'moov'"))
+                        {
+                            faststart = true;
+                            break;
+                        }
+                        // If mdat appeares first, we need to provide ffmpeg a file
+                        if (line.Contains("type:'mdat'"))
+                        {
+                            faststart = false;
+                            break;
+                        }
+                    }
+
+                    // Discard rest of the logs
+                    _ = process.StandardError.ReadToEnd();
+                    return faststart;
+                });
+
+                if (isMOV)
+                    fastStartTask.Start();
+
                 stats = await Task.Run<string>(() =>
                 {
                     List<string> output = new List<string>();
                     string line;
-                    while ((line = process.StandardError.ReadLine()) != null)
+                    while ((line = process.StandardOutput.ReadLine()) != null)
                         output.Add(line);
                     return output.FindLast(x => x.StartsWith("out_time_us=")).Substring("out_time_us=".Length);
                 });
+
+                if (isMOV)
+                    fastStart = fastStartTask.Result;
 
                 await awaitExitSource.Task;
             }
@@ -117,7 +157,7 @@ namespace Kuroko.Audio.FFmpeg
             if (await awaitExitSource.Task != 0)
                 throw new Exception("FFmpeg (probe) closed with a non-0 exit code");
 
-            return metadata;
+            return (metadata, !fastStart);
         }
     }
 }

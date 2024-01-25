@@ -223,7 +223,7 @@ namespace Kuroko.Audio
             await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SLASHCMD, $"Transcoding file"));
             sw.Start();
             var tokenSourceTranscode = new CancellationTokenSource();
-            Stream transcodedAudio = await OpusTranscode.TranscodeAudio(state.Stream, tokenSourceTranscode.Token);
+            Stream transcodedAudio = await OpusTranscode.TranscodeAudio(state.Stream, state.Meta, tokenSourceTranscode.Token);
             state.Stream.Position = 0;
             sw.Stop();
             await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.SLASHCMD, $"Transcoded (Elapsed = {sw.ElapsedMilliseconds / 1000d})"));
