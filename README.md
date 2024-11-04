@@ -12,3 +12,6 @@ N/A
 
 ## Contacting The Developer
 You may contact the developers of Kuroko via [NekoTech](https://discord.gg/fFbMNGbXVv).
+
+
+I'm going to lose my shit
