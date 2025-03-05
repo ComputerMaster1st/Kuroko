@@ -1,4 +1,5 @@
 using Discord.Interactions;
+using Kuroko.Database;
 
 namespace Kuroko;
 
@@ -11,12 +12,12 @@ public abstract class KurokoCommandBase : InteractionModuleBase<KurokoInteractio
         return false;
     }
 
-    // public override async Task AfterExecuteAsync(ICommandInfo command)
-    // {
-    //     await Context.Database.SaveChangesAsync();
-    //     await base.AfterExecuteAsync(command);
-    // }
-    //
+    public override async Task AfterExecuteAsync(ICommandInfo command)
+    {
+        await Context.Database.SaveChangesAsync();
+        await base.AfterExecuteAsync(command);
+    }
+    
     // protected async Task<TPropertyEntity> GetPropertiesAsync<TPropertyEntity, TDiscordEntity>(ulong rootId)
     //     where TPropertyEntity : class, IPropertyEntity
     //     where TDiscordEntity : class, IDiscordEntity
@@ -33,7 +34,7 @@ public abstract class KurokoCommandBase : InteractionModuleBase<KurokoInteractio
     //
     //     return result;
     // }
-    //
+    
     // protected async Task<TTicketEntity> GetTicketAsync<TTicketEntity>(int ticketId)
     //     where TTicketEntity : class, ITicketEntity
     // {
@@ -42,9 +43,9 @@ public abstract class KurokoCommandBase : InteractionModuleBase<KurokoInteractio
     //
     //     return result;
     // }
-    //
+    
     // protected async Task<TDiscordEntity> GetRootAsync<TDiscordEntity>(ulong rootId)
-    //     where TDiscordEntity : class, IDiscordEntity
+    //     where TDiscordEntity : class, IBaseEntity
     // {
     //     var set = Context.Database.Set<TDiscordEntity>();
     //     var result = await set.GetDataAsync(rootId);
