@@ -28,7 +28,7 @@ InteractionService interactionService = new(client, new InteractionServiceConfig
     LogLevel = LogSeverity.Info,
     UseCompiledLambda = true
 });
-IServiceCollection serviceCollection = new ServiceCollection();
+var serviceCollection = new ServiceCollection();
 
 await Utilities.WriteLogAsync(
     new LogMessage(
