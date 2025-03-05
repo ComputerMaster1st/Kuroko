@@ -1,6 +1,6 @@
 namespace Kuroko.Database.GuildEntities;
 
-public sealed class GuildEntity(ulong id) : DiscordEntity(id)
+public class GuildEntity(ulong id) : DiscordEntity(id)
 {
-    public BanSyncProperties BanSyncProperties { get; set; } = null;
+    public virtual BanSyncProperties BanSyncProperties { get; set; } = null;
 }
