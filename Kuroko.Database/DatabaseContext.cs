@@ -25,7 +25,7 @@ public sealed class DatabaseContext : DbContext
             .GetAwaiter()
             .GetResult();
 
-        optionsBuilder.UseNpgsql(config.ConnectionString)
+        optionsBuilder.UseNpgsql(config.ConnectionString())
             .EnableSensitiveDataLogging()
             .UseLazyLoadingProxies();
         

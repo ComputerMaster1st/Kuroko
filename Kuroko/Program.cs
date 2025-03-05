@@ -68,7 +68,7 @@ serviceCollection.AddSingleton(config)
     .AddSingleton(interactionService)
     .AddDbContext<DatabaseContext>(options =>
     {
-        options.UseNpgsql(config.ConnectionString)
+        options.UseNpgsql(config.ConnectionString())
             .EnableSensitiveDataLogging()
             .UseLazyLoadingProxies();
     }, ServiceLifetime.Transient);
