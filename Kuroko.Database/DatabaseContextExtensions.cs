@@ -4,7 +4,7 @@ namespace Kuroko.Database;
 
 public static class DatabaseContextExtensions
 {
-    public static async Task<TDiscordEntity> GetOrCreateRootAsync<TDiscordEntity>(
+    public static async Task<TDiscordEntity> GetOrCreateDataAsync<TDiscordEntity>(
         this DbSet<TDiscordEntity> dbTable, ulong id) where TDiscordEntity : class, IDiscordEntity
     {
         var data = await dbTable.FirstOrDefaultAsync(x => x.Id == id);

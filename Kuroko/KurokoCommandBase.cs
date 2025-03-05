@@ -44,12 +44,12 @@ public abstract class KurokoCommandBase : InteractionModuleBase<KurokoInteractio
     //     return result;
     // }
     
-    // protected async Task<TDiscordEntity> GetRootAsync<TDiscordEntity>(ulong rootId)
-    //     where TDiscordEntity : class, IBaseEntity
-    // {
-    //     var set = Context.Database.Set<TDiscordEntity>();
-    //     var result = await set.GetDataAsync(rootId);
-    //
-    //     return result;
-    // }
+    protected async Task<TDiscordEntity> GetOrCreateDataAsync<TDiscordEntity>(ulong rootId)
+        where TDiscordEntity : class, IDiscordEntity
+    {
+        var set = Context.Database.Set<TDiscordEntity>();
+        var result = await set.GetOrCreateDataAsync(rootId);
+    
+        return result;
+    }
 }
