@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Text;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
@@ -65,3 +66,39 @@ serviceCollection.AddSingleton(config)
     
 var currentAssembly = Assembly.GetExecutingAssembly();
 IServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
+
+await Utilities.WriteLogAsync(
+    new LogMessage(
+        LogSeverity.Info, 
+        LogHeader.SYSTEM,
+        $"Loaded {serviceCollection.Count} dependencies!"));
+        
+await interactionService.AddModulesAsync(currentAssembly, serviceProvider);
+
+await Utilities.WriteLogAsync(
+    new LogMessage(
+        LogSeverity.Info, 
+        LogHeader.SYSTEM,
+        new StringBuilder()
+            .Append($"SLASH COMMANDS     : {interactionService.SlashCommands.Count}/100").AppendLine()
+            .Append($"MODAL COMMANDS     : {interactionService.ModalCommands.Count}").AppendLine()
+            .Append($"COMPONENT COMMANDS : {interactionService.ComponentCommands.Count}").AppendLine()
+            .Append($"TEXT COMMANDS      : {interactionService.ContextCommands.Count}").AppendLine()
+            .AppendLine("Initializing services...").ToString()
+    ));
+    
+await Utilities.WriteLogAsync(
+    new LogMessage(
+        LogSeverity.Info, 
+        LogHeader.SYSTEM, 
+        new StringBuilder()
+            .AppendLine("Startup completed!")
+            .AppendLine("Beginning connection to Discord...").ToString()
+    ));
+
+await client.LoginAsync(TokenType.Bot, config.Token);
+await client.StartAsync();
+await client.SetStatusAsync(UserStatus.DoNotDisturb);
+await client.SetGameAsync("Starting...");
+
+await Task.Delay(-1);
