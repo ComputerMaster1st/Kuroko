@@ -6,6 +6,7 @@ namespace Kuroko;
 internal static class Utilities
 {
     private static readonly SemaphoreSlim LogLock = new(1);
+    public const string SepChar = "⬤";
     
     public static async Task WriteLogAsync(LogMessage message)
     {
