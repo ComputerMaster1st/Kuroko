@@ -11,16 +11,16 @@ public class KurokoInteractionContext(
     IServiceProvider serviceProvider)
     : ShardedInteractionContext(client, interaction)
 {
-    //private DatabaseContext _db = null;
+    private DatabaseContext _db = null;
 
     public IServiceProvider ServiceProvider { get; } = serviceProvider;
 
-    // public DatabaseContext Database
-    // {
-    //     get
-    //     {
-    //         _db ??= ServiceProvider.GetRequiredService<DatabaseContext>();
-    //         return _db;
-    //     }
-    // }
+    public DatabaseContext Database
+    {
+        get
+        {
+            _db ??= ServiceProvider.GetRequiredService<DatabaseContext>();
+            return _db;
+        }
+    }
 }
