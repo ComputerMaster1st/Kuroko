@@ -5,7 +5,9 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Kuroko;
 using Kuroko.Attributes;
+using Kuroko.Database;
 using Kuroko.Shared;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 DataDirectories.CheckDirectories();
@@ -63,7 +65,13 @@ await Utilities.WriteLogAsync(
         
 serviceCollection.AddSingleton(config)
     .AddSingleton(client)
-    .AddSingleton(interactionService);
+    .AddSingleton(interactionService)
+    .AddDbContext<DatabaseContext>(options =>
+    {
+        options.UseNpgsql(config.ConnectionString)
+            .EnableSensitiveDataLogging()
+            .UseLazyLoadingProxies();
+    }, ServiceLifetime.Transient);
     
 var currentAssembly = Assembly.GetExecutingAssembly();
 
