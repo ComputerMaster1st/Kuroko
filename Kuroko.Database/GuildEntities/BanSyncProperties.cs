@@ -21,5 +21,8 @@ public class BanSyncProperties : IPropertyEntity
     
     // Permission Level
     public BanSyncMode Mode { get; set; } = BanSyncMode.Disabled;
-    public virtual List<BanSyncProfile> Profiles { get; private set; } = [];
+    
+    // Sync Profiles
+    public virtual List<BanSyncProfile> HostForProfiles { get; private set; } = [];
+    public virtual List<BanSyncProfile> ClientOfProfiles { get; private set; } = [];
 }

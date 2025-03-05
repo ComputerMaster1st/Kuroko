@@ -39,13 +39,13 @@ public sealed class DatabaseContext : DbContext
     {
         #region BanSyncProperties
         modelBuilder.Entity<BanSyncProperties>()
-            .HasMany(x => x.Profiles)
+            .HasMany(x => x.HostForProfiles)
             .WithOne(x => x.HostProperties)
             .HasForeignKey(x => x.HostSyncId)
             .HasPrincipalKey(x => x.SyncId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<BanSyncProperties>()
-            .HasMany(x => x.Profiles)
+            .HasMany(x => x.ClientOfProfiles)
             .WithOne(x => x.ClientProperties)
             .HasForeignKey(x => x.ClientSyncId)
             .HasPrincipalKey(x => x.SyncId)
