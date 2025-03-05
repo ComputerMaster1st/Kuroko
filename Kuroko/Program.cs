@@ -4,6 +4,7 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Kuroko;
+using Kuroko.Attributes;
 using Kuroko.Shared;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -65,6 +66,13 @@ serviceCollection.AddSingleton(config)
     .AddSingleton(interactionService);
     
 var currentAssembly = Assembly.GetExecutingAssembly();
+
+foreach (var type in currentAssembly.GetTypes())
+{
+    if (type.GetCustomAttribute<KurokoEventAttribute>(false) != null)
+        serviceCollection.AddSingleton(type);
+}
+
 IServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
 
 await Utilities.WriteLogAsync(
@@ -86,6 +94,15 @@ await Utilities.WriteLogAsync(
             .Append($"TEXT COMMANDS      : {interactionService.ContextCommands.Count}").AppendLine()
             .AppendLine("Initializing services...").ToString()
     ));
+
+foreach (var service in serviceCollection)
+{
+    if (service.ServiceType.GetCustomAttribute<PreInitializeAttribute>(false) is null)
+        continue;
+
+    if (service.ImplementationType != null)
+        _ = serviceProvider.GetService(service.ImplementationType);
+}
     
 await Utilities.WriteLogAsync(
     new LogMessage(
