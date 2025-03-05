@@ -21,8 +21,6 @@ public sealed class DatabaseContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        base.OnConfiguring(optionsBuilder);
-
         var config = KurokoConfig.LoadAsync()
             .GetAwaiter()
             .GetResult();
@@ -30,6 +28,8 @@ public sealed class DatabaseContext : DbContext
         optionsBuilder.UseNpgsql(config.ConnectionString)
             .EnableSensitiveDataLogging()
             .UseLazyLoadingProxies();
+        
+        base.OnConfiguring(optionsBuilder);
     }
 #else
     public DatabaseContext(DbContextOptions optionsBuilder) : base(optionsBuilder) { }

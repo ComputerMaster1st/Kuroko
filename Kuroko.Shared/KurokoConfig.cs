@@ -31,7 +31,7 @@ public class KurokoConfig
     
     // Connection String
     [JsonIgnore]
-    public string ConnectionString = $"Server={Hostname};Port={Port};Database={Database};UserId={Username}Password={Password}";
+    public string ConnectionString = $"Server={Hostname};Port={Port};Database={Database};UserId={Username};Password={Password};";
 
     public static async Task<KurokoConfig> LoadAsync()
     {
