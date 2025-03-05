@@ -13,7 +13,7 @@ public class BanSync : KurokoCommandBase
             .AppendLine("## BanSync Status")
             .AppendLine("* **Enabled:** True/False")
             .AppendLine("* **Servers Remote/Serving:** 10/5")
-            .AppendLine("* **Default Sync Mode:** Simplex/Half-Duplex/Full-Duplex");
+            .AppendLine("* **Default Sync Mode:** Disabled/Simplex/Half-Duplex/Full-Duplex");
         return RespondAsync(output.ToString(), ephemeral: true);
     }
 

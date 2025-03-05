@@ -1,4 +1,5 @@
 ﻿using Kuroko.Database.GuildEntities;
+using Kuroko.Database.GuildEntities.Extras;
 using Kuroko.Shared;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +12,9 @@ public sealed class DatabaseContext : DbContext
     
     // Property Entities
     public DbSet<BanSyncProperties> BanSyncProperties { get; internal set; } = null;
+    
+    // Extra Entities
+    public DbSet<BanSyncProfile> BanSyncProfiles { get; internal set; } = null;
     
 #if DEBUG
     public DatabaseContext() { }
@@ -34,6 +38,10 @@ public sealed class DatabaseContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         #region BanSyncProperties
+        modelBuilder.Entity<BanSyncProperties>()
+            .HasMany(b => b.Profiles)
+            .WithOne()
+            .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<GuildEntity>()
             .HasOne(x => x.BanSyncProperties)
             .WithOne(x => x.Guild)
