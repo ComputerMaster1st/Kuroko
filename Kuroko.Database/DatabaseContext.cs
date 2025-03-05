@@ -9,6 +9,9 @@ public sealed class DatabaseContext : DbContext
     // Base Entities
     public DbSet<GuildEntity> Guilds { get; internal set; } = null;
     
+    // Property Entities
+    public DbSet<BanSyncProperties> BanSyncProperties { get; internal set; } = null;
+    
 #if DEBUG
     public DatabaseContext() { }
 
@@ -30,6 +33,15 @@ public sealed class DatabaseContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        #region BanSyncProperties
+        modelBuilder.Entity<GuildEntity>()
+            .HasOne(x => x.BanSyncProperties)
+            .WithOne(x => x.Guild)
+            .HasForeignKey<BanSyncProperties>(x => x.GuildId)
+            .HasPrincipalKey<GuildEntity>(x => x.Id)
+            .OnDelete(DeleteBehavior.Cascade);
+        #endregion
+        
         base.OnModelCreating(modelBuilder);
     }
 
