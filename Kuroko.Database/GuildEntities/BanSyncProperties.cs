@@ -17,6 +17,7 @@ public class BanSyncProperties : IPropertyEntity
     // Properties
     public Guid SyncId { get; private set; } = Guid.NewGuid();
     public bool IsEnabled { get; set; } = false;
+    public bool AllowRequests { get; set; } = false;
     
     // Permissions
     public BanSyncMode Mode { get; set; } = BanSyncMode.Disabled;
