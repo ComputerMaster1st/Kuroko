@@ -8,5 +8,5 @@ public class Ping : KurokoCommandBase
 {
     [SlashCommand("ping", "Bot latency")]
     public Task ExecuteAsync()
-        => RespondAsync($"Gateway Latency: {Context.ServiceProvider.GetRequiredService<DiscordShardedClient>().Latency} ms");
+        => RespondAsync($"Gateway Latency: {Context.ServiceProvider.GetRequiredService<DiscordShardedClient>().Latency} ms", ephemeral: true);
 }
