@@ -41,7 +41,7 @@ public class KurokoConfig
         var config = new KurokoConfig();
         await config.SaveAsync();
 
-        return config;
+        return null;
     }
     
     public Task SaveAsync()
