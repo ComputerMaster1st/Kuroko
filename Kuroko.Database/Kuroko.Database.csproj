@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
+        <Nullable>disable</Nullable>
         <Configurations>Debug;Release;SemiDebug</Configurations>
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
@@ -17,10 +17,6 @@
       <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="9.0.2" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.2" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\Kuroko.Shared\Kuroko.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>
