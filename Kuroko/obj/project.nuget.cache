@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "RandefBMteE=",
+  "dgSpecHash": "h8GOophRYpY=",
   "success": true,
   "projectFilePath": "/home/nekoputer/Discord/KurokoNet9/Kuroko/Kuroko/Kuroko.csproj",
   "expectedPackageFiles": [
@@ -12,7 +12,8 @@
     "/home/nekoputer/.nuget/packages/discord.net.webhook/3.17.1/discord.net.webhook.3.17.1.nupkg.sha512",
     "/home/nekoputer/.nuget/packages/discord.net.websocket/3.17.1/discord.net.websocket.3.17.1.nupkg.sha512",
     "/home/nekoputer/.nuget/packages/microsoft.bcl.asyncinterfaces/6.0.0/microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",
-    "/home/nekoputer/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/8.0.0/microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
+    "/home/nekoputer/.nuget/packages/microsoft.extensions.dependencyinjection/9.0.2/microsoft.extensions.dependencyinjection.9.0.2.nupkg.sha512",
+    "/home/nekoputer/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/9.0.2/microsoft.extensions.dependencyinjection.abstractions.9.0.2.nupkg.sha512",
     "/home/nekoputer/.nuget/packages/newtonsoft.json/13.0.3/newtonsoft.json.13.0.3.nupkg.sha512",
     "/home/nekoputer/.nuget/packages/system.collections.immutable/8.0.0/system.collections.immutable.8.0.0.nupkg.sha512",
     "/home/nekoputer/.nuget/packages/system.interactive.async/6.0.1/system.interactive.async.6.0.1.nupkg.sha512",

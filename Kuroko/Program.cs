@@ -1,6 +1,8 @@
-﻿using Discord;
+﻿using System.Reflection;
+using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Kuroko;
 using Kuroko.Shared;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -27,3 +29,39 @@ InteractionService interactionService = new(client, new InteractionServiceConfig
 });
 IServiceCollection serviceCollection = new ServiceCollection();
 
+await Utilities.WriteLogAsync(
+    new LogMessage(
+        LogSeverity.Info, 
+        LogHeader.SYSTEM, 
+        "Now Starting Kuroko! Please wait a few minutes..."
+    ));
+await Utilities.WriteLogAsync(
+    new LogMessage(
+        LogSeverity.Info, 
+        LogHeader.SYSTEM, 
+        "--------------------------------"
+    ));
+
+var config = await KurokoConfig.LoadAsync();
+if (config is null)
+{
+    await Utilities.WriteLogAsync(
+        new LogMessage(
+            LogSeverity.Info, 
+            LogHeader.SYSTEM,
+            $"New \"{KurokoConfig.FILEPATH}\" file has been generated! Please edit before restarting the bot!"));
+    return;
+}
+    
+await Utilities.WriteLogAsync(
+    new LogMessage(
+        LogSeverity.Info, 
+        LogHeader.SYSTEM,
+        $"Mounted \"{KurokoConfig.FILEPATH}\"!"));
+        
+serviceCollection.AddSingleton(config)
+    .AddSingleton(client)
+    .AddSingleton(interactionService);
+    
+var currentAssembly = Assembly.GetExecutingAssembly();
+IServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
