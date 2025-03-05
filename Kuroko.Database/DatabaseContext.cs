@@ -1,10 +1,14 @@
-﻿using Kuroko.Shared;
+﻿using Kuroko.Database.GuildEntities;
+using Kuroko.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace Kuroko.Database;
 
 public sealed class DatabaseContext : DbContext
 {
+    // Base Entities
+    public DbSet<GuildEntity> Guilds { get; internal set; } = null;
+    
 #if DEBUG
     public DatabaseContext() { }
 
