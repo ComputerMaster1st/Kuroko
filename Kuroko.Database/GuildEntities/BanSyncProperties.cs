@@ -19,7 +19,7 @@ public class BanSyncProperties : IPropertyEntity
     public bool IsEnabled { get; set; } = false;
     public bool AllowRequests { get; set; } = false;
     
-    // Permissions
+    // Permission Level
     public BanSyncMode Mode { get; set; } = BanSyncMode.Disabled;
     public virtual List<BanSyncProfile> Profiles { get; private set; } = [];
 }
