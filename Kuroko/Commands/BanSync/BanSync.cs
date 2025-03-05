@@ -1,5 +1,6 @@
 using System.Text;
 using Discord.Interactions;
+using Kuroko.Database.GuildEntities;
 
 namespace Kuroko.Commands.BanSync;
 
@@ -7,14 +8,16 @@ namespace Kuroko.Commands.BanSync;
 public class BanSync : KurokoCommandBase
 {
     [SlashCommand("status", "Status of BanSync")]
-    public Task StatusAsync()
+    public async Task StatusAsync()
     {
+        var properties = await GetPropertiesAsync<BanSyncProperties, GuildEntity>(Context.Guild.Id);
         var output = new StringBuilder()
             .AppendLine("## BanSync Status")
-            .AppendLine("* **Enabled:** True/False")
-            .AppendLine("* **Servers Remote/Serving:** 10/5")
-            .AppendLine("* **Default Sync Mode:** Disabled/Simplex/Half-Duplex/Full-Duplex");
-        return RespondAsync(output.ToString(), ephemeral: true);
+            .AppendLine($"* **Enabled:** {(properties.IsEnabled ? "True" : "False")}")
+            .AppendLine($"* **Servers Hosting For/As Client:** {properties.HostForProfiles.Count}/{properties.ClientOfProfiles.Count}")
+            .AppendLine($"* **Default Sync Mode:** {properties.Mode}");
+        
+        await RespondAsync(output.ToString());
     }
 
     [SlashCommand("config", "(Server Management Only) Configuration for BanSync")]
