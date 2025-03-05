@@ -30,9 +30,10 @@ public class KurokoConfig
     public static int Port { get; private set; } = 5432;
     
     // Connection String
+    [JsonIgnore]
     public string ConnectionString = $"Server={Hostname};Port={Port};Database={Database};UserId={Username}Password={Password}";
 
-    public static async Task<KurokoConfig?> LoadAsync()
+    public static async Task<KurokoConfig> LoadAsync()
     {
         if (File.Exists(FILEPATH))
             return JsonConvert.DeserializeObject<KurokoConfig>(await File.ReadAllTextAsync(FILEPATH));
