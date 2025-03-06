@@ -1,3 +1,4 @@
+using Discord;
 using Discord.Interactions;
 using Kuroko.Database;
 
@@ -52,4 +53,7 @@ public abstract class KurokoCommandBase : InteractionModuleBase<KurokoInteractio
     
         return result;
     }
+
+    public static ButtonStyle ButtonToggle(bool isEnabled)
+        => isEnabled ? ButtonStyle.Success : ButtonStyle.Secondary;
 }
