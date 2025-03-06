@@ -116,7 +116,7 @@ public partial class BanSync : KurokoCommandBase
                 CommandMap.EXIT_WITH_PERM,
                 ButtonStyle.Danger);
         var properties = await GetPropertiesAsync<BanSyncProperties, GuildEntity>(Context.Guild.Id);
-        var channel = Context.Guild.GetTextChannel(Context.Channel.Id);
+        var channel = Context.Guild.GetTextChannel(properties.BanSyncChannelId);
         if (channel is null)
         {
             await RespondAsync("Unable to send request! Please ask an administrator to setup the ban sync channel.", ephemeral: true);
