@@ -54,7 +54,7 @@ public abstract class KurokoCommandBase : InteractionModuleBase<KurokoInteractio
     protected static ButtonStyle ButtonToggle(bool isEnabled)
         => isEnabled ? ButtonStyle.Success : ButtonStyle.Secondary;
 
-    protected async Task<TPropertyEntity> ToggleInPropertyAsync<TPropertyEntity>
+    protected async Task<TPropertyEntity> QuickEditPropertiesAsync<TPropertyEntity>
         (ulong guildId, Action<TPropertyEntity> action)
         where TPropertyEntity : class, IPropertyEntity
     {
