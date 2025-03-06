@@ -54,6 +54,6 @@ public abstract class KurokoCommandBase : InteractionModuleBase<KurokoInteractio
         return result;
     }
 
-    public static ButtonStyle ButtonToggle(bool isEnabled)
+    protected static ButtonStyle ButtonToggle(bool isEnabled)
         => isEnabled ? ButtonStyle.Success : ButtonStyle.Secondary;
 }
