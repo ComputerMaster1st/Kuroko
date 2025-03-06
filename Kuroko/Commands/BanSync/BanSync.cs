@@ -6,10 +6,9 @@ using Kuroko.Database.GuildEntities;
 
 namespace Kuroko.Commands.BanSync;
 
-[Group("bansync", "Ban synchronization between servers")]
 public partial class BanSync : KurokoCommandBase
 {
-    [SlashCommand("status", "Status of BanSync")]
+    [SlashCommand("bansync-status", "Status of BanSync")]
     public async Task StatusAsync()
     {
         var properties = await GetPropertiesAsync<BanSyncProperties, GuildEntity>(Context.Guild.Id);

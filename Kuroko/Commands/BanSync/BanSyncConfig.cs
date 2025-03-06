@@ -13,7 +13,7 @@ public partial class BanSync
     [KurokoUserPermission(GuildPermission.ManageGuild)]
     public class BanSyncConfig : KurokoCommandBase
     {
-        [SlashCommand("config", 
+        [SlashCommand("bansync-config", 
             "(Server Management Only) Configuration for BanSync")]
         public Task ShowConfigAsync()
             => ExecuteAsync();
@@ -25,6 +25,17 @@ public partial class BanSync
             var properties = await ToggleInPropertyAsync<BanSyncProperties>(Context.Guild.Id, x =>
             {
                 x.IsEnabled = !x.IsEnabled;
+            });
+            await ExecuteAsync(properties, true);
+        }
+
+        [ComponentInteraction($"{CommandMap.BANSYNC_ALLOWREQUEST}:*")]
+        public async Task AllowRequestAsync(ulong interactedUserId)
+        {
+            if (!IsInteractedUser(interactedUserId)) return;
+            var properties = await ToggleInPropertyAsync<BanSyncProperties>(Context.Guild.Id, x =>
+            {
+                x.AllowRequests = !x.AllowRequests;
             });
             await ExecuteAsync(properties, true);
         }
@@ -65,7 +76,8 @@ public partial class BanSync
                             Label = nameof(BanSyncMode.FullDuplex),
                             Value = nameof(BanSyncMode.FullDuplex)
                         },
-                    ])
+                    ],
+                    row: 1)
                 .WithButton("Exit",
                     $"{CommandMap.EXIT}:{Context.User.Id}",
                     ButtonStyle.Secondary,
