@@ -58,6 +58,7 @@ public partial class BanSync
             var output = new StringBuilder()
                 .AppendLine("# BanSync Configuration")
                 .AppendLine($"* **UUID:** {properties.SyncId}")
+                .AppendLine($"* **BanSync Channel:** {Context.Guild.GetTextChannel(properties.BanSyncChannelId)?.Mention}")
                 .AppendLine("## SyncMode Descriptions")
                 .AppendLine("* **Disabled:** No Sync")
                 .AppendLine("* **Simplex:** Read Host Banlist Only")

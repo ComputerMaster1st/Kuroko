@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Kuroko.Database")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ec8bf6c9d8d905d70a509d08ee9a8d393afd1ed9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bdf59d7548ffd04cf8e0d77efa27b541c4749834")]
 [assembly: System.Reflection.AssemblyProductAttribute("Kuroko.Database")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Kuroko.Database")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
