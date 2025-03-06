@@ -52,6 +52,17 @@ public partial class BanSync
             await ExecuteAsync(properties, true);
         }
 
+        [ComponentInteraction($"{CommandMap.BANSYNC_CHANNEL}:*")]
+        public async Task SetChannelAsync(ulong interactedUserId)
+        {
+            if (!IsInteractedUser(interactedUserId)) return;
+            var properties = await QuickEditPropertiesAsync<BanSyncProperties>(Context.Guild.Id, x =>
+            {
+                x.BanSyncChannelId = Context.Channel.Id;
+            });
+            await ExecuteAsync(properties, true);
+        }
+
         private async Task ExecuteAsync(BanSyncProperties propParam = null, bool isReturning = false)
         {
             var properties = propParam ?? await GetPropertiesAsync<BanSyncProperties, GuildEntity>(Context.Guild.Id);
@@ -65,6 +76,7 @@ public partial class BanSync
                 .AppendLine("* **HalfDuplex:** Read Host Banlist & Send Warnings To Host")
                 .AppendLine("* **FullDuplex:** Read Host Banlist & Execute Ban On Host")
                 .AppendLine("  * **WARNING:** _ONLY TO BE USED FOR GROUPED COMMUNITY SERVERS_");
+            var isBanSyncCurrentChannel = properties.BanSyncChannelId == Context.Channel.Id;
             var componentBuilder = new ComponentBuilder()
                 .WithButton($"Enabled: {(properties.IsEnabled ? "Yes" : "No")}",
                     $"{CommandMap.BANSYNC_ENABLE}:{Context.User.Id}",
@@ -73,6 +85,10 @@ public partial class BanSync
                 .WithButton($"Allow Requests: {(properties.AllowRequests ? "Yes" : "No")}",
                     $"{CommandMap.BANSYNC_ALLOWREQUEST}:{Context.User.Id}",
                     ButtonToggle(properties.AllowRequests),
+                    row: 0)
+                .WithButton(isBanSyncCurrentChannel ? "BanSync Channel Already Set" : "Set As BanSync Channel",
+                    $"{CommandMap.BANSYNC_CHANNEL}:{Context.User.Id}",
+                    ButtonToggle(isBanSyncCurrentChannel),
                     row: 0)
                 .WithSelectMenu($"{CommandMap.BANSYNC_SYNCMODE}:{Context.User.Id}",
                     [
