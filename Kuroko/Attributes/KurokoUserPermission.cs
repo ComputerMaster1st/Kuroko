@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Kuroko.Attributes;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true)]
-public class RequireUserPermission(GuildPermission permission) : PreconditionAttribute
+public class KurokoUserPermission(GuildPermission permission) : PreconditionAttribute
 {
     public override Task<PreconditionResult> CheckRequirementsAsync(
         IInteractionContext context, ICommandInfo commandInfo, IServiceProvider services)

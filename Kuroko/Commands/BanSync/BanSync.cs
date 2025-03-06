@@ -1,5 +1,7 @@
 using System.Text;
+using Discord;
 using Discord.Interactions;
+using Kuroko.Attributes;
 using Kuroko.Database.GuildEntities;
 
 namespace Kuroko.Commands.BanSync;
@@ -22,6 +24,8 @@ public class BanSync : KurokoCommandBase
     }
 
     [SlashCommand("config", "(Server Management Only) Configuration for BanSync")]
+    [KurokoBotPermission(GuildPermission.BanMembers)]
+    [KurokoUserPermission(GuildPermission.ManageGuild)]
     public Task ConfigAsync()
     {
         return RespondAsync("Nothing to see here at this time.", ephemeral: true);

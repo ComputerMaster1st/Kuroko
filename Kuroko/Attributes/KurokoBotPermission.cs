@@ -4,7 +4,7 @@ using Discord.Interactions;
 namespace Kuroko.Attributes;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true)]
-public class RequireBotPermission(GuildPermission permission) : PreconditionAttribute
+public class KurokoBotPermission(GuildPermission permission) : PreconditionAttribute
 {
     public override async Task<PreconditionResult> CheckRequirementsAsync(
         IInteractionContext context, ICommandInfo commandInfo, IServiceProvider services)
