@@ -19,7 +19,7 @@ public enum BanSyncMode
     /// </summary>
     HalfDuplex,
     /// <summary>
-    /// Read Host Banlist & Send Warnings To Host & Execute Ban On Host
+    /// Read Host Banlist & Execute Ban On Host
     /// WARNING: ONLY TO BE USED FOR GROUPED COMMUNITY SERVERS
     /// </summary>
     FullDuplex
