@@ -100,7 +100,7 @@ public partial class BanSync
                     maxValues: 1,
                     row: 1)
                 .WithButton("Exit",
-                    $"{CommandMap.EXIT}:{Context.User.Id}",
+                    $"{CommandMap.EXIT_WITH_UID}:{Context.User.Id}",
                     ButtonStyle.Secondary,
                     row: 2);
 
