@@ -18,7 +18,7 @@ public class BanSync : KurokoCommandBase
             .AppendLine($"* **Servers Hosting For/As Client:** {properties.HostForProfiles.Count}/{properties.ClientOfProfiles.Count}")
             .AppendLine($"* **Default Sync Mode:** {properties.Mode}");
         
-        await RespondAsync(output.ToString());
+        await RespondAsync(output.ToString(), ephemeral: true);
     }
 
     [SlashCommand("config", "(Server Management Only) Configuration for BanSync")]
