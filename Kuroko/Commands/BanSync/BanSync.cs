@@ -3,6 +3,7 @@ using Discord;
 using Discord.Interactions;
 using Kuroko.Attributes;
 using Kuroko.Database.GuildEntities;
+using Kuroko.Shared;
 
 namespace Kuroko.Commands.BanSync;
 
@@ -24,7 +25,7 @@ public partial class BanSync : KurokoCommandBase
     }
     
     // Public/Client Request Command
-    [SlashCommand("bansync-request", "(UUID Required) BanSync public request")]
+    [SlashCommand("bansync-request", "(BanSync UUID Required) BanSync public request")]
     public async Task ClientRequestAsync(string uuid = null)
     {
         var properties = await GetPropertiesAsync<BanSyncProperties, GuildEntity>(Context.Guild.Id);
@@ -37,14 +38,14 @@ public partial class BanSync : KurokoCommandBase
         if (!Guid.TryParse(uuid, out var guid))
         {
             await RespondAsync(
-                "Invalid UUID! Please double-check by running /bansync-config on your server!",
+                "Invalid BanSync UUID! Please double-check by running /bansync-config on your server!",
                 ephemeral: true);
             return;
         }
         if (properties.SyncId == guid)
         {
             await RespondAsync(
-                "The UUID provided belongs to this server! Please make sure you are using this command on another server.",
+                "The BanSync UUID provided belongs to this server! Please make sure you are using this command on another server.",
                 ephemeral: true);
             return;
         }
@@ -85,8 +86,38 @@ public partial class BanSync : KurokoCommandBase
             ],
             Timestamp = DateTimeOffset.Now
         };
+        var componentBuilder = new ComponentBuilder()
+            .WithSelectMenu($"{CommandMap.BANSYNC_CLIENTREQUEST_ACCEPT}:{Context.User.Id}",
+                [
+                    new SelectMenuOptionBuilder
+                    {
+                        Label = nameof(BanSyncMode.Default),
+                        Value = nameof(BanSyncMode.Default)
+                    },
+                    new SelectMenuOptionBuilder
+                    {
+                        Label = nameof(BanSyncMode.Simplex),
+                        Value = nameof(BanSyncMode.Simplex)
+                    },
+                    new SelectMenuOptionBuilder
+                    {
+                        Label = nameof(BanSyncMode.HalfDuplex),
+                        Value = nameof(BanSyncMode.HalfDuplex)
+                    },
+                    new SelectMenuOptionBuilder
+                    {
+                        Label = nameof(BanSyncMode.FullDuplex),
+                        Value = nameof(BanSyncMode.FullDuplex)
+                    }
+                ],
+                $"Accept Request With BanSync Mode...",
+                maxValues: 1)
+            .WithButton("Reject Request",
+                CommandMap.EXIT_WITH_PERM,
+                ButtonStyle.Danger);
         
-        await Context.Channel.SendMessageAsync(embed: embedBuilder.Build());
+        await Context.Channel.SendMessageAsync(embed: embedBuilder.Build(),
+            components: componentBuilder.Build());
         await RespondAsync("Your request has been sent!", ephemeral: true);
     }
 
