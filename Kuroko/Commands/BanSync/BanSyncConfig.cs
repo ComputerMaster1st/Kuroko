@@ -22,7 +22,7 @@ public partial class BanSync
         public async Task EnableAsync(ulong interactedUserId)
         {
             if (!IsInteractedUser(interactedUserId)) return;
-            var properties = await ToggleInPropertyAsync<BanSyncProperties>(Context.Guild.Id, x =>
+            var properties = await QuickEditPropertiesAsync<BanSyncProperties>(Context.Guild.Id, x =>
             {
                 x.IsEnabled = !x.IsEnabled;
             });
@@ -33,18 +33,37 @@ public partial class BanSync
         public async Task AllowRequestAsync(ulong interactedUserId)
         {
             if (!IsInteractedUser(interactedUserId)) return;
-            var properties = await ToggleInPropertyAsync<BanSyncProperties>(Context.Guild.Id, x =>
+            var properties = await QuickEditPropertiesAsync<BanSyncProperties>(Context.Guild.Id, x =>
             {
                 x.AllowRequests = !x.AllowRequests;
+            });
+            await ExecuteAsync(properties, true);
+        }
+        
+        [ComponentInteraction($"{CommandMap.BANSYNC_SYNCMODE}:*")]
+        public async Task SetSyncModeAsync(ulong interactedUserId, string syncMode)
+        {
+            if (!IsInteractedUser(interactedUserId)) return;
+            var mode = Enum.Parse<BanSyncMode>(syncMode);
+            var properties = await QuickEditPropertiesAsync<BanSyncProperties>(Context.Guild.Id, x =>
+            {
+                x.Mode = mode;
             });
             await ExecuteAsync(properties, true);
         }
 
         private async Task ExecuteAsync(BanSyncProperties propParam = null, bool isReturning = false)
         {
-            var output = new StringBuilder()
-                .AppendLine("# BanSync Configuration");
             var properties = propParam ?? await GetPropertiesAsync<BanSyncProperties, GuildEntity>(Context.Guild.Id);
+            var output = new StringBuilder()
+                .AppendLine("# BanSync Configuration")
+                .AppendLine($"* **UUID:** {properties.SyncId}")
+                .AppendLine("## SyncMode Descriptions")
+                .AppendLine("* **Disabled:** No Sync")
+                .AppendLine("* **Simplex:** Read Host Banlist Only")
+                .AppendLine("* **HalfDuplex:** Read Host Banlist & Send Warnings To Host")
+                .AppendLine("* **FullDuplex:** Read Host Banlist & Execute Ban On Host")
+                .AppendLine("  * **WARNING:** _ONLY TO BE USED FOR GROUPED COMMUNITY SERVERS_");
             var componentBuilder = new ComponentBuilder()
                 .WithButton($"Enabled: {(properties.IsEnabled ? "Yes" : "No")}",
                     $"{CommandMap.BANSYNC_ENABLE}:{Context.User.Id}",
@@ -77,6 +96,8 @@ public partial class BanSync
                             Value = nameof(BanSyncMode.FullDuplex)
                         },
                     ],
+                    $"Current Mode: {properties.Mode.ToString()}",
+                    maxValues: 1,
                     row: 1)
                 .WithButton("Exit",
                     $"{CommandMap.EXIT}:{Context.User.Id}",
