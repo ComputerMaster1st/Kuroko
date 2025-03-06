@@ -1,17 +1,14 @@
 using Discord;
 using Discord.Interactions;
 using Kuroko.Database;
+using Kuroko.Database.GuildEntities;
 
 namespace Kuroko;
 
 public abstract class KurokoCommandBase : InteractionModuleBase<KurokoInteractionContext>
 {
-    protected async Task<bool> IsInteractedUserAsync(ulong userId)
-    {
-        if (userId == Context.User.Id) return true;
-        await RespondAsync("You can not perform this action due to not being the original user.", ephemeral: true);
-        return false;
-    }
+    protected bool IsInteractedUser(ulong userId)
+        => userId == Context.User.Id;
 
     public override async Task AfterExecuteAsync(ICommandInfo command)
     {
@@ -56,4 +53,14 @@ public abstract class KurokoCommandBase : InteractionModuleBase<KurokoInteractio
 
     protected static ButtonStyle ButtonToggle(bool isEnabled)
         => isEnabled ? ButtonStyle.Success : ButtonStyle.Secondary;
+
+    protected async Task<TPropertyEntity> ToggleInPropertyAsync<TPropertyEntity>
+        (ulong guildId, Action<TPropertyEntity> action)
+        where TPropertyEntity : class, IPropertyEntity
+    {
+        var properties = await GetPropertiesAsync<TPropertyEntity, GuildEntity>(guildId);
+        action(properties);
+        await DeferAsync();
+        return properties;
+    }
 }

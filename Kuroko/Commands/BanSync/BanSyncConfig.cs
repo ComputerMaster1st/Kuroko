@@ -9,19 +9,31 @@ namespace Kuroko.Commands.BanSync;
 
 public partial class BanSync
 {
+    [KurokoBotPermission(GuildPermission.BanMembers)]
+    [KurokoUserPermission(GuildPermission.ManageGuild)]
     public class BanSyncConfig : KurokoCommandBase
     {
-        [SlashCommand("config", "(Server Management Only) Configuration for BanSync")]
-        [KurokoBotPermission(GuildPermission.BanMembers)]
-        [KurokoUserPermission(GuildPermission.ManageGuild)]
+        [SlashCommand("config", 
+            "(Server Management Only) Configuration for BanSync")]
         public Task ShowConfigAsync()
             => ExecuteAsync();
 
-        private async Task ExecuteAsync()
+        [ComponentInteraction($"{CommandMap.BANSYNC_ENABLE}:*")]
+        public async Task EnableAsync(ulong interactedUserId)
+        {
+            if (!IsInteractedUser(interactedUserId)) return;
+            var properties = await ToggleInPropertyAsync<BanSyncProperties>(Context.Guild.Id, x =>
+            {
+                x.IsEnabled = !x.IsEnabled;
+            });
+            await ExecuteAsync(properties, true);
+        }
+
+        private async Task ExecuteAsync(BanSyncProperties propParam = null, bool isReturning = false)
         {
             var output = new StringBuilder()
                 .AppendLine("# BanSync Configuration");
-            var properties = await GetPropertiesAsync<BanSyncProperties, GuildEntity>(Context.Guild.Id);
+            var properties = propParam ?? await GetPropertiesAsync<BanSyncProperties, GuildEntity>(Context.Guild.Id);
             var componentBuilder = new ComponentBuilder()
                 .WithButton($"Enabled: {(properties.IsEnabled ? "Yes" : "No")}",
                     $"{CommandMap.BANSYNC_ENABLE}:{Context.User.Id}",
@@ -58,8 +70,15 @@ public partial class BanSync
                     $"{CommandMap.EXIT}:{Context.User.Id}",
                     ButtonStyle.Secondary,
                     row: 2);
-            
-            await RespondAsync(output.ToString(), components: componentBuilder.Build());
+
+            if (!isReturning)
+                await RespondAsync(output.ToString(), components: componentBuilder.Build());
+            else
+                await Context.Interaction.ModifyOriginalResponseAsync(x =>
+                {
+                    x.Content = output.ToString();
+                    x.Components = componentBuilder.Build();
+                });
         }
     }
 }
