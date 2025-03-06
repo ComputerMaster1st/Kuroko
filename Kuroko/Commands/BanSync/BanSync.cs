@@ -115,8 +115,15 @@ public partial class BanSync : KurokoCommandBase
             .WithButton("Reject Request",
                 CommandMap.EXIT_WITH_PERM,
                 ButtonStyle.Danger);
+        var properties = await GetPropertiesAsync<BanSyncProperties, GuildEntity>(Context.Guild.Id);
+        var channel = Context.Guild.GetTextChannel(Context.Channel.Id);
+        if (channel is null)
+        {
+            await RespondAsync("Unable to send request! Please ask an administrator to setup the ban sync channel.", ephemeral: true);
+            return;
+        }
         
-        await Context.Channel.SendMessageAsync(embed: embedBuilder.Build(),
+        await channel.SendMessageAsync(embed: embedBuilder.Build(),
             components: componentBuilder.Build());
         await RespondAsync("Your request has been sent!", ephemeral: true);
     }
