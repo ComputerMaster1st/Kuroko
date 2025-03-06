@@ -14,6 +14,7 @@ public class BanSync : KurokoCommandBase
         var output = new StringBuilder()
             .AppendLine("## BanSync Status")
             .AppendLine($"* **Enabled:** {(properties.IsEnabled ? "True" : "False")}")
+            .AppendLine($"* **Allow Requests:** {(properties.AllowRequests ? "True" : "False")}")
             .AppendLine($"* **Servers Hosting For/As Client:** {properties.HostForProfiles.Count}/{properties.ClientOfProfiles.Count}")
             .AppendLine($"* **Default Sync Mode:** {properties.Mode}");
         
