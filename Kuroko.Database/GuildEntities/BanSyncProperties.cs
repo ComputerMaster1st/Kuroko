@@ -19,10 +19,11 @@ public class BanSyncProperties : IPropertyEntity
     public bool IsEnabled { get; set; } = false;
     public bool AllowRequests { get; set; } = false;
     public ulong BanSyncChannelId { get; set; } = 0;
-    
+
     // Permission Level
-    public BanSyncMode Mode { get; set; } = BanSyncMode.Disabled;
-    
+    public BanSyncMode HostMode { get; set; } = BanSyncMode.Disabled;
+    public BanSyncMode ClientMode { get; set; } = BanSyncMode.Disabled;
+
     // Sync Profiles
     public virtual List<BanSyncProfile> HostForProfiles { get; private set; } = [];
     public virtual List<BanSyncProfile> ClientOfProfiles { get; private set; } = [];

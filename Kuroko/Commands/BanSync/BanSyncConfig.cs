@@ -40,14 +40,14 @@ public partial class BanSync
             await ExecuteAsync(properties, true);
         }
         
-        [ComponentInteraction($"{CommandMap.BANSYNC_SYNCMODE}:*")]
+        [ComponentInteraction($"{CommandMap.BANSYNC_SYNCMODE_HOST}:*")]
         public async Task SetSyncModeAsync(ulong interactedUserId, string syncMode)
         {
             if (!IsInteractedUser(interactedUserId)) return;
             var mode = Enum.Parse<BanSyncMode>(syncMode);
             var properties = await QuickEditPropertiesAsync<BanSyncProperties>(Context.Guild.Id, x =>
             {
-                x.Mode = mode;
+                x.HostMode = mode;
             });
             await ExecuteAsync(properties, true);
         }
@@ -69,7 +69,8 @@ public partial class BanSync
             var output = new StringBuilder()
                 .AppendLine("# BanSync Configuration")
                 .AppendLine($"* **UUID:** {properties.SyncId}")
-                .AppendLine($"* **BanSync Channel:** {Context.Guild.GetTextChannel(properties.BanSyncChannelId)?.Mention}")
+                .AppendLine($"* **BanSync Channel:** {Context.Guild.GetTextChannel(
+                    properties.BanSyncChannelId)?.Mention}")
                 .AppendLine("## SyncMode Descriptions")
                 .AppendLine("* **Disabled:** No Sync")
                 .AppendLine("* **Simplex:** Read Host Banlist Only")
@@ -90,7 +91,7 @@ public partial class BanSync
                     $"{CommandMap.BANSYNC_CHANNEL}:{Context.User.Id}",
                     ButtonToggle(isBanSyncCurrentChannel),
                     row: 0)
-                .WithSelectMenu($"{CommandMap.BANSYNC_SYNCMODE}:{Context.User.Id}",
+                .WithSelectMenu($"{CommandMap.BANSYNC_SYNCMODE_HOST}:{Context.User.Id}",
                     [
                         new SelectMenuOptionBuilder
                         {
@@ -111,9 +112,30 @@ public partial class BanSync
                         {
                             Label = nameof(BanSyncMode.FullDuplex),
                             Value = nameof(BanSyncMode.FullDuplex)
-                        },
+                        }
                     ],
-                    $"Current Mode: {properties.Mode.ToString()}",
+                    $"Current Host Mode: {properties.HostMode.ToString()}",
+                    maxValues: 1,
+                    row: 1)
+                .WithSelectMenu($"{CommandMap.BANSYNC_SYNCMODE_CLIENT}:{Context.User.Id}",
+                    [
+                        new SelectMenuOptionBuilder
+                        {
+                            Label = nameof(BanSyncMode.Disabled),
+                            Value = nameof(BanSyncMode.Disabled)
+                        },
+                        new SelectMenuOptionBuilder
+                        {
+                            Label = nameof(BanSyncMode.HalfDuplex),
+                            Value = nameof(BanSyncMode.HalfDuplex)
+                        },
+                        new SelectMenuOptionBuilder
+                        {
+                            Label = nameof(BanSyncMode.FullDuplex),
+                            Value = nameof(BanSyncMode.FullDuplex)
+                        }
+                    ],
+                    $"Current Client Mode: {properties.ClientMode.ToString()}",
                     maxValues: 1,
                     row: 1)
                 .WithButton("Exit",

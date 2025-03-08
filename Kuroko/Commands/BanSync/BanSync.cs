@@ -19,7 +19,7 @@ public partial class BanSync : KurokoCommandBase
             .AppendLine($"* **Allow Requests:** {(properties.AllowRequests ? "True" : "False")}")
             .AppendLine($"* **Servers Hosting For/As Client:** {
                 properties.HostForProfiles.Count}/{properties.ClientOfProfiles.Count}")
-            .AppendLine($"* **Default Sync Mode:** {properties.Mode}");
+            .AppendLine($"* **Default Sync Mode:** {properties.HostMode}");
         
         await RespondAsync(output.ToString(), ephemeral: true);
     }
@@ -119,7 +119,8 @@ public partial class BanSync : KurokoCommandBase
         var channel = Context.Guild.GetTextChannel(properties.BanSyncChannelId);
         if (channel is null)
         {
-            await RespondAsync("Unable to send request! Please ask an administrator to setup the ban sync channel.", ephemeral: true);
+            await RespondAsync("Unable to send request! Please ask an administrator to setup the ban sync channel.",
+                ephemeral: true);
             return;
         }
         
