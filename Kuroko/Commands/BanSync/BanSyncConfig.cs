@@ -41,13 +41,25 @@ public partial class BanSync
         }
         
         [ComponentInteraction($"{CommandMap.BANSYNC_SYNCMODE_HOST}:*")]
-        public async Task SetSyncModeAsync(ulong interactedUserId, string syncMode)
+        public async Task SetHostSyncModeAsync(ulong interactedUserId, string syncMode)
         {
             if (!IsInteractedUser(interactedUserId)) return;
             var mode = Enum.Parse<BanSyncMode>(syncMode);
             var properties = await QuickEditPropertiesAsync<BanSyncProperties>(Context.Guild.Id, x =>
             {
                 x.HostMode = mode;
+            });
+            await ExecuteAsync(properties, true);
+        }
+        
+        [ComponentInteraction($"{CommandMap.BANSYNC_SYNCMODE_CLIENT}:*")]
+        public async Task SetClientSyncModeAsync(ulong interactedUserId, string syncMode)
+        {
+            if (!IsInteractedUser(interactedUserId)) return;
+            var mode = Enum.Parse<BanSyncMode>(syncMode);
+            var properties = await QuickEditPropertiesAsync<BanSyncProperties>(Context.Guild.Id, x =>
+            {
+                x.ClientMode = mode;
             });
             await ExecuteAsync(properties, true);
         }
