@@ -87,7 +87,9 @@ public partial class BanSync
                 .AppendLine("* **Disabled:** No Sync")
                 .AppendLine("* **Simplex:** Read Host Banlist Only")
                 .AppendLine("* **HalfDuplex:** Read Host Banlist & Send Warnings To Host")
+                .AppendLine("  * _Client Side: Receive Incoming Ban As Warning From Host_")
                 .AppendLine("* **FullDuplex:** Read Host Banlist & Execute Ban On Host")
+                .AppendLine("  * _Client Side: Execute Incoming Ban From Host_")
                 .AppendLine("  * **WARNING:** _ONLY TO BE USED FOR GROUPED COMMUNITY SERVERS_");
             var isBanSyncCurrentChannel = properties.BanSyncChannelId == Context.Channel.Id;
             var componentBuilder = new ComponentBuilder()
