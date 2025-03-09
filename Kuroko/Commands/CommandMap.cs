@@ -13,7 +13,7 @@ public static class CommandMap
     public const string BANSYNC_SYNCMODE_CLIENT = "bansync_syncmode_client";
     public const string BANSYNC_CHANNEL = "bansync_channel";
     public const string BANSYNC_CLIENTREQUEST = "bansync_clientrequest";
-    public const string BANSYNC_CLIENTREQUEST_UUID = "bansync_clientrequest_uuid";
+    public const string BANSYNC_CLIENTREQUEST_ID = "bansync_clientrequest_uuid";
     public const string BANSYNC_CLIENTREQUEST_REASON = "bansync_clientrequest_reason";
     public const string BANSYNC_CLIENTREQUEST_ACCEPT = "bansync_clientrequest_accept";
 }
