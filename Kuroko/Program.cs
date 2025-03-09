@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 DataDirectories.CheckDirectories();
 
-DiscordShardedClient client = new(new DiscordSocketConfig()
+DiscordShardedClient client = new(new DiscordSocketConfig
 {
     AlwaysDownloadUsers = true,
     DefaultRetryMode = RetryMode.AlwaysRetry,
@@ -25,7 +25,7 @@ DiscordShardedClient client = new(new DiscordSocketConfig()
                      GatewayIntents.GuildBans,
     MessageCacheSize = 1000
 });
-InteractionService interactionService = new(client, new InteractionServiceConfig()
+InteractionService interactionService = new(client, new InteractionServiceConfig
 {
     DefaultRunMode = RunMode.Sync,
     LogLevel = LogSeverity.Info,
