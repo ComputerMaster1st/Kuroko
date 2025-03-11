@@ -18,4 +18,6 @@ public static class CommandMap
     public const string BANSYNC_CLIENTREQUEST_ACCEPT = "bansync_clientrequest_accept";
     public const string BANSYNC_PROFILE_UPDATE  = "bansync_profile_update";
     public const string BANSYNC_PROFILE_CANCEL = "bansync_profile_cancel";
+    public const string BANSYNC_BANUSER = "bansync_banuser";
+    public const string BANSYNC_IGNORE = "bansync_ignore";
 }
