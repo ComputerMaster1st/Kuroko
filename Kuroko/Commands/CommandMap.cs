@@ -16,4 +16,6 @@ public static class CommandMap
     public const string BANSYNC_CLIENTREQUEST_ID = "bansync_clientrequest_uuid";
     public const string BANSYNC_CLIENTREQUEST_REASON = "bansync_clientrequest_reason";
     public const string BANSYNC_CLIENTREQUEST_ACCEPT = "bansync_clientrequest_accept";
+    public const string BANSYNC_PROFILE_UPDATE  = "bansync_profile_update";
+    public const string BANSYNC_PROFILE_CANCEL = "bansync_profile_cancel";
 }

@@ -1,6 +1,7 @@
 using Discord;
 using Discord.Interactions;
 using Kuroko.Attributes;
+using Kuroko.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace Kuroko.Commands.BanSync;
@@ -10,7 +11,10 @@ namespace Kuroko.Commands.BanSync;
 public class BanSyncProfileInteract : KurokoCommandBase
 {
     [SlashCommand("bansync-profile", "Show BanSync Profile for selected guild/server")]
-    public async Task BanSyncProfileAsync([Autocomplete(typeof(BanSyncProfileAutocomplete))] int profileId)
+    public Task BanSyncProfileAsync([Autocomplete(typeof(BanSyncProfileAutocomplete))] int profileId)
+        => ExecuteGuiAsync(profileId);
+    
+    private async Task ExecuteGuiAsync(int profileId, bool isReturning = false)
     {
         var bansyncProfile = await Context.Database.BanSyncProfiles
             .Include(banSyncProfile => banSyncProfile.HostProperties)
@@ -36,8 +40,42 @@ public class BanSyncProfileInteract : KurokoCommandBase
             guildName = guild.Name;
             bansyncId = bansyncProfile.HostSyncId.ToString();
         }
+
+        MessageComponent components = null;
+        if (isHost)
+            components = new ComponentBuilder()
+                .WithSelectMenu($"{CommandMap.BANSYNC_PROFILE_UPDATE}:{Context.User.Id},{bansyncProfile.Id}", 
+                    [
+                        new SelectMenuOptionBuilder
+                        {
+                            Label = nameof(BanSyncMode.Default),
+                            Value = nameof(BanSyncMode.Default)
+                        },
+                        new SelectMenuOptionBuilder
+                        {
+                            Label = nameof(BanSyncMode.Simplex),
+                            Value = nameof(BanSyncMode.Simplex)
+                        },
+                        new SelectMenuOptionBuilder
+                        {
+                            Label = nameof(BanSyncMode.HalfDuplex),
+                            Value = nameof(BanSyncMode.HalfDuplex)
+                        },
+                        new SelectMenuOptionBuilder
+                        {
+                            Label = nameof(BanSyncMode.FullDuplex),
+                            Value = nameof(BanSyncMode.FullDuplex)
+                        }
+                    ],
+                    $"Update BanSync Mode...",
+                    maxValues: 1)
+                .WithButton("Cancel Sync", $"{CommandMap.BANSYNC_PROFILE_CANCEL}:{Context.User.Id}",
+                    ButtonStyle.Danger)
+                .WithButton("Exit", $"{CommandMap.EXIT_WITH_UID}:{Context.User.Id}",
+                    ButtonStyle.Secondary)
+                .Build();
         
-        var embed = new EmbedBuilder()
+        var embed = new EmbedBuilder
         {
             Title = "BanSync Profile Information",
             Color = Color.Blue,
@@ -62,6 +100,13 @@ public class BanSyncProfileInteract : KurokoCommandBase
             ]
         }.Build();
         
-        await RespondAsync(embed: embed, ephemeral: true);
+        if (!isReturning)
+            await RespondAsync(embed: embed, components: components);
+        else
+            await Context.Interaction.ModifyOriginalResponseAsync(x =>
+            {
+                x.Embed = embed;
+                x.Components = components;
+            });
     }
 }
