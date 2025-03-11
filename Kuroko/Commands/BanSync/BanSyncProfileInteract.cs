@@ -26,6 +26,7 @@ public class BanSyncProfileInteract : KurokoCommandBase
     public async Task UpdateProfileAsync(ulong interactedUserId, int profileId, string rawMode)
     {
         if (!IsInteractedUser(interactedUserId)) return;
+        await DeferAsync();
         
         var mode = Enum.Parse<BanSyncMode>(rawMode);
         var profile = await Context.Database.BanSyncProfiles
@@ -41,7 +42,29 @@ public class BanSyncProfileInteract : KurokoCommandBase
     [ComponentInteraction($"{CommandMap.BANSYNC_PROFILE_CANCEL}:*,*")]
     public async Task CancelProfileAsync(ulong interactedUserId, int profileId)
     {
+        if (!IsInteractedUser(interactedUserId)) return;
+        await DeferAsync();
+
+        var profile = await Context.Database.BanSyncProfiles.FirstOrDefaultAsync(
+            x => x.Id == profileId);
+        if (profile is null)
+            return;
         
+        Context.Database.BanSyncProfiles.Remove(profile);
+        
+        var embed = new EmbedBuilder
+        {
+            Title = "BanSync Profile Cancelled!",
+            Color = Color.Green,
+            Timestamp = DateTimeOffset.Now,
+            Description = "BanSync Profile has been cancelled!"
+        }.Build();
+        
+        await Context.Channel.SendMessageAsync(embed: embed);
+        
+        var msg = await Context.Interaction.GetOriginalResponseAsync();
+        if (msg != null)
+            await msg.DeleteAsync();
     }
     
     private async Task ExecuteGuiAsync(BanSyncProfile profile, bool isReturning = false)
@@ -93,15 +116,15 @@ public class BanSyncProfileInteract : KurokoCommandBase
                         }
                     ],
                     $"Update BanSync Mode...",
-                    maxValues: 1)
-                .WithButton("Cancel Sync", $"{
-                    CommandMap.BANSYNC_PROFILE_CANCEL}:{Context.User.Id},{profile.Id}",
-                    ButtonStyle.Danger);
+                    maxValues: 1);
         componentBuilder
+            .WithButton("Cancel Sync", $"{
+                CommandMap.BANSYNC_PROFILE_CANCEL}:{Context.User.Id},{profile.Id}",
+                ButtonStyle.Danger)
             .WithButton("Exit", $"{CommandMap.EXIT_WITH_UID}:{Context.User.Id}",
                 ButtonStyle.Secondary);
         
-        var embed = new EmbedBuilder
+        var embedBuilder = new EmbedBuilder
         {
             Title = "BanSync Profile Information",
             Color = Color.Blue,
@@ -124,15 +147,17 @@ public class BanSyncProfileInteract : KurokoCommandBase
                     Value = profile.Mode.ToString()
                 }
             ]
-        }.Build();
+        };
         
         if (!isReturning)
-            await RespondAsync(embed: embed, components: componentBuilder.Build());
+            await RespondAsync(embed: embedBuilder.Build(), components: componentBuilder.Build());
         else
+        {
             await Context.Interaction.ModifyOriginalResponseAsync(x =>
             {
-                x.Embed = embed;
+                x.Embed = embedBuilder.Build();
                 x.Components = componentBuilder.Build();
             });
+        }
     }
 }
