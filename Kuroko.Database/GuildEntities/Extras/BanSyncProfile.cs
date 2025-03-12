@@ -6,7 +6,7 @@ namespace Kuroko.Database.GuildEntities.Extras;
 
 public class BanSyncProfile(Guid hostSyncId, Guid clientSyncId, BanSyncMode mode)
 {
-    [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
+    [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; private set; } = 0;
     
     // Host Guild

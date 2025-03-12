@@ -155,6 +155,8 @@ public partial class BanSync : KurokoCommandBase
     
     private async Task<bool> ProcessRequestAsync(string bansyncId, BanSyncMode mode)
     {
+        await DeferAsync();
+        
         var hostProperties = await GetPropertiesAsync<BanSyncProperties, GuildEntity>(Context.Guild.Id);
         var verifiedClientGuid = await VerifyGuidAsync(bansyncId, hostProperties.SyncId);
         var clientProperties = await Context.Database.BanSyncProperties.FirstOrDefaultAsync(
