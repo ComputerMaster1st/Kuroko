@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "4ov7AcGuRxg=",
+  "dgSpecHash": "dkY6yCujjWk=",
   "success": true,
   "projectFilePath": "/home/nekoputer/Discord/KurokoNet9/Kuroko/Kuroko/Kuroko.csproj",
   "expectedPackageFiles": [
@@ -17,10 +17,10 @@
     "/home/nekoputer/.nuget/packages/microsoft.entityframeworkcore.abstractions/9.0.3/microsoft.entityframeworkcore.abstractions.9.0.3.nupkg.sha512",
     "/home/nekoputer/.nuget/packages/microsoft.entityframeworkcore.analyzers/9.0.3/microsoft.entityframeworkcore.analyzers.9.0.3.nupkg.sha512",
     "/home/nekoputer/.nuget/packages/microsoft.entityframeworkcore.proxies/9.0.3/microsoft.entityframeworkcore.proxies.9.0.3.nupkg.sha512",
-    "/home/nekoputer/.nuget/packages/microsoft.entityframeworkcore.relational/9.0.1/microsoft.entityframeworkcore.relational.9.0.1.nupkg.sha512",
+    "/home/nekoputer/.nuget/packages/microsoft.entityframeworkcore.relational/9.0.3/microsoft.entityframeworkcore.relational.9.0.3.nupkg.sha512",
     "/home/nekoputer/.nuget/packages/microsoft.extensions.caching.abstractions/9.0.3/microsoft.extensions.caching.abstractions.9.0.3.nupkg.sha512",
     "/home/nekoputer/.nuget/packages/microsoft.extensions.caching.memory/9.0.3/microsoft.extensions.caching.memory.9.0.3.nupkg.sha512",
-    "/home/nekoputer/.nuget/packages/microsoft.extensions.configuration.abstractions/9.0.1/microsoft.extensions.configuration.abstractions.9.0.1.nupkg.sha512",
+    "/home/nekoputer/.nuget/packages/microsoft.extensions.configuration.abstractions/9.0.3/microsoft.extensions.configuration.abstractions.9.0.3.nupkg.sha512",
     "/home/nekoputer/.nuget/packages/microsoft.extensions.dependencyinjection/9.0.3/microsoft.extensions.dependencyinjection.9.0.3.nupkg.sha512",
     "/home/nekoputer/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/9.0.3/microsoft.extensions.dependencyinjection.abstractions.9.0.3.nupkg.sha512",
     "/home/nekoputer/.nuget/packages/microsoft.extensions.logging/9.0.3/microsoft.extensions.logging.9.0.3.nupkg.sha512",

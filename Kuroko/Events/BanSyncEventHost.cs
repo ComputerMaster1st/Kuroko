@@ -32,6 +32,9 @@ public class BanSyncEventHost : BanSyncEventBase
             .Include(banSyncProperties => banSyncProperties.HostForProfiles)
             .FirstOrDefaultAsync(x => x.GuildId == hostGuild.Id);
         
+        if (!properties.IsEnabled)
+            return;
+        
         var components = new ComponentBuilder()
             .WithButton("(3) !! Ban User !! (3)", $"{CommandMap.BANSYNC_BANUSER}:{hostBannedUser.Id},3",
                 ButtonStyle.Danger)
@@ -61,6 +64,9 @@ public class BanSyncEventHost : BanSyncEventBase
         
         foreach (var profile in properties.HostForProfiles)
         {
+            if (!profile.ClientProperties.IsEnabled)
+                return;
+            
             var clientGuild = _client.GetGuild(profile.ClientProperties.GuildId);
             var clientUser = clientGuild.GetUser(hostBannedUser.Id);
             var clientChannel = clientGuild.GetTextChannel(profile.ClientProperties.BanSyncChannelId);

@@ -3443,6 +3443,7 @@
       "Microsoft.EntityFrameworkCore >= 9.0.3",
       "Microsoft.EntityFrameworkCore.Design >= 9.0.3",
       "Microsoft.EntityFrameworkCore.Proxies >= 9.0.3",
+      "Microsoft.EntityFrameworkCore.Relational >= 9.0.3",
       "Microsoft.Extensions.DependencyInjection >= 9.0.3",
       "Npgsql.EntityFrameworkCore.PostgreSQL >= 9.0.4"
     ]
@@ -3505,6 +3506,10 @@
             "version": "[9.0.3, )"
           },
           "Microsoft.EntityFrameworkCore.Proxies": {
+            "target": "Package",
+            "version": "[9.0.3, )"
+          },
+          "Microsoft.EntityFrameworkCore.Relational": {
             "target": "Package",
             "version": "[9.0.3, )"
           },
