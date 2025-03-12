@@ -66,4 +66,10 @@ public sealed class DatabaseContext : DbContext
         SaveChanges();
         base.Dispose();
     }
+
+    public override async ValueTask DisposeAsync()
+    {
+        await SaveChangesAsync();
+        await base.DisposeAsync();
+    }
 }
