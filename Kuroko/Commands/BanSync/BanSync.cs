@@ -141,8 +141,6 @@ public partial class BanSync : KurokoCommandBase
         if (!await ProcessRequestAsync(rawGuid, mode))
             return;
         
-        await RespondAsync("Server/Guild Successfully Synced!", ephemeral: true);
-        
         var msg = await Context.Interaction.GetOriginalResponseAsync();
         if (msg != null)
             await msg.DeleteAsync();
@@ -153,11 +151,11 @@ public partial class BanSync : KurokoCommandBase
     [KurokoUserPermission(GuildPermission.ManageGuild)]
     public async Task InviteAsync(string bansyncId, BanSyncMode mode)
     {
-        if (await ProcessRequestAsync(bansyncId, mode))
+        if (await ProcessRequestAsync(bansyncId, mode, true))
             await RespondAsync("Server/Guild Successfully Synced!", ephemeral: true);
     }
     
-    private async Task<bool> ProcessRequestAsync(string bansyncId, BanSyncMode mode)
+    private async Task<bool> ProcessRequestAsync(string bansyncId, BanSyncMode mode, bool isInvited = false)
     {
         var hostProperties = await GetPropertiesAsync<BanSyncProperties, GuildEntity>(Context.Guild.Id);
         var verifiedClientGuid = await VerifyGuidAsync(bansyncId, hostProperties.SyncId);
@@ -182,8 +180,10 @@ public partial class BanSync : KurokoCommandBase
 
         if (clientChannel != null)
             await clientChannel.SendMessageAsync(embed: MakeEmbed());
-        if (hostChannel != null)
+        if (hostChannel != null && isInvited)
             await hostChannel.SendMessageAsync(embed: MakeEmbed(true));
+        else
+            await RespondAsync(embed: MakeEmbed(true));
         return true;
 
         Embed MakeEmbed(bool isClient = false)
