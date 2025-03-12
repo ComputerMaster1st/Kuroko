@@ -183,7 +183,11 @@ public partial class BanSync : KurokoCommandBase
         if (hostChannel != null && isInvited)
             await hostChannel.SendMessageAsync(embed: MakeEmbed(true));
         else
-            await RespondAsync(embed: MakeEmbed(true));
+            await Context.Interaction.ModifyOriginalResponseAsync(x =>
+            {
+                x.Embed = MakeEmbed(true);
+                x.Components = null;
+            });
         return true;
 
         Embed MakeEmbed(bool isClient = false)
