@@ -68,10 +68,8 @@ public class BanSyncEventHost : BanSyncEventBase
             if (await clientGuild.GetBanAsync(hostBannedUser.Id) != null)
                 continue;
 
-            // Client mode can only be Disabled, Half Or Full
             switch (profile.ClientProperties.ClientMode)
             {
-                // Send Warning
                 case BanSyncMode.HalfDuplex:
                     if (clientChannel != null)
                         await clientChannel.SendMessageAsync(embed: embedWarn, components: components);
