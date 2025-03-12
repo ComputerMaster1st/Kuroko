@@ -50,21 +50,21 @@
           "dependencies": {
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[9.0.2, )"
+              "version": "[9.0.3, )"
             },
             "Microsoft.EntityFrameworkCore.Design": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[9.0.2, )"
+              "version": "[9.0.3, )"
             },
             "Microsoft.EntityFrameworkCore.Proxies": {
               "target": "Package",
-              "version": "[9.0.2, )"
+              "version": "[9.0.3, )"
             },
             "Microsoft.Extensions.DependencyInjection": {
               "target": "Package",
-              "version": "[9.0.2, )"
+              "version": "[9.0.3, )"
             },
             "Npgsql.EntityFrameworkCore.PostgreSQL": {
               "target": "Package",
@@ -139,7 +139,7 @@
           "dependencies": {
             "Discord.Net": {
               "target": "Package",
-              "version": "[3.17.1, )"
+              "version": "[3.17.2, )"
             },
             "Newtonsoft.Json": {
               "target": "Package",
