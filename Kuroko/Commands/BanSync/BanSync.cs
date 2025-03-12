@@ -136,8 +136,12 @@ public partial class BanSync : KurokoCommandBase
     public async Task AcceptClientRequestAsync(ulong interactedUserId, string rawGuid, string rawMode)
     {
         if (!IsInteractedUser(interactedUserId)) return;
+        
         var mode = Enum.Parse<BanSyncMode>(rawMode);
-        await ProcessRequestAsync(rawGuid, mode);
+        if (!await ProcessRequestAsync(rawGuid, mode))
+            return;
+        
+        await RespondAsync("Server/Guild Successfully Synced!", ephemeral: true);
         
         var msg = await Context.Interaction.GetOriginalResponseAsync();
         if (msg != null)
@@ -155,13 +159,13 @@ public partial class BanSync : KurokoCommandBase
     
     private async Task<bool> ProcessRequestAsync(string bansyncId, BanSyncMode mode)
     {
-        await DeferAsync();
-        
         var hostProperties = await GetPropertiesAsync<BanSyncProperties, GuildEntity>(Context.Guild.Id);
         var verifiedClientGuid = await VerifyGuidAsync(bansyncId, hostProperties.SyncId);
+        if (verifiedClientGuid == Guid.Empty)
+            return false;
+        
         var clientProperties = await Context.Database.BanSyncProperties.FirstOrDefaultAsync(
             x => x.SyncId == verifiedClientGuid);
-
         if (clientProperties is null)
         {
             await RespondAsync(
