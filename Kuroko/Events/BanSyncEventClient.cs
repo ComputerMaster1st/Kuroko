@@ -33,7 +33,7 @@ public class BanSyncEventClient : BanSyncEventBase
             .FirstOrDefaultAsync(x => x.GuildId == clientGuild.Id);
         
         var components = new ComponentBuilder()
-            .WithButton("(3) !! Ban User !! (3)", $"{CommandMap.BANSYNC_BANUSER}:{clientBannedUser.Id},3",
+            .WithButton("(3) !! Ban User !! (3)", $"{CommandMap.BANSYNC_BANUSER}:{clientBannedUser.Id}",
                 ButtonStyle.Danger)
             .WithButton("Ignore", $"{CommandMap.BANSYNC_IGNORE}", ButtonStyle.Secondary)
             .Build();
