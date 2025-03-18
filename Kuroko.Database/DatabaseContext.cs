@@ -11,12 +11,15 @@ public sealed class DatabaseContext : DbContext
 {
     // Base Entities
     public DbSet<GuildEntity> Guilds { get; internal set; } = null;
+    public DbSet<UserEntity> Users { get; internal set; } = null;
     
     // Property Entities
     public DbSet<BanSyncGuildProperties> BanSyncProperties { get; internal set; } = null;
+    public DbSet<PatreonProperties> PatreonProperties { get; internal set; } = null;
     
     // Extra Entities
     public DbSet<BanSyncProfile> BanSyncProfiles { get; internal set; } = null;
+    public DbSet<PremiumKey> PremiumKeys { get; internal set; } = null;
     
 #if DEBUG
     public DatabaseContext() { }
