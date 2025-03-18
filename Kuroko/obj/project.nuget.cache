@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "Rd7HTHe+niQ=",
+  "dgSpecHash": "I00USyU5WlA=",
   "success": true,
   "projectFilePath": "/home/nekoputer/Discord/KurokoNet9/Kuroko/Kuroko/Kuroko.csproj",
   "expectedPackageFiles": [
@@ -12,6 +12,7 @@
     "/home/nekoputer/.nuget/packages/discord.net.rest/3.17.2/discord.net.rest.3.17.2.nupkg.sha512",
     "/home/nekoputer/.nuget/packages/discord.net.webhook/3.17.2/discord.net.webhook.3.17.2.nupkg.sha512",
     "/home/nekoputer/.nuget/packages/discord.net.websocket/3.17.2/discord.net.websocket.3.17.2.nupkg.sha512",
+    "/home/nekoputer/.nuget/packages/fluentscheduler/5.5.1/fluentscheduler.5.5.1.nupkg.sha512",
     "/home/nekoputer/.nuget/packages/microsoft.bcl.asyncinterfaces/6.0.0/microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",
     "/home/nekoputer/.nuget/packages/microsoft.entityframeworkcore/9.0.3/microsoft.entityframeworkcore.9.0.3.nupkg.sha512",
     "/home/nekoputer/.nuget/packages/microsoft.entityframeworkcore.abstractions/9.0.3/microsoft.entityframeworkcore.abstractions.9.0.3.nupkg.sha512",
