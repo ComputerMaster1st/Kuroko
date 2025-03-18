@@ -15,13 +15,17 @@ public partial class BanSync : KurokoCommandBase
     public async Task StatusAsync()
     {
         var properties = await GetPropertiesAsync<BanSyncGuildProperties, GuildEntity>(Context.Guild.Id);
+        var premKeyExpireAt = properties.Guild.PremiumKey is null ? "No Premium Key Installed" : 
+            properties.Guild.PremiumKey.ExpiresAt.ToString();
         var output = new StringBuilder()
             .AppendLine("## BanSync Status")
             .AppendLine($"* **Enabled:** {(properties.IsEnabled ? "True" : "False")}")
             .AppendLine($"* **Allow Requests:** {(properties.AllowRequests ? "True" : "False")}")
             .AppendLine($"* **Servers Hosting For/As Client:** {
                 properties.HostForProfiles.Count}/{properties.ClientOfProfiles.Count}")
-            .AppendLine($"* **Default Sync Mode:** {properties.HostMode}");
+            .AppendLine($"* **Default Host Sync Mode:** {properties.HostMode}")
+            .AppendLine($"* **Default Client Sync Mode: {properties.ClientMode}")
+            .AppendLine($"* **Premium Key Expires: {premKeyExpireAt}");
         
         await RespondAsync(output.ToString(), ephemeral: true);
     }
@@ -35,6 +39,14 @@ public partial class BanSync : KurokoCommandBase
         if (!properties.AllowRequests)
         {
             await RespondAsync("BanSync requests are not allowed on this server.", ephemeral: true);
+            return;
+        }
+        if ((properties.ClientOfProfiles.Count + properties.HostForProfiles.Count
+            >= NonPremiumLimits.BanSyncProfileLimit) && properties.Guild.PremiumKey is null)
+        {
+            await RespondAsync(
+                "BanSync requests are temporarily disabled due to BanSync limit reached. Premium Key Required!",
+                ephemeral: true);
             return;
         }
         var verifiedHostGuid = await VerifyGuidAsync(bansyncId, properties.SyncId);
@@ -151,13 +163,24 @@ public partial class BanSync : KurokoCommandBase
     [KurokoUserPermission(GuildPermission.ManageGuild)]
     public async Task InviteAsync(string bansyncId, BanSyncMode mode)
     {
-        if (await ProcessRequestAsync(bansyncId, mode, true))
+        var properties = await GetPropertiesAsync<BanSyncGuildProperties, GuildEntity>(Context.Guild.Id);
+        if ((properties.ClientOfProfiles.Count + properties.HostForProfiles.Count
+             >= NonPremiumLimits.BanSyncProfileLimit) && properties.Guild.PremiumKey is null)
+        {
+            await RespondAsync(
+                "BanSync requests are temporarily disabled due to BanSync limit reached. Premium Key Required!",
+                ephemeral: true);
+            return;
+        }
+        
+        if (await ProcessRequestAsync(bansyncId, mode, true, properties))
             await RespondAsync("Server/Guild Successfully Synced!", ephemeral: true);
     }
     
-    private async Task<bool> ProcessRequestAsync(string bansyncId, BanSyncMode mode, bool isInvited = false)
+    private async Task<bool> ProcessRequestAsync(string bansyncId, BanSyncMode mode, bool isInvited = false,
+        BanSyncGuildProperties hostParams = null)
     {
-        var hostProperties = await GetPropertiesAsync<BanSyncGuildProperties, GuildEntity>(Context.Guild.Id);
+        var hostProperties = hostParams ?? await GetPropertiesAsync<BanSyncGuildProperties, GuildEntity>(Context.Guild.Id);
         var verifiedClientGuid = await VerifyGuidAsync(bansyncId, hostProperties.SyncId);
         if (verifiedClientGuid == Guid.Empty)
             return false;
