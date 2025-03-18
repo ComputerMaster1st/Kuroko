@@ -14,7 +14,7 @@ public partial class BanSync : KurokoCommandBase
     [SlashCommand("bansync-status", "Status of BanSync")]
     public async Task StatusAsync()
     {
-        var properties = await GetPropertiesAsync<BanSyncProperties, GuildEntity>(Context.Guild.Id);
+        var properties = await GetPropertiesAsync<BanSyncGuildProperties, GuildEntity>(Context.Guild.Id);
         var output = new StringBuilder()
             .AppendLine("## BanSync Status")
             .AppendLine($"* **Enabled:** {(properties.IsEnabled ? "True" : "False")}")
@@ -30,7 +30,7 @@ public partial class BanSync : KurokoCommandBase
     [SlashCommand("bansync-request", "(BanSync Id Required) BanSync public request")]
     public async Task ClientRequestAsync(string bansyncId = null)
     {
-        var properties = await GetPropertiesAsync<BanSyncProperties, GuildEntity>(Context.Guild.Id);
+        var properties = await GetPropertiesAsync<BanSyncGuildProperties, GuildEntity>(Context.Guild.Id);
 
         if (!properties.AllowRequests)
         {
@@ -53,12 +53,12 @@ public partial class BanSync : KurokoCommandBase
     public async Task ProcessClientRequestAsync(ulong interactedUserId, BanSyncClientModal modal)
     {
         if (!IsInteractedUser(interactedUserId)) return;
-        var hostProperties = await GetPropertiesAsync<BanSyncProperties, GuildEntity>(Context.Guild.Id);
+        var hostProperties = await GetPropertiesAsync<BanSyncGuildProperties, GuildEntity>(Context.Guild.Id);
         var verifiedHostGuid = await VerifyGuidAsync(modal.BanSyncId, hostProperties.SyncId);
         if (verifiedHostGuid == Guid.Empty) return;
         var clientProperties = await Context.Database.BanSyncProperties.FirstOrDefaultAsync(
             x => x.SyncId == Guid.Parse(modal.BanSyncId));
-        var clientGuild = Context.Client.GetGuild(clientProperties.GuildId);
+        var clientGuild = Context.Client.GetGuild(clientProperties.RootId);
         
         var embedBuilder = new EmbedBuilder
         {
@@ -157,7 +157,7 @@ public partial class BanSync : KurokoCommandBase
     
     private async Task<bool> ProcessRequestAsync(string bansyncId, BanSyncMode mode, bool isInvited = false)
     {
-        var hostProperties = await GetPropertiesAsync<BanSyncProperties, GuildEntity>(Context.Guild.Id);
+        var hostProperties = await GetPropertiesAsync<BanSyncGuildProperties, GuildEntity>(Context.Guild.Id);
         var verifiedClientGuid = await VerifyGuidAsync(bansyncId, hostProperties.SyncId);
         if (verifiedClientGuid == Guid.Empty)
             return false;
@@ -173,7 +173,7 @@ public partial class BanSync : KurokoCommandBase
         }
 
         var profile = new BanSyncProfile(hostProperties.SyncId, verifiedClientGuid, mode);
-        var clientGuild = Context.Client.GetGuild(clientProperties.GuildId);
+        var clientGuild = Context.Client.GetGuild(clientProperties.RootId);
         var hostChannel = Context.Guild.GetTextChannel(hostProperties.BanSyncChannelId);
         var clientChannel = clientGuild.GetTextChannel(clientProperties.BanSyncChannelId);
         Context.Database.BanSyncProfiles.Add(profile);

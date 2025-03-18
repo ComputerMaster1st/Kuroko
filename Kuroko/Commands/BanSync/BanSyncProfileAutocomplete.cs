@@ -15,14 +15,14 @@ public class BanSyncProfileAutocomplete : AutocompleteHandler
         var properties = await ctx.Database.BanSyncProperties
             .Include(banSyncProperties => banSyncProperties.HostForProfiles)
             .Include(banSyncProperties => banSyncProperties.ClientOfProfiles)
-            .FirstOrDefaultAsync(x => x.GuildId == ctx.Guild.Id);
+            .FirstOrDefaultAsync(x => x.RootId == ctx.Guild.Id);
         
         if (properties is null)
             return AutocompletionResult.FromSuccess();
 
         foreach (var x in properties.HostForProfiles)
         {
-            var guild = ctx.Client.GetGuild(x.ClientProperties.GuildId);
+            var guild = ctx.Client.GetGuild(x.ClientGuildProperties.RootId);
             if (guild is null)
             {
                 ctx.Database.BanSyncProfiles.Remove(x);
@@ -34,7 +34,7 @@ public class BanSyncProfileAutocomplete : AutocompleteHandler
         
         foreach (var x in properties.ClientOfProfiles)
         {
-            var guild = ctx.Client.GetGuild(x.HostProperties.GuildId);
+            var guild = ctx.Client.GetGuild(x.HostGuildProperties.RootId);
             if (guild is null)
             {
                 ctx.Database.BanSyncProfiles.Remove(x);

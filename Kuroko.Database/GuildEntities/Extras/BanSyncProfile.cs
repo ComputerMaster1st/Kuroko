@@ -11,11 +11,11 @@ public class BanSyncProfile(Guid hostSyncId, Guid clientSyncId, BanSyncMode mode
     
     // Host Guild
     public Guid HostSyncId { get; private set; } = hostSyncId;
-    public virtual BanSyncProperties HostProperties { get; private set; } = null;
+    public virtual BanSyncGuildProperties HostGuildProperties { get; private set; } = null;
     
     // Client Guild
     public Guid ClientSyncId { get; private set; } = clientSyncId;
-    public virtual BanSyncProperties ClientProperties { get; private set; } = null;
+    public virtual BanSyncGuildProperties ClientGuildProperties { get; private set; } = null;
     
     // Permission Level
     public BanSyncMode Mode { get; set; } = mode;

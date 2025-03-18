@@ -30,7 +30,7 @@ public class BanSyncEventHost : BanSyncEventBase
         await using var database = _services.GetRequiredService<DatabaseContext>();
         var properties = await database.BanSyncProperties
             .Include(banSyncProperties => banSyncProperties.HostForProfiles)
-            .FirstOrDefaultAsync(x => x.GuildId == hostGuild.Id);
+            .FirstOrDefaultAsync(x => x.RootId == hostGuild.Id);
         
         if (!properties.IsEnabled)
             return;
@@ -64,17 +64,17 @@ public class BanSyncEventHost : BanSyncEventBase
         
         foreach (var profile in properties.HostForProfiles)
         {
-            if (!profile.ClientProperties.IsEnabled)
+            if (!profile.ClientGuildProperties.IsEnabled)
                 return;
             
-            var clientGuild = _client.GetGuild(profile.ClientProperties.GuildId);
+            var clientGuild = _client.GetGuild(profile.ClientGuildProperties.RootId);
             var clientUser = clientGuild.GetUser(hostBannedUser.Id);
-            var clientChannel = clientGuild.GetTextChannel(profile.ClientProperties.BanSyncChannelId);
+            var clientChannel = clientGuild.GetTextChannel(profile.ClientGuildProperties.BanSyncChannelId);
 
             if (await clientGuild.GetBanAsync(hostBannedUser.Id) != null)
                 continue;
 
-            switch (profile.ClientProperties.ClientMode)
+            switch (profile.ClientGuildProperties.ClientMode)
             {
                 case BanSyncMode.HalfDuplex:
                     if (clientChannel != null)

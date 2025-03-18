@@ -22,7 +22,7 @@ public partial class BanSync
         public async Task EnableAsync(ulong interactedUserId)
         {
             if (!IsInteractedUser(interactedUserId)) return;
-            var properties = await QuickEditPropertiesAsync<BanSyncProperties>(Context.Guild.Id, x =>
+            var properties = await QuickEditPropertiesAsync<BanSyncGuildProperties>(Context.Guild.Id, x =>
             {
                 x.IsEnabled = !x.IsEnabled;
             });
@@ -33,7 +33,7 @@ public partial class BanSync
         public async Task AllowRequestAsync(ulong interactedUserId)
         {
             if (!IsInteractedUser(interactedUserId)) return;
-            var properties = await QuickEditPropertiesAsync<BanSyncProperties>(Context.Guild.Id, x =>
+            var properties = await QuickEditPropertiesAsync<BanSyncGuildProperties>(Context.Guild.Id, x =>
             {
                 x.AllowRequests = !x.AllowRequests;
             });
@@ -45,7 +45,7 @@ public partial class BanSync
         {
             if (!IsInteractedUser(interactedUserId)) return;
             var mode = Enum.Parse<BanSyncMode>(syncMode);
-            var properties = await QuickEditPropertiesAsync<BanSyncProperties>(Context.Guild.Id, x =>
+            var properties = await QuickEditPropertiesAsync<BanSyncGuildProperties>(Context.Guild.Id, x =>
             {
                 x.HostMode = mode;
             });
@@ -57,7 +57,7 @@ public partial class BanSync
         {
             if (!IsInteractedUser(interactedUserId)) return;
             var mode = Enum.Parse<BanSyncMode>(syncMode);
-            var properties = await QuickEditPropertiesAsync<BanSyncProperties>(Context.Guild.Id, x =>
+            var properties = await QuickEditPropertiesAsync<BanSyncGuildProperties>(Context.Guild.Id, x =>
             {
                 x.ClientMode = mode;
             });
@@ -68,16 +68,16 @@ public partial class BanSync
         public async Task SetChannelAsync(ulong interactedUserId)
         {
             if (!IsInteractedUser(interactedUserId)) return;
-            var properties = await QuickEditPropertiesAsync<BanSyncProperties>(Context.Guild.Id, x =>
+            var properties = await QuickEditPropertiesAsync<BanSyncGuildProperties>(Context.Guild.Id, x =>
             {
                 x.BanSyncChannelId = Context.Channel.Id;
             });
             await ExecuteAsync(properties, true);
         }
 
-        private async Task ExecuteAsync(BanSyncProperties propParam = null, bool isReturning = false)
+        private async Task ExecuteAsync(BanSyncGuildProperties propParam = null, bool isReturning = false)
         {
-            var properties = propParam ?? await GetPropertiesAsync<BanSyncProperties, GuildEntity>(Context.Guild.Id);
+            var properties = propParam ?? await GetPropertiesAsync<BanSyncGuildProperties, GuildEntity>(Context.Guild.Id);
             var output = new StringBuilder()
                 .AppendLine("# BanSync Configuration")
                 .AppendLine($"* **UUID:** {properties.SyncId}")

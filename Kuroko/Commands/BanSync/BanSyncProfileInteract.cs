@@ -15,8 +15,8 @@ public class BanSyncProfileInteract : KurokoCommandBase
     public async Task BanSyncProfileAsync([Autocomplete(typeof(BanSyncProfileAutocomplete))] int profileId)
     {
         var profile = await Context.Database.BanSyncProfiles
-            .Include(banSyncProfile => banSyncProfile.HostProperties)
-            .Include(banSyncProfile => banSyncProfile.ClientProperties).FirstOrDefaultAsync(
+            .Include(banSyncProfile => banSyncProfile.HostGuildProperties)
+            .Include(banSyncProfile => banSyncProfile.ClientGuildProperties).FirstOrDefaultAsync(
                 x => x.Id == profileId);
         
         await ExecuteGuiAsync(profile);
@@ -30,8 +30,8 @@ public class BanSyncProfileInteract : KurokoCommandBase
         
         var mode = Enum.Parse<BanSyncMode>(rawMode);
         var profile = await Context.Database.BanSyncProfiles
-            .Include(banSyncProfile => banSyncProfile.HostProperties)
-            .Include(banSyncProfile => banSyncProfile.ClientProperties).FirstOrDefaultAsync(
+            .Include(banSyncProfile => banSyncProfile.HostGuildProperties)
+            .Include(banSyncProfile => banSyncProfile.ClientGuildProperties).FirstOrDefaultAsync(
                 x => x.Id == profileId);
 
         profile.Mode = mode;
@@ -73,9 +73,9 @@ public class BanSyncProfileInteract : KurokoCommandBase
         string thumbnailUrl;
         string guildName;
         string bansyncId;
-        if (profile.HostProperties.GuildId == Context.Guild.Id)
+        if (profile.HostGuildProperties.RootId == Context.Guild.Id)
         {
-            var guild = Context.Client.GetGuild(profile.ClientProperties.GuildId);
+            var guild = Context.Client.GetGuild(profile.ClientGuildProperties.RootId);
             thumbnailUrl = guild.IconUrl;
             guildName = guild.Name;
             bansyncId = profile.ClientSyncId.ToString();
@@ -83,7 +83,7 @@ public class BanSyncProfileInteract : KurokoCommandBase
         }
         else
         {
-            var guild = Context.Client.GetGuild(profile.HostProperties.GuildId);
+            var guild = Context.Client.GetGuild(profile.HostGuildProperties.RootId);
             thumbnailUrl = guild.IconUrl;
             guildName = guild.Name;
             bansyncId = profile.HostSyncId.ToString();

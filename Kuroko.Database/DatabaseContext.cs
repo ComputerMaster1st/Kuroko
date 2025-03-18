@@ -1,5 +1,7 @@
 ﻿using Kuroko.Database.GuildEntities;
 using Kuroko.Database.GuildEntities.Extras;
+using Kuroko.Database.UserEntities;
+using Kuroko.Database.UserEntities.Extras;
 using Kuroko.Shared;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +13,7 @@ public sealed class DatabaseContext : DbContext
     public DbSet<GuildEntity> Guilds { get; internal set; } = null;
     
     // Property Entities
-    public DbSet<BanSyncProperties> BanSyncProperties { get; internal set; } = null;
+    public DbSet<BanSyncGuildProperties> BanSyncProperties { get; internal set; } = null;
     
     // Extra Entities
     public DbSet<BanSyncProfile> BanSyncProfiles { get; internal set; } = null;
@@ -38,23 +40,44 @@ public sealed class DatabaseContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         #region BanSyncProperties
-        modelBuilder.Entity<BanSyncProperties>()
+        modelBuilder.Entity<BanSyncGuildProperties>()
             .HasMany(x => x.HostForProfiles)
-            .WithOne(x => x.HostProperties)
+            .WithOne(x => x.HostGuildProperties)
             .HasForeignKey(x => x.HostSyncId)
             .HasPrincipalKey(x => x.SyncId)
             .OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<BanSyncProperties>()
+        modelBuilder.Entity<BanSyncGuildProperties>()
             .HasMany(x => x.ClientOfProfiles)
-            .WithOne(x => x.ClientProperties)
+            .WithOne(x => x.ClientGuildProperties)
             .HasForeignKey(x => x.ClientSyncId)
             .HasPrincipalKey(x => x.SyncId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<GuildEntity>()
-            .HasOne(x => x.BanSyncProperties)
+            .HasOne(x => x.BanSyncGuildProperties)
             .WithOne(x => x.Guild)
-            .HasForeignKey<BanSyncProperties>(x => x.GuildId)
+            .HasForeignKey<BanSyncGuildProperties>(x => x.RootId)
             .HasPrincipalKey<GuildEntity>(x => x.Id)
+            .OnDelete(DeleteBehavior.Cascade);
+        #endregion
+        
+        #region PatreonProperties
+        modelBuilder.Entity<PatreonProperties>()
+            .HasMany(x => x.PremiumKeys)
+            .WithOne(x => x.PatreonProperties)
+            .HasForeignKey(x => x.PatreonPropertiesId)
+            .HasPrincipalKey(x => x.Id)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<PremiumKey>()
+            .HasOne(x => x.Guild)
+            .WithOne(x => x.PremiumKey)
+            .HasForeignKey<PremiumKey>(x => x.GuildId)
+            .HasPrincipalKey<GuildEntity>(x => x.Id)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<UserEntity>()
+            .HasOne(x => x.Patreon)
+            .WithOne(x => x.User)
+            .HasForeignKey<PatreonProperties>(x => x.RootId)
+            .HasPrincipalKey<UserEntity>(x => x.Id)
             .OnDelete(DeleteBehavior.Cascade);
         #endregion
         

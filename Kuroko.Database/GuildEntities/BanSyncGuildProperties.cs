@@ -5,13 +5,13 @@ using Kuroko.Shared;
 
 namespace Kuroko.Database.GuildEntities;
 
-public class BanSyncProperties : IPropertyEntity
+public class BanSyncGuildProperties : IPropertyEntity
 {
     [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; private set; } = 0;
     
     // Relational Link
-    public ulong GuildId { get; private set; } = 0;
+    public ulong RootId { get; private set; } = 0;
     public virtual GuildEntity Guild { get; private set; } = null;
     
     // Properties

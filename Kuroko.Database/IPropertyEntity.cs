@@ -4,6 +4,5 @@ namespace Kuroko.Database;
 
 public interface IPropertyEntity
 {
-    ulong GuildId { get; }
-    GuildEntity Guild { get; }
+    ulong RootId { get; }
 }

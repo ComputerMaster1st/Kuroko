@@ -18,20 +18,20 @@ public static class DatabaseContextExtensions
         return data;
     }
     
-    public static async Task<TGuildPropertyEntity> CreateOrGetPropertiesAsync<TGuildPropertyEntity, TDiscordEntity>(
-        this DbSet<TGuildPropertyEntity> dbProperty, 
+    public static async Task<TPropertyEntity> CreateOrGetPropertiesAsync<TPropertyEntity, TDiscordEntity>(
+        this DbSet<TPropertyEntity> dbProperty, 
         DbSet<TDiscordEntity> dbDiscordEntity, 
         ulong guildId,
-        Action<TDiscordEntity, TGuildPropertyEntity> guildEntityAction)
-        where TGuildPropertyEntity : class, IPropertyEntity
+        Action<TDiscordEntity, TPropertyEntity> guildEntityAction)
+        where TPropertyEntity : class, IPropertyEntity
         where TDiscordEntity : class, IDiscordEntity
     {
-        var propertyEntity = await dbProperty.FirstOrDefaultAsync(x => x.GuildId == guildId);
+        var propertyEntity = await dbProperty.FirstOrDefaultAsync(x => x.RootId == guildId);
 
         if (propertyEntity != null)
             return propertyEntity;
 
-        propertyEntity = Activator.CreateInstance<TGuildPropertyEntity>();
+        propertyEntity = Activator.CreateInstance<TPropertyEntity>();
 
         await dbProperty.AddAsync(propertyEntity);
 
