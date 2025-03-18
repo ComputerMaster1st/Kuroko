@@ -128,7 +128,7 @@ namespace Kuroko.Database.Migrations
 
                     b.HasIndex("PatreonPropertiesId");
 
-                    b.ToTable("PremiumKey");
+                    b.ToTable("PremiumKeys");
                 });
 
             modelBuilder.Entity("Kuroko.Database.UserEntities.PatreonProperties", b =>
@@ -157,7 +157,7 @@ namespace Kuroko.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserEntity");
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Kuroko.Database.GuildEntities.BanSyncGuildProperties", b =>

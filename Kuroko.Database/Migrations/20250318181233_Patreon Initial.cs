@@ -27,14 +27,14 @@ namespace Kuroko.Database.Migrations
                 newName: "IX_BanSyncProperties_RootId");
 
             migrationBuilder.CreateTable(
-                name: "UserEntity",
+                name: "Users",
                 columns: table => new
                 {
                     Id = table.Column<decimal>(type: "numeric(20,0)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserEntity", x => x.Id);
+                    table.PrimaryKey("PK_Users", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -49,15 +49,15 @@ namespace Kuroko.Database.Migrations
                 {
                     table.PrimaryKey("PK_PatreonProperties", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PatreonProperties_UserEntity_RootId",
+                        name: "FK_PatreonProperties_Users_RootId",
                         column: x => x.RootId,
-                        principalTable: "UserEntity",
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "PremiumKey",
+                name: "PremiumKeys",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -70,15 +70,15 @@ namespace Kuroko.Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PremiumKey", x => x.Id);
+                    table.PrimaryKey("PK_PremiumKeys", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PremiumKey_Guilds_GuildId",
+                        name: "FK_PremiumKeys_Guilds_GuildId",
                         column: x => x.GuildId,
                         principalTable: "Guilds",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_PremiumKey_PatreonProperties_PatreonPropertiesId",
+                        name: "FK_PremiumKeys_PatreonProperties_PatreonPropertiesId",
                         column: x => x.PatreonPropertiesId,
                         principalTable: "PatreonProperties",
                         principalColumn: "Id",
@@ -92,14 +92,14 @@ namespace Kuroko.Database.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_PremiumKey_GuildId",
-                table: "PremiumKey",
+                name: "IX_PremiumKeys_GuildId",
+                table: "PremiumKeys",
                 column: "GuildId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_PremiumKey_PatreonPropertiesId",
-                table: "PremiumKey",
+                name: "IX_PremiumKeys_PatreonPropertiesId",
+                table: "PremiumKeys",
                 column: "PatreonPropertiesId");
 
             migrationBuilder.AddForeignKey(
@@ -119,13 +119,13 @@ namespace Kuroko.Database.Migrations
                 table: "BanSyncProperties");
 
             migrationBuilder.DropTable(
-                name: "PremiumKey");
+                name: "PremiumKeys");
 
             migrationBuilder.DropTable(
                 name: "PatreonProperties");
 
             migrationBuilder.DropTable(
-                name: "UserEntity");
+                name: "Users");
 
             migrationBuilder.RenameColumn(
                 name: "RootId",
