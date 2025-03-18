@@ -32,7 +32,7 @@ public class BanSyncEventClient : BanSyncEventBase
             .Include(banSyncProperties => banSyncProperties.ClientOfProfiles)
             .FirstOrDefaultAsync(x => x.RootId == clientGuild.Id);
 
-        if (!properties.IsEnabled)
+        if (!properties.IsEnabled || properties.ClientOfProfiles.Count < 1)
             return;
         
         var components = new ComponentBuilder()

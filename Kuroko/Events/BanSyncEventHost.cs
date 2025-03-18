@@ -32,7 +32,7 @@ public class BanSyncEventHost : BanSyncEventBase
             .Include(banSyncProperties => banSyncProperties.HostForProfiles)
             .FirstOrDefaultAsync(x => x.RootId == hostGuild.Id);
         
-        if (!properties.IsEnabled)
+        if (!properties.IsEnabled || properties.HostForProfiles.Count < 1)
             return;
         
         var components = new ComponentBuilder()
