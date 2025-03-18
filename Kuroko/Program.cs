@@ -118,12 +118,15 @@ foreach (var service in serviceCollection)
         continue;
     
     var initialized = serviceProvider.GetService(service.ImplementationType);
-    if (initialized is IKurokoService kurokoService)
-        await kurokoService.StartServiceAsync();
-    else if (initialized is IJob job)
+    switch (initialized)
     {
-        var scheduleJob = job as IScheduleJob;
-        scheduleJob.ScheduleJob(registry);
+        case IKurokoService kurokoService:
+            await kurokoService.StartServiceAsync();
+            break;
+        case IJob job:
+            var scheduleJob = job as IScheduleJob;
+            scheduleJob.ScheduleJob(registry);
+            break;
     }
 }
     
