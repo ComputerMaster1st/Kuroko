@@ -83,7 +83,9 @@ var currentAssembly = Assembly.GetExecutingAssembly();
 foreach (var type in currentAssembly.GetTypes())
 {
     if (type.GetCustomAttributes().Any(x => 
-            x is KurokoJobAttribute or KurokoEventAttribute))
+            x is KurokoJobAttribute or 
+                KurokoEventAttribute or
+                KurokoDependencyAttribute))
         serviceCollection.AddSingleton(type);
 }
 
@@ -125,7 +127,7 @@ foreach (var service in serviceCollection)
             break;
         case IJob job:
             var scheduleJob = job as IScheduleJob;
-            scheduleJob.ScheduleJob(registry);
+            scheduleJob?.ScheduleJob(registry);
             break;
     }
 }
