@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Patreon.Net.Models;
 
 namespace Kuroko.Shared;
 
@@ -19,16 +20,24 @@ public class KurokoConfig
     
     // Database Properties
     [JsonProperty]
-    public static string Hostname { get; private set; } = "localhost";
+    public string Hostname { get; private set; } = "localhost";
     [JsonProperty]
-    public static string Database { get; private set; } = "Kuroko";
+    public string Database { get; private set; } = "Kuroko";
     [JsonProperty]
-    public static string Username { get; private set; } = "username";
+    public string Username { get; private set; } = "username";
     [JsonProperty]
-    public static string Password { get; private set; } = "password";
+    public string Password { get; private set; } = "password";
     [JsonProperty]
-    public static int Port { get; private set; } = 5432;
+    public int Port { get; private set; } = 5432;
     
+    // Patreon Properties
+    [JsonProperty]
+    public OAuthToken PatreonOAuthToken { get; set; } = new();
+    [JsonProperty]
+    public string PatreonClientId { get; private set; } = "PATREON_CLIENT_ID";
+    [JsonProperty]
+    public string PatreonCampaignId { get; private set; } = "PATREON_CAMPAIGN_ID";
+
     // Connection String
     public string ConnectionString()
         => $"Server={Hostname};Port={Port};Database={Database};UserId={Username};Password={Password};";

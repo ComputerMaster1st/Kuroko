@@ -108,8 +108,12 @@ foreach (var service in serviceCollection)
     if (service.ServiceType.GetCustomAttribute<PreInitializeAttribute>(false) is null)
         continue;
 
-    if (service.ImplementationType != null)
-        _ = serviceProvider.GetService(service.ImplementationType);
+    if (service.ImplementationType is null)
+        continue;
+    
+    var initialized = serviceProvider.GetService(service.ImplementationType);
+    if (initialized is IKurokoService kurokoService)
+        await kurokoService.StartServiceAsync();
 }
     
 await Utilities.WriteLogAsync(
