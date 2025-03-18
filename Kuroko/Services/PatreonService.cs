@@ -5,7 +5,7 @@ using Patreon.Net.Models;
 
 namespace Kuroko.Services;
 
-[PreInitialize]
+[PreInitialize, KurokoDependency]
 public class PatreonService(KurokoConfig config) : IKurokoService
 {
     private PatreonClient _client = null;
