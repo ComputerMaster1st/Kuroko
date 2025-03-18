@@ -53,14 +53,6 @@ public class BanSyncEventClient : BanSyncEventBase
         var declineCount = 0;
         var warnCount = 0;
         var banCount = 0;
-        var embedSync = CreateEmbed("BanSync - User Banned & Synced!", 
-            clientBannedUser.GlobalName, clientBannedUser.Id, 
-            new StringBuilder()
-                .AppendLine($"Hosts Declined: {declineCount}")
-                .AppendLine($"Warnings Sent: {warnCount}")
-                .AppendLine($"Bans Executed: {banCount}")
-                .ToString(),
-            clientBannedUser.GetAvatarUrl(), reason);
         
         foreach (var profile in properties.ClientOfProfiles)
         {
@@ -109,6 +101,15 @@ public class BanSyncEventClient : BanSyncEventBase
                     continue;
             }
         }
+        
+        var embedSync = CreateEmbed("BanSync - User Banned & Synced!", 
+            clientBannedUser.GlobalName, clientBannedUser.Id, 
+            new StringBuilder()
+                .AppendLine($"Hosts Declined: {declineCount}")
+                .AppendLine($"Warnings Sent: {warnCount}")
+                .AppendLine($"Bans Executed: {banCount}")
+                .ToString(),
+            clientBannedUser.GetAvatarUrl(), reason);
         
         if (clientChannel != null)
             await clientChannel.SendMessageAsync(embed: embedSync);

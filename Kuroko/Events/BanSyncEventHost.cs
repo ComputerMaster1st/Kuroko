@@ -36,7 +36,7 @@ public class BanSyncEventHost : BanSyncEventBase
             return;
         
         var components = new ComponentBuilder()
-            .WithButton("(3) !! Ban User !! (3)", $"{CommandMap.BANSYNC_BANUSER}:{hostBannedUser.Id},3",
+            .WithButton("(3) !! Ban User !! (3)", $"{CommandMap.BANSYNC_BANUSER}:{hostBannedUser.Id}",
                 ButtonStyle.Danger)
             .WithButton("Ignore", $"{CommandMap.BANSYNC_IGNORE}", ButtonStyle.Secondary)
             .Build();
@@ -53,14 +53,6 @@ public class BanSyncEventHost : BanSyncEventBase
         var declineCount = 0;
         var warnCount = 0;
         var banCount = 0;
-        var embedSync = CreateEmbed("BanSync - User Banned & Synced!", 
-            hostBannedUser.GlobalName, hostBannedUser.Id, 
-            new StringBuilder()
-                .AppendLine($"Clients Declined: {declineCount}")
-                .AppendLine($"Warnings Sent: {warnCount}")
-                .AppendLine($"Bans Executed: {banCount}")
-                .ToString(),
-            hostBannedUser.GetAvatarUrl(), reason);
         
         foreach (var profile in properties.HostForProfiles)
         {
@@ -95,6 +87,15 @@ public class BanSyncEventHost : BanSyncEventBase
                     continue;
             }
         }
+        
+        var embedSync = CreateEmbed("BanSync - User Banned & Synced!", 
+            hostBannedUser.GlobalName, hostBannedUser.Id, 
+            new StringBuilder()
+                .AppendLine($"Clients Declined: {declineCount}")
+                .AppendLine($"Warnings Sent: {warnCount}")
+                .AppendLine($"Bans Executed: {banCount}")
+                .ToString(),
+            hostBannedUser.GetAvatarUrl(), reason);
         
         if (hostChannel != null)
             await hostChannel.SendMessageAsync(embed: embedSync);
