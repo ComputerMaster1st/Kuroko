@@ -3,9 +3,11 @@ using System.Text;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using FluentScheduler;
 using Kuroko;
 using Kuroko.Attributes;
 using Kuroko.Database;
+using Kuroko.Jobs;
 using Kuroko.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,6 +34,8 @@ InteractionService interactionService = new(client, new InteractionServiceConfig
     UseCompiledLambda = true
 });
 var serviceCollection = new ServiceCollection();
+Registry registry = new();
+JobManager.UseUtcTime();
 
 await Utilities.WriteLogAsync(
     new LogMessage(
@@ -66,6 +70,7 @@ await Utilities.WriteLogAsync(
 serviceCollection.AddSingleton(config)
     .AddSingleton(client)
     .AddSingleton(interactionService)
+    .AddSingleton(registry)
     .AddDbContext<DatabaseContext>(options =>
     {
         options.UseNpgsql(config.ConnectionString())
@@ -77,7 +82,8 @@ var currentAssembly = Assembly.GetExecutingAssembly();
 
 foreach (var type in currentAssembly.GetTypes())
 {
-    if (type.GetCustomAttribute<KurokoEventAttribute>(false) != null)
+    if (type.GetCustomAttributes().Any(x => 
+            x is KurokoJobAttribute or KurokoEventAttribute))
         serviceCollection.AddSingleton(type);
 }
 
@@ -114,6 +120,11 @@ foreach (var service in serviceCollection)
     var initialized = serviceProvider.GetService(service.ImplementationType);
     if (initialized is IKurokoService kurokoService)
         await kurokoService.StartServiceAsync();
+    else if (initialized is IJob job)
+    {
+        var scheduleJob = job as IScheduleJob;
+        scheduleJob.ScheduleJob(registry);
+    }
 }
     
 await Utilities.WriteLogAsync(
