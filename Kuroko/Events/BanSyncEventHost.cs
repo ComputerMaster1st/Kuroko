@@ -36,7 +36,7 @@ public class BanSyncEventHost : BanSyncEventBase
             return;
         
         var components = new ComponentBuilder()
-            .WithButton("(3) !! Ban User !! (3)", $"{CommandMap.BANSYNC_BANUSER}:{hostBannedUser.Id}",
+            .WithButton("(3) !! Ban User !! (3)", $"{CommandMap.BANSYNC_BANUSER}:{hostBannedUser.Id},3",
                 ButtonStyle.Danger)
             .WithButton("Ignore", $"{CommandMap.BANSYNC_IGNORE}", ButtonStyle.Secondary)
             .Build();

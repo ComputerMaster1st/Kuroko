@@ -8,9 +8,9 @@ namespace Kuroko.Commands.BanSync;
 [KurokoUserPermission(GuildPermission.BanMembers)]
 public class BanSyncComponents : KurokoCommandBase
 {
-    [ComponentInteraction($"{CommandMap.BANSYNC_BANUSER}:*")]
-    public Task BanUserAsync(ulong bannedUserId)
-        => ConfirmBanUserAsync(Context.User.Id, bannedUserId, 3);
+    [ComponentInteraction($"{CommandMap.BANSYNC_BANUSER}:*,*")]
+    public Task BanUserAsync(ulong bannedUserId, int verifyCount)
+        => ConfirmBanUserAsync(Context.User.Id, bannedUserId, verifyCount);
 
     [ComponentInteraction($"{CommandMap.BANSYNC_BANUSER}:*,*,*")]
     public async Task ConfirmBanUserAsync(ulong interactedUserId, ulong bannedUserId, int verifyCount)
