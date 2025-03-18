@@ -161,6 +161,22 @@
           }
         }
       },
+      "Patreon.Net/1.0.3": {
+        "type": "package",
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.3"
+        },
+        "compile": {
+          "lib/net6.0/Patreon.Net.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/Patreon.Net.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "System.Collections.Immutable/8.0.0": {
         "type": "package",
         "compile": {
@@ -493,6 +509,21 @@
         "packageIcon.png"
       ]
     },
+    "Patreon.Net/1.0.3": {
+      "sha512": "ur/LO13WrCV0+QDVug+fouMNWp8rP9Mo57g3XNENByv60O/IWqna8BKQ9vHFLbyNxLwZ2jFrslRw0R4uq5ms4w==",
+      "type": "package",
+      "path": "patreon.net/1.0.3",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net5.0/Patreon.Net.dll",
+        "lib/net5.0/Patreon.Net.xml",
+        "lib/net6.0/Patreon.Net.dll",
+        "lib/net6.0/Patreon.Net.xml",
+        "patreon.net.1.0.3.nupkg.sha512",
+        "patreon.net.nuspec"
+      ]
+    },
     "System.Collections.Immutable/8.0.0": {
       "sha512": "AurL6Y5BA1WotzlEvVaIDpqzpIPvYnnldxru8oXJU2yFxFUy3+pNXjXd1ymO+RA0rq0+590Q8gaz2l3Sr7fmqg==",
       "type": "package",
@@ -647,7 +678,8 @@
   "projectFileDependencyGroups": {
     "net9.0": [
       "Discord.Net >= 3.17.2",
-      "Newtonsoft.Json >= 13.0.3"
+      "Newtonsoft.Json >= 13.0.3",
+      "Patreon.Net >= 1.0.3"
     ]
   },
   "packageFolders": {
@@ -700,6 +732,10 @@
           "Newtonsoft.Json": {
             "target": "Package",
             "version": "[13.0.3, )"
+          },
+          "Patreon.Net": {
+            "target": "Package",
+            "version": "[1.0.3, )"
           }
         },
         "imports": [

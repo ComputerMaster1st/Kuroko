@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Kuroko")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+56e640aade8d29b2b83ec567d099735a7a7e5958")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8030263bdb4200f8ba8552da0b65f2d421e4ef8f")]
 [assembly: System.Reflection.AssemblyProductAttribute("Kuroko")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Kuroko")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

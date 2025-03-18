@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "dkY6yCujjWk=",
+  "dgSpecHash": "Rd7HTHe+niQ=",
   "success": true,
   "projectFilePath": "/home/nekoputer/Discord/KurokoNet9/Kuroko/Kuroko/Kuroko.csproj",
   "expectedPackageFiles": [
@@ -30,6 +30,7 @@
     "/home/nekoputer/.nuget/packages/newtonsoft.json/13.0.3/newtonsoft.json.13.0.3.nupkg.sha512",
     "/home/nekoputer/.nuget/packages/npgsql/9.0.3/npgsql.9.0.3.nupkg.sha512",
     "/home/nekoputer/.nuget/packages/npgsql.entityframeworkcore.postgresql/9.0.4/npgsql.entityframeworkcore.postgresql.9.0.4.nupkg.sha512",
+    "/home/nekoputer/.nuget/packages/patreon.net/1.0.3/patreon.net.1.0.3.nupkg.sha512",
     "/home/nekoputer/.nuget/packages/system.collections.immutable/8.0.0/system.collections.immutable.8.0.0.nupkg.sha512",
     "/home/nekoputer/.nuget/packages/system.diagnostics.eventlog/6.0.0/system.diagnostics.eventlog.6.0.0.nupkg.sha512",
     "/home/nekoputer/.nuget/packages/system.interactive.async/6.0.1/system.interactive.async.6.0.1.nupkg.sha512",
