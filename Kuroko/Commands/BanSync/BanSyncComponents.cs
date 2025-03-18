@@ -15,6 +15,8 @@ public class BanSyncComponents : KurokoCommandBase
     [ComponentInteraction($"{CommandMap.BANSYNC_BANUSER}:*,*,*")]
     public async Task ConfirmBanUserAsync(ulong interactedUserId, ulong bannedUserId, int verifyCount)
     {
+        await DeferAsync();
+        
         if (!IsInteractedUser(interactedUserId)) return;
         verifyCount--;
 
