@@ -10,6 +10,8 @@ namespace Kuroko.Services;
 public class PatreonService(KurokoConfig config) : IKurokoService
 {
     private PatreonClient _client = null;
+    private DateTimeOffset _lastChecked = DateTimeOffset.UtcNow;
+    private Dictionary<Member, MemberRelationships> _downloadedMembers = new();
     
     public int StartingPatronCount { get; private set; } = 0;
 
@@ -24,6 +26,9 @@ public class PatreonService(KurokoConfig config) : IKurokoService
 
     public async Task<IDictionary<Member, MemberRelationships>> GetMembershipsAsync()
     {
+        if (_downloadedMembers.Count != 0 && _lastChecked.AddMinutes(15) < DateTimeOffset.UtcNow)
+            return _downloadedMembers;
+        
         var members = new Dictionary<Member, MemberRelationships>();
         var incomingMembers = 
             await _client.GetCampaignMembersAsync(config.PatreonCampaignId, 
@@ -32,8 +37,11 @@ public class PatreonService(KurokoConfig config) : IKurokoService
 
         await foreach (var member in incomingMembers)
             members.Add(member, member.Relationships);
-
-        return members;
+        
+        _downloadedMembers = members;
+        _lastChecked = DateTimeOffset.UtcNow;
+        
+        return _downloadedMembers;
     }
 
     public async Task<int> CountMembersAsync()
