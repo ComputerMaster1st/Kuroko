@@ -2,7 +2,9 @@ Last Updated: 19th March 2025
 
 # Project: Kuroko (.NET 9 Edition)
 Kuroko is a Discord Bot, built upon Microsoft's .NET 9 runtime & Entity Framework 9. The bot is currently under "Early Access" release and is actively being worked on.
-If you wish to acquire the bot for your server to help test it's feature-sets, feel free to join our Discord server via https://discord.gg/fFbMNGbXVv.
+If you wish to acquire the bot for your server to help test it's feature-sets, feel free to join our Discord server via https://discord.gg/fFbMNGbXVv to provide feedback.
+
+Link to Kuroko: https://discord.com/oauth2/authorize?client_id=1115368540124500018
 
 ## Current Feature Sets
 ### True BanSync
