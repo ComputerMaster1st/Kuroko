@@ -1,3 +1,4 @@
+using Discord;
 using Kuroko.Attributes;
 using Kuroko.Shared;
 using Patreon.Net;
@@ -9,14 +10,16 @@ namespace Kuroko.Services;
 public class PatreonService(KurokoConfig config) : IKurokoService
 {
     private PatreonClient _client = null;
+    
+    public int StartingPatronCount { get; private set; } = 0;
 
     public async Task StartServiceAsync()
     {
+        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.PATREON, "Starting service..."));
         RefreshClient();
-
-        var campaigns = await _client.GetCampaignsAsync(Includes.All);
-        await foreach (var campaign in campaigns)
-            Console.WriteLine($"{campaign.Id} has {campaign.PatronCount} patrons");
+        StartingPatronCount = await CountMembersAsync();
+        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.PATREON, 
+            $"Found {StartingPatronCount} Patrons"));
     }
 
     public async Task<IDictionary<Member, MemberRelationships>> GetMembershipsAsync()
