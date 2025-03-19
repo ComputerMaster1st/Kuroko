@@ -21,12 +21,12 @@ public static class DatabaseContextExtensions
     public static async Task<TPropertyEntity> CreateOrGetPropertiesAsync<TPropertyEntity, TDiscordEntity>(
         this DbSet<TPropertyEntity> dbProperty, 
         DbSet<TDiscordEntity> dbDiscordEntity, 
-        ulong guildId,
+        ulong rootId,
         Action<TDiscordEntity, TPropertyEntity> guildEntityAction)
         where TPropertyEntity : class, IPropertyEntity
         where TDiscordEntity : class, IDiscordEntity
     {
-        var propertyEntity = await dbProperty.FirstOrDefaultAsync(x => x.RootId == guildId);
+        var propertyEntity = await dbProperty.FirstOrDefaultAsync(x => x.RootId == rootId);
 
         if (propertyEntity != null)
             return propertyEntity;
@@ -35,7 +35,7 @@ public static class DatabaseContextExtensions
 
         await dbProperty.AddAsync(propertyEntity);
 
-        var discordEntity = await dbDiscordEntity.GetOrCreateDataAsync(guildId);
+        var discordEntity = await dbDiscordEntity.GetOrCreateDataAsync(rootId);
         guildEntityAction(discordEntity, propertyEntity);
 
         return propertyEntity;

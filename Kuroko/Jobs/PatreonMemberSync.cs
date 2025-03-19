@@ -2,6 +2,7 @@ using Discord;
 using FluentScheduler;
 using Kuroko.Attributes;
 using Kuroko.Database;
+using Kuroko.Database.UserEntities;
 using Kuroko.Services;
 using Kuroko.Shared;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,8 +16,7 @@ public class PatreonMemberSync(PatreonService patreonService, IServiceProvider s
     private const string NAME = "Patreon: Membership Sync";
     
     public void Execute()
-        //=> Task.Factory.StartNew(ExecuteAsync).GetAwaiter();
-        => ExecuteAsync().GetAwaiter().GetResult();
+        => Task.Factory.StartNew(ExecuteAsync).GetAwaiter();
 
     public void ScheduleJob(Registry registry)
         => registry.Schedule(this)
@@ -47,14 +47,15 @@ public class PatreonMemberSync(PatreonService patreonService, IServiceProvider s
                 continue;
 
             var memberDiscord = member.Value.User.SocialConnections.Discord;
-            if (memberDiscord.UserId == 0)
+            if (memberDiscord is null || memberDiscord.UserId == 0)
                 continue;
 
             if (!config.PatreonTiers.TryGetValue(tiers[0].Title, out var keys))
                 continue;
 
-            var user = await database.Users.GetOrCreateDataAsync(memberDiscord.UserId);
-            user.Patreon.KeysAllowed = keys;
+            var properties = await database.PatreonProperties.CreateOrGetPropertiesAsync(
+                database.Users, memberDiscord.UserId, (x, y) => { x.Patreon ??= y; });
+            properties.KeysAllowed = keys;
             memberCount++;
         }
 
