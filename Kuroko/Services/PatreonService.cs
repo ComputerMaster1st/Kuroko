@@ -59,6 +59,9 @@ public class PatreonService(KurokoConfig config) : IKurokoService
         config.PatreonOAuthToken = token;
         await config.SaveAsync();
         
+        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.PATREON, 
+            "OAuth Token Refreshed"));
+        
         _client.Dispose();
         RefreshClient();
     }
