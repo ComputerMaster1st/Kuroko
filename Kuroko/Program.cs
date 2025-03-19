@@ -110,7 +110,7 @@ Console.WriteLine(new StringBuilder()
     .Append($"MODAL COMMANDS     : {interactionService.ModalCommands.Count}").AppendLine()
     .Append($"COMPONENT COMMANDS : {interactionService.ComponentCommands.Count}").AppendLine()
     .Append($"TEXT COMMANDS      : {interactionService.ContextCommands.Count}").AppendLine()
-    .AppendLine("Initializing services...").ToString());
+    .Append("Initializing services...").ToString());
 
 foreach (var service in serviceCollection)
 {
