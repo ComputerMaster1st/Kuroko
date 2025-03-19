@@ -32,7 +32,8 @@ public class PatreonService(KurokoConfig config) : IKurokoService
         var members = new Dictionary<Member, MemberRelationships>();
         var incomingMembers = 
             await _client.GetCampaignMembersAsync(config.PatreonCampaignId, 
-                Includes.Tiers | Includes.User | Includes.CurrentlyEntitledTiers);
+                Includes.Tiers | Includes.User | Includes.CurrentlyEntitledTiers | 
+                Includes.Memberships);
         if (incomingMembers == null) return members;
 
         await foreach (var member in incomingMembers)
@@ -51,8 +52,11 @@ public class PatreonService(KurokoConfig config) : IKurokoService
     public async Task<Member> GetMemberAsync(ulong discordUserId)
     {
         var memberships = await GetMembershipsAsync();
-
-        return memberships.FirstOrDefault(x => 
+        
+        if (memberships.All(x => 
+                x.Value.User.SocialConnections.Discord?.UserId != discordUserId))
+            return null;
+        return memberships.First(x => 
             x.Value.User.SocialConnections.Discord.UserId == discordUserId).Key;
     }
 
