@@ -28,7 +28,7 @@ You can now support us via Patreon if you like using our bot. By subscribing, yo
 You do not need to be an admin or mod for that server either. Our Patreon page: https://www.patreon.com/nekoputer
 
 ## Currently Worked-On
-* Patreon Integration for premium keys to use on servers.
+* Monitoring backend & logs for now while bugfixing
 
 ## Expected Future Re-Works
 * Blackbox Recorder
