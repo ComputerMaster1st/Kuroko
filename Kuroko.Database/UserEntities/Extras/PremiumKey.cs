@@ -19,7 +19,10 @@ public class PremiumKey
     public virtual GuildEntity Guild { get; private set; } = null;
 
 
-    public string Key { get; private set; } = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
+    [MaxLength(50)]
+    public string Key { get; private set; } = Convert.ToBase64String(Guid.NewGuid()
+        .ToByteArray()).TrimEnd('=');
+    
     public DateTimeOffset CreatedAt { get; private set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset ExpiresAt { get; set; } = DateTimeOffset.UtcNow.AddMonths(1);
 }
