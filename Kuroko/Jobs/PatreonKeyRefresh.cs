@@ -10,8 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Kuroko.Jobs;
 
 [PreInitialize, KurokoJob]
-public class PatreonKeyRefresh(PatreonService patreonService, IServiceProvider services,
-    KurokoConfig config) : IJob, IScheduleJob
+public class PatreonKeyRefresh(IServiceProvider services) : IJob, IScheduleJob
 {
     private const string NAME = "Patreon: Premium Key Refresh";
     

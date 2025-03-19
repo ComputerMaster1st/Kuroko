@@ -10,8 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Kuroko.Jobs;
 
 [PreInitialize, KurokoJob]
-public class PatreonKeyDeletion(PatreonService patreonService, IServiceProvider services,
-    KurokoConfig config) : IJob, IScheduleJob
+public class PatreonKeyDeletion(IServiceProvider services) : IJob, IScheduleJob
 {
     private const string NAME = "Patreon: Premium Key Expired";
     
