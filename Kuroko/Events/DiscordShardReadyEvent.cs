@@ -3,6 +3,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using FluentScheduler;
 using Kuroko.Attributes;
+using Kuroko.Services;
 using Kuroko.Shared;
 
 namespace Kuroko.Events;
@@ -14,18 +15,20 @@ public class DiscordShardReadyEvent
     private readonly InteractionService _interactions;
     private readonly KurokoConfig _config;
     private readonly Registry _registry;
+    private readonly PatreonService _patreonService;
 
     private bool jobManagerStarted = false;
 
     private readonly List<int> _shardIds = [];
 
     public DiscordShardReadyEvent(DiscordShardedClient client, InteractionService interactions, 
-        KurokoConfig config, Registry registry)
+        KurokoConfig config, Registry registry, PatreonService patreonService)
     {
         _client = client;
         _interactions = interactions;
         _config = config;
         _registry = registry;
+        _patreonService = patreonService;
 
         _client.ShardReady += ShardReadyEvent;
     }
@@ -45,7 +48,8 @@ public class DiscordShardReadyEvent
 #endif
 
         await _client.SetGameAsync(
-            $"Prefix \"/\" {Utilities.SepChar} Guilds: {_client.Guilds.Count}");
+            $"Prefix \"/\" {Utilities.SepChar} Guilds: {_client.Guilds.Count} {Utilities.SepChar} Patrons: {
+            _patreonService.StartingPatronCount}");
         await _client.SetStatusAsync(UserStatus.Online);
 
         if (!jobManagerStarted)
