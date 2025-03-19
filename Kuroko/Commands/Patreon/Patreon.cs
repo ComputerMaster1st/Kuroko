@@ -30,7 +30,7 @@ public class Patreon(PatreonService patreonService) : KurokoCommandBase
             .AppendLine("### Patreon Payments")
             .AppendLine($"* **Next Charge Date:** {membership?.NextChargeDate?.ToString("dddd d, MMMM yy")}")
             .AppendLine($"* **Next Payment Amount:** {(membership is null ? "$0.00" : 
-                $"${membership.WillPayAmountCents / 100.00}")}");
+                $"${membership.WillPayAmountCents / 100.00:0.00}")}");
         
         await RespondAsync(output.ToString(), ephemeral: true);
     }
