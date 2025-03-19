@@ -31,16 +31,28 @@ public class PatreonKeyRefresh(PatreonService patreonService, IServiceProvider s
 
         var keysRefreshed = 0;
         await using var database = services.GetRequiredService<DatabaseContext>();
-        var premiumKeys = database.PremiumKeys
-            .Include(premiumKey => premiumKey.PatreonProperties);
         
-        foreach (var key in premiumKeys)
+        foreach (var properties in database.PatreonProperties
+                     .Include(patreonProperties => patreonProperties.PremiumKeys))
         {
-            if (key.ExpiresAt >= DateTimeOffset.UtcNow || key.PatreonProperties.KeysAllowed == 0)
+            if (properties.PremiumKeys.Count < 1)
+                continue;
+
+            if (properties.KeysAllowed == 0)
                 continue;
             
-            key.ExpiresAt = DateTimeOffset.UtcNow.AddMonths(1);
-            keysRefreshed++;
+            var cycle = 0;
+            foreach (var key in properties.PremiumKeys.TakeWhile(key => 
+                         cycle < properties.KeysAllowed || properties.KeysAllowed == -1))
+            {
+                cycle++;
+
+                if (key.ExpiresAt >= DateTimeOffset.UtcNow)
+                    continue;
+            
+                key.ExpiresAt = DateTimeOffset.UtcNow.AddMonths(1);
+                keysRefreshed++;
+            }
         }
         
         await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.JOBS, 
