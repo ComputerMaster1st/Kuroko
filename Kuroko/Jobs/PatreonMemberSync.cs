@@ -21,7 +21,7 @@ public class PatreonMemberSync(PatreonService patreonService, IServiceProvider s
     public void ScheduleJob(Registry registry)
         => registry.Schedule(this)
             .WithName(NAME)
-            .ToRunEvery(2)
+            .ToRunEvery(15)
             .Minutes();
 
     private async Task ExecuteAsync()
