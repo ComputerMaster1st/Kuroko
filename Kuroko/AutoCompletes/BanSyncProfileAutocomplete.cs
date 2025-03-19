@@ -2,7 +2,7 @@ using Discord;
 using Discord.Interactions;
 using Microsoft.EntityFrameworkCore;
 
-namespace Kuroko.Commands.BanSync;
+namespace Kuroko.AutoCompletes;
 
 public class BanSyncProfileAutocomplete : AutocompleteHandler
 {

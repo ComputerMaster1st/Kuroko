@@ -1,6 +1,7 @@
 using Discord;
 using Discord.Interactions;
 using Kuroko.Attributes;
+using Kuroko.AutoCompletes;
 using Kuroko.Database.GuildEntities.Extras;
 using Kuroko.Shared;
 using Microsoft.EntityFrameworkCore;
