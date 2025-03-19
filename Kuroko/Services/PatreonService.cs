@@ -27,7 +27,7 @@ public class PatreonService(KurokoConfig config) : IKurokoService
         var members = new Dictionary<Member, MemberRelationships>();
         var incomingMembers = 
             await _client.GetCampaignMembersAsync(config.PatreonCampaignId, 
-                Includes.Tiers | Includes.User);
+                Includes.Tiers | Includes.User | Includes.CurrentlyEntitledTiers);
         if (incomingMembers == null) return members;
 
         await foreach (var member in incomingMembers)
@@ -52,19 +52,18 @@ public class PatreonService(KurokoConfig config) : IKurokoService
     {
         _client = new PatreonClient(config.PatreonOAuthToken.AccessToken,
             config.PatreonOAuthToken.RefreshToken,
-            config.PatreonClientId);
+            config.PatreonClientId, config.PatreonOAuthLastUpdated
+                .AddSeconds(config.PatreonOAuthToken.ExpiresIn));
         _client.TokensRefreshedAsync += OnTokensRefreshedAsync;
     }
 
     private async Task OnTokensRefreshedAsync(OAuthToken token)
     {
         config.PatreonOAuthToken = token;
+        config.PatreonOAuthLastUpdated = DateTimeOffset.UtcNow;
         await config.SaveAsync();
         
         await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.PATREON, 
             "OAuth Token Refreshed"));
-        
-        _client.Dispose();
-        RefreshClient();
     }
 }
