@@ -102,14 +102,15 @@ await interactionService.AddModulesAsync(currentAssembly, serviceProvider);
 await Utilities.WriteLogAsync(
     new LogMessage(
         LogSeverity.Info, 
-        LogHeader.SYSTEM,
-        new StringBuilder()
-            .Append($"SLASH COMMANDS     : {interactionService.SlashCommands.Count}/100").AppendLine()
-            .Append($"MODAL COMMANDS     : {interactionService.ModalCommands.Count}").AppendLine()
-            .Append($"COMPONENT COMMANDS : {interactionService.ComponentCommands.Count}").AppendLine()
-            .Append($"TEXT COMMANDS      : {interactionService.ContextCommands.Count}").AppendLine()
-            .AppendLine("Initializing services...").ToString()
+        LogHeader.SLASHCMD,
+        "Loaded following slash commands:"
     ));
+Console.WriteLine(new StringBuilder()
+    .Append($"SLASH COMMANDS     : {interactionService.SlashCommands.Count}/100").AppendLine()
+    .Append($"MODAL COMMANDS     : {interactionService.ModalCommands.Count}").AppendLine()
+    .Append($"COMPONENT COMMANDS : {interactionService.ComponentCommands.Count}").AppendLine()
+    .Append($"TEXT COMMANDS      : {interactionService.ContextCommands.Count}").AppendLine()
+    .AppendLine("Initializing services...").ToString());
 
 foreach (var service in serviceCollection)
 {
@@ -136,9 +137,7 @@ await Utilities.WriteLogAsync(
     new LogMessage(
         LogSeverity.Info, 
         LogHeader.SYSTEM, 
-        new StringBuilder()
-            .AppendLine("Startup completed!")
-            .AppendLine("Beginning connection to Discord...").ToString()
+        "Startup completed! Beginning connection to Discord..."
     ));
 
 await client.LoginAsync(TokenType.Bot, config.Token);
