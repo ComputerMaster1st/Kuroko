@@ -37,6 +37,8 @@ public class KurokoConfig
     public string PatreonClientId { get; private set; } = "PATREON_CLIENT_ID";
     [JsonProperty]
     public string PatreonCampaignId { get; private set; } = "PATREON_CAMPAIGN_ID";
+    [JsonProperty]
+    public Dictionary<string, int> PatreonTiers { get; private set; } = new(); // Key is tier name, Value is keys given
 
     // Connection String
     public string ConnectionString()
