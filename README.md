@@ -23,9 +23,12 @@ Sync Modes are the following:
   * Client can read Host banlist & Client can send ban commands to Host.
   * Under client mode, the Host can run ban commands on Client.
   * This mode should **NEVER** be used unless networked with trusted sources
+### Patreon Integration
+You can now support us via Patreon if you like using our bot. By subscribing, you get access to redeem premium keys which you can use on any server as long as the bot is present ofcourse. 
+You do not need to be an admin or mod for that server either. Our Patreon page: https://www.patreon.com/nekoputer
 
 ## Currently Worked-On
-* Patreon Integration for premium keys to use on servers.
+* Monitoring backend & logs for now while bugfixing
 
 ## Expected Future Re-Works
 * Blackbox Recorder
