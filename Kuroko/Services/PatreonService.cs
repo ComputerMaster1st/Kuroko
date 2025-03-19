@@ -25,7 +25,9 @@ public class PatreonService(KurokoConfig config) : IKurokoService
     public async Task<IDictionary<Member, MemberRelationships>> GetMembershipsAsync()
     {
         var members = new Dictionary<Member, MemberRelationships>();
-        var incomingMembers = await _client.GetCampaignMembersAsync(config.PatreonCampaignId);
+        var incomingMembers = 
+            await _client.GetCampaignMembersAsync(config.PatreonCampaignId, 
+                Includes.Tiers | Includes.User);
         if (incomingMembers == null) return members;
 
         await foreach (var member in incomingMembers)

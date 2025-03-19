@@ -15,12 +15,13 @@ public class PatreonMemberSync(PatreonService patreonService, IServiceProvider s
     private const string NAME = "Patreon: Membership Sync";
     
     public void Execute()
-        => Task.Factory.StartNew(ExecuteAsync).GetAwaiter();
+        //=> Task.Factory.StartNew(ExecuteAsync).GetAwaiter();
+        => ExecuteAsync().GetAwaiter().GetResult();
 
     public void ScheduleJob(Registry registry)
         => registry.Schedule(this)
             .WithName(NAME)
-            .ToRunEvery(15)
+            .ToRunEvery(2)
             .Minutes();
 
     private async Task ExecuteAsync()
@@ -38,18 +39,18 @@ public class PatreonMemberSync(PatreonService patreonService, IServiceProvider s
 
         var memberCount = 0;
         await using var database = services.GetRequiredService<DatabaseContext>();
-        
+
         foreach (var member in members)
         {
             var tiers = member.Value.Tiers;
-            if (tiers.Length < 1)
+            if (tiers is null || tiers.Length < 1)
                 continue;
-            
+
             var memberDiscord = member.Value.User.SocialConnections.Discord;
             if (memberDiscord.UserId == 0)
                 continue;
 
-            if (!config.PatreonTiers.TryGetValue(tiers[0].Title, out var keys)) 
+            if (!config.PatreonTiers.TryGetValue(tiers[0].Title, out var keys))
                 continue;
 
             var user = await database.Users.GetOrCreateDataAsync(memberDiscord.UserId);
@@ -57,7 +58,7 @@ public class PatreonMemberSync(PatreonService patreonService, IServiceProvider s
             memberCount++;
         }
 
-        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.JOBS, 
+        await Utilities.WriteLogAsync(new LogMessage(LogSeverity.Info, LogHeader.JOBS,
             $"{NAME}: Job finished at {DateTimeOffset.UtcNow}. Synced {memberCount} patrons."));
     }
 }
