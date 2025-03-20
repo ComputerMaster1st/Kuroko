@@ -24,8 +24,8 @@ public partial class BanSync : KurokoCommandBase
             .AppendLine($"* **Servers Hosting For/As Client:** {
                 properties.HostForProfiles.Count}/{properties.ClientOfProfiles.Count}")
             .AppendLine($"* **Default Host Sync Mode:** {properties.HostMode}")
-            .AppendLine($"* **Default Client Sync Mode: {properties.ClientMode}")
-            .AppendLine($"* **Premium Key Expires: {premKeyExpireAt}");
+            .AppendLine($"* **Default Client Sync Mode:** {properties.ClientMode}")
+            .AppendLine($"* **Premium Key Expires:** {premKeyExpireAt}");
         
         await RespondAsync(output.ToString(), ephemeral: true);
     }
