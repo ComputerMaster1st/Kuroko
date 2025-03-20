@@ -44,9 +44,6 @@ public class PatreonMemberSync(PatreonService patreonService, IServiceProvider s
             var memberDiscord = member.Value.User.SocialConnections.Discord;
             if (memberDiscord is null || memberDiscord.UserId == 0)
                 continue;
-
-            var isAdmin = config.OwnerId != memberDiscord.UserId || 
-                          !config.AdminUserIds.Contains(memberDiscord.UserId);
             
             var tiers = member.Value.Tiers;
             if (tiers is null || tiers.Length < 1)
@@ -57,7 +54,7 @@ public class PatreonMemberSync(PatreonService patreonService, IServiceProvider s
 
             var properties = await database.PatreonProperties.CreateOrGetPropertiesAsync(
                 database.Users, memberDiscord.UserId, (x, y) => { x.Patreon ??= y; });
-            properties.KeysAllowed = !isAdmin ? keys : -1;
+            properties.KeysAllowed = keys;
             memberCount++;
         }
 
