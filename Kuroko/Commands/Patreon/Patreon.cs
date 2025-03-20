@@ -22,9 +22,10 @@ public class Patreon(PatreonService patreonService) : KurokoCommandBase
                         "Discord account is linked to your Patreon account._")
             .AppendLine()
             .AppendLine($"* **Patron Status:** {(membership is null ? "No Membership Found" : 
-                membership.PatronStatus)}")
+                membership.PatronStatus)} {(properties.BotAdminEnabled ? "_(Bot Admin Mode Enabled!)_" : "")}")
             .AppendLine($"* **Premium keys:** {properties.PremiumKeys.Count}/{
-                (properties.KeysAllowed == -1 ? "Unlimited" : properties.KeysAllowed)}")
+                (properties.KeysAllowed == -1 ? "Unlimited" : properties.KeysAllowed)} {
+                    (properties.BotAdminEnabled ? "_(Bot Admin Limit: 10)_" : "")}")
             .AppendLine($"* **Pledged Since:** {membership?.PledgeRelationshipStart?
                 .ToString("dddd d, MMMM yy")}")
             .AppendLine("### Patreon Payments")
