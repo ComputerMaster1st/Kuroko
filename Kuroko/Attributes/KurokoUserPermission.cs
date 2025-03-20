@@ -11,13 +11,13 @@ public class KurokoUserPermission(GuildPermission permission) : PreconditionAttr
     public override Task<PreconditionResult> CheckRequirementsAsync(
         IInteractionContext context, ICommandInfo commandInfo, IServiceProvider services)
     {
-        var config = services.GetRequiredService<KurokoConfig>();
+        var ctx = (KurokoInteractionContext)context;
         var user = context.User as IGuildUser;
 
         if (!(user!.GuildPermissions.Has(permission) ||
               user.GuildPermissions.Administrator ||
-              config.AdminUserIds.Contains(user.Id) ||
-              user.Id == config.OwnerId))
+              ctx.KurokoConfig.AdminUserIds.Contains(user.Id) ||
+              user.Id == ctx.KurokoConfig.OwnerId))
             return Task.FromResult(PreconditionResult.FromError(
                 $"{Format.Bold("ACCESS DENIED:")} Missing {permission} Server Permission!"));
 

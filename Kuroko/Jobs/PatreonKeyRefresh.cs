@@ -34,10 +34,8 @@ public class PatreonKeyRefresh(IServiceProvider services) : IJob, IScheduleJob
         foreach (var properties in database.PatreonProperties
                      .Include(patreonProperties => patreonProperties.PremiumKeys))
         {
-            if (properties.PremiumKeys.Count < 1)
-                continue;
-
-            if (properties.KeysAllowed == 0)
+            if (properties.PremiumKeys.Count < 1 || 
+                properties.KeysAllowed == 0)
                 continue;
             
             var cycle = 0;
