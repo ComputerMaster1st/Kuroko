@@ -26,10 +26,9 @@ public class Patreon(PatreonService patreonService) : KurokoCommandBase
             .AppendLine($"* **Premium keys:** {properties.PremiumKeys.Count}/{
                 (properties.KeysAllowed == -1 ? "Unlimited" : properties.KeysAllowed)} {
                     (properties.BotAdminEnabled ? "_(Bot Admin Limit: 10)_" : "")}")
-            .AppendLine($"* **Pledged Since:** {membership?.PledgeRelationshipStart?
-                .ToString("dddd d, MMMM yy")}")
+            .AppendLine($"* **Pledged Since:** {membership?.PledgeRelationshipStart?.ReadableDateTime()}")
             .AppendLine("### Patreon Payments")
-            .AppendLine($"* **Next Charge Date:** {membership?.NextChargeDate?.ToString("dddd d, MMMM yy")}")
+            .AppendLine($"* **Next Charge Date:** {membership?.NextChargeDate?.ReadableDateTime()}")
             .AppendLine($"* **Next Payment Amount:** {(membership is null ? "$0.00" : 
                 $"${membership.WillPayAmountCents / 100.00:0.00}")}");
         

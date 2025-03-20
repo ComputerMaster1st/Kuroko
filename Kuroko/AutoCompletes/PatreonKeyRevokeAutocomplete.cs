@@ -30,7 +30,7 @@ public class PatreonKeyRevokeAutocomplete : AutocompleteHandler
             }
             
             results.Add(new AutocompleteResult($"KEY: {key.Key} | Redeemed At: {guild.Name} | (Expires: {
-                key.ExpiresAt:dddd d, MMMM yy})", key.Id));
+                key.ExpiresAt.ReadableDateTime()})", key.Id));
         }
         
         return AutocompletionResult.FromSuccess(results.Take(25));

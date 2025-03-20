@@ -22,7 +22,7 @@ public class PatreonKeyRedeemAutocomplete : AutocompleteHandler
         results.AddRange(from key in properties.PremiumKeys
             where key.GuildId == 0
             select new AutocompleteResult($"KEY: {key.Key} | (Expires: {
-                key.ExpiresAt:dddd d, MMMM yy})", key.Id));
+                key.ExpiresAt.ReadableDateTime()})", key.Id));
 
         if ((properties.RootId == ctx.KurokoConfig.OwnerId || 
              ctx.KurokoConfig.AdminUserIds.Contains(properties.RootId)) && !properties.BotAdminEnabled)

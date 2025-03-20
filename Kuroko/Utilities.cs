@@ -21,4 +21,7 @@ internal static class Utilities
 
         Console.WriteLine(message);
     }
+
+    public static string ReadableDateTime(this DateTimeOffset dto)
+        => dto.ToString("dddd d, MMMM yy");
 }

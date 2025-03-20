@@ -16,7 +16,7 @@ public partial class BanSync : KurokoCommandBase
     {
         var properties = await GetPropertiesAsync<BanSyncGuildProperties, GuildEntity>(Context.Guild.Id);
         var premKeyExpireAt = properties.Guild.PremiumKey is null ? "No Premium Key Installed" : 
-            properties.Guild.PremiumKey.ExpiresAt.ToString();
+            properties.Guild.PremiumKey.ExpiresAt.ReadableDateTime();
         var output = new StringBuilder()
             .AppendLine("## BanSync Status")
             .AppendLine($"* **Enabled:** {(properties.IsEnabled ? "True" : "False")}")
