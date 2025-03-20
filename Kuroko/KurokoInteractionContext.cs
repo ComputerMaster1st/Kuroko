@@ -1,6 +1,7 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using Kuroko.Database;
+using Kuroko.Shared;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Kuroko;
@@ -11,16 +12,12 @@ public class KurokoInteractionContext(
     IServiceProvider serviceProvider)
     : ShardedInteractionContext(client, interaction)
 {
-    private DatabaseContext _db = null;
+    private KurokoConfig _config;
+    private DatabaseContext _db;
 
     public IServiceProvider ServiceProvider { get; } = serviceProvider;
 
-    public DatabaseContext Database
-    {
-        get
-        {
-            _db ??= ServiceProvider.GetRequiredService<DatabaseContext>();
-            return _db;
-        }
-    }
+    public KurokoConfig KurokoConfig => _config ??= ServiceProvider.GetRequiredService<KurokoConfig>();
+    
+    public DatabaseContext Database => _db ??= ServiceProvider.GetRequiredService<DatabaseContext>();
 }
