@@ -2,7 +2,6 @@ using Discord;
 using FluentScheduler;
 using Kuroko.Attributes;
 using Kuroko.Database;
-using Kuroko.Database.UserEntities;
 using Kuroko.Services;
 using Kuroko.Shared;
 using Microsoft.Extensions.DependencyInjection;
@@ -42,12 +41,15 @@ public class PatreonMemberSync(PatreonService patreonService, IServiceProvider s
 
         foreach (var member in members)
         {
-            var tiers = member.Value.Tiers;
-            if (tiers is null || tiers.Length < 1)
-                continue;
-
             var memberDiscord = member.Value.User.SocialConnections.Discord;
             if (memberDiscord is null || memberDiscord.UserId == 0)
+                continue;
+
+            var isAdmin = config.OwnerId != memberDiscord.UserId || 
+                          !config.AdminUserIds.Contains(memberDiscord.UserId);
+            
+            var tiers = member.Value.Tiers;
+            if (tiers is null || tiers.Length < 1)
                 continue;
 
             if (!config.PatreonTiers.TryGetValue(tiers[0].Title, out var keys))
@@ -55,7 +57,7 @@ public class PatreonMemberSync(PatreonService patreonService, IServiceProvider s
 
             var properties = await database.PatreonProperties.CreateOrGetPropertiesAsync(
                 database.Users, memberDiscord.UserId, (x, y) => { x.Patreon ??= y; });
-            properties.KeysAllowed = keys;
+            properties.KeysAllowed = !isAdmin ? keys : -1;
             memberCount++;
         }
 
