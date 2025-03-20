@@ -39,6 +39,7 @@ public class Patreon(PatreonService patreonService) : KurokoCommandBase
     public async Task RedeemAsync([Autocomplete(typeof(PatreonKeyRedeemAutocomplete))] int keyId)
     {
         var properties = await GetPropertiesAsync<PatreonProperties, UserEntity>(Context.User.Id);
+        
         PremiumKey key;
         
         switch (keyId)
@@ -65,6 +66,11 @@ public class Patreon(PatreonService patreonService) : KurokoCommandBase
         if (key is null)
         {
             await RespondAsync("**ERROR:** Invalid Premium Key!", ephemeral: true);
+            return;
+        }
+        if (key.GuildId == Context.Guild.Id)
+        {
+            await RespondAsync("**ERROR:** This server already has a premium key redeemed.", ephemeral: true);
             return;
         }
         
