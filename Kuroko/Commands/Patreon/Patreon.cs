@@ -41,14 +41,26 @@ public class Patreon(PatreonService patreonService) : KurokoCommandBase
         var properties = await GetPropertiesAsync<PatreonProperties, UserEntity>(Context.User.Id);
         PremiumKey key;
         
-        if (keyId == -1 && (properties.KeysAllowed == -1 || 
-            (properties.KeysAllowed > 0 && properties.PremiumKeys.Count < properties.KeysAllowed)))
+        switch (keyId)
         {
-            key = new PremiumKey();
-            properties.PremiumKeys.Add(key);
+            case -2:
+                properties.BotAdminEnabled = true;
+                await RespondAsync("**CAUTION:** Bot Admin Bypass is now enabled!", ephemeral: true);
+                return;
+            case -3:
+                properties.BotAdminEnabled = false;
+                await RespondAsync("**CAUTION:** Bot Admin Bypass is now disabled!", ephemeral: true);
+                return;
+            case -1 when (properties.KeysAllowed == -1 || 
+                          (properties.KeysAllowed > 0 && properties.PremiumKeys.Count < properties.KeysAllowed)):
+                key = new PremiumKey();
+                properties.PremiumKeys.Add(key);
+                break;
+            default:
+                key = properties.PremiumKeys.FirstOrDefault(p => p.Id == keyId);
+                break;
         }
-        else
-            key = properties.PremiumKeys.FirstOrDefault(p => p.Id == keyId);
+
         if (key is null)
         {
             await RespondAsync("**ERROR:** Invalid Premium Key!", ephemeral: true);

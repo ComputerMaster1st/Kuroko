@@ -12,6 +12,7 @@ public class PatreonProperties : IPropertyEntity
     public ulong RootId { get; private set; } = 0;
     public virtual UserEntity User { get; private set; } = null;
     
+    public bool BotAdminEnabled { get; set; } = false;
     public int KeysAllowed { get; set; } = 0;
     public virtual List<PremiumKey> PremiumKeys { get; private set; } = [];
 }

@@ -23,9 +23,20 @@ public class PatreonKeyRedeemAutocomplete : AutocompleteHandler
             where key.GuildId == 0
             select new AutocompleteResult($"KEY: {key.Key} | (Expires: {
                 key.ExpiresAt:dddd d, MMMM yy})", key.Id));
+
+        if ((properties.RootId == ctx.KurokoConfig.OwnerId || 
+             ctx.KurokoConfig.AdminUserIds.Contains(properties.RootId)) && !properties.BotAdminEnabled)
+            results.Add(new AutocompleteResult("WARNING: ENABLE BOT ADMIN BYPASS?", -2));
         
-        if (properties.PremiumKeys.Count < properties.KeysAllowed || properties.KeysAllowed == -1)
-            results.Add(new AutocompleteResult("Generate New Key!", -1));
+        if ((properties.RootId == ctx.KurokoConfig.OwnerId || 
+             ctx.KurokoConfig.AdminUserIds.Contains(properties.RootId)) && properties.BotAdminEnabled)
+            results.Add(new AutocompleteResult("WARNING: DISABLE BOT ADMIN BYPASS?", -3));
+
+        var adminMode = properties.BotAdminEnabled && properties.PremiumKeys.Count < 10;
+        if (properties.PremiumKeys.Count < properties.KeysAllowed || properties.KeysAllowed == -1 ||
+            adminMode)
+            results.Add(new AutocompleteResult($"Generate New Key! {
+                (adminMode ? "(BOT ADMIN MODE ENABLED)" : "")}", -1));
         
         return AutocompletionResult.FromSuccess(results.Take(25));
     }
