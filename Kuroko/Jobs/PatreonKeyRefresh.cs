@@ -40,7 +40,7 @@ public class PatreonKeyRefresh(IServiceProvider services) : IJob, IScheduleJob
             
             var cycle = 0;
             foreach (var key in properties.PremiumKeys.TakeWhile(key => 
-                         cycle < properties.KeysAllowed || properties.KeysAllowed == -1))
+                         cycle < properties.KeysAllowed || properties.KeysAllowed == -1 || properties.BotAdminEnabled))
             {
                 cycle++;
 
