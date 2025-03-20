@@ -52,8 +52,9 @@ public class Patreon(PatreonService patreonService) : KurokoCommandBase
                 properties.BotAdminEnabled = false;
                 await RespondAsync("**CAUTION:** Bot Admin Bypass is now disabled!", ephemeral: true);
                 return;
-            case -1 when (properties.KeysAllowed == -1 || 
-                          (properties.KeysAllowed > 0 && properties.PremiumKeys.Count < properties.KeysAllowed)):
+            case -1 when properties.KeysAllowed == -1 || 
+                         (properties.KeysAllowed > 0 && properties.PremiumKeys.Count < properties.KeysAllowed)
+                         || (properties.BotAdminEnabled && properties.PremiumKeys.Count < 10):
                 key = new PremiumKey();
                 properties.PremiumKeys.Add(key);
                 break;
