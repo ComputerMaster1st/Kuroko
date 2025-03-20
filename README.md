@@ -37,7 +37,9 @@ You do not need to be an admin or mod for that server either. Our Patreon page: 
 
 ## Currently Under Consideration
 * Music Playback
-* Websocket-Based API
+* Websocket-Based API / Web-Based API
+* Clam-AV Integration?
+* Android/iOS App?
 
 ## Not Yet Ready
 * Terms of Service
